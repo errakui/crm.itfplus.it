@@ -16,23 +16,16 @@ console.log('Available env variables:', Object.keys(process.env).filter(key => !
 app.use(express.json());
 app.use(cors());
 
-// Gestione sicura della directory uploads
+// Gestione sicura della directory uploads - CORRETTO PER VERCEL
 try {
-  // In Vercel, possiamo usare /tmp che è scrivibile
-  const uploadsDir = process.env.NODE_ENV === 'production' 
-    ? path.join('/tmp', 'uploads') 
-    : path.join(process.cwd(), 'uploads');
+  // Su Vercel, possiamo scrivere SOLO nella directory /tmp
+  const uploadsDir = '/tmp';
   
-  console.log(`Configurazione directory uploads: ${uploadsDir}`);
+  console.log(`Utilizzo directory temporanea: ${uploadsDir}`);
   
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-    console.log(`Directory uploads creata: ${uploadsDir}`);
-  }
-  
-  // Servi i file statici
+  // Non abbiamo bisogno di creare /tmp perché esiste già in Vercel
   app.use('/uploads', express.static(uploadsDir));
-  console.log('Middleware per uploads configurato');
+  console.log('Middleware per uploads configurato con /tmp');
 } catch (error) {
   console.error('Errore nella configurazione uploads:', error);
 }
