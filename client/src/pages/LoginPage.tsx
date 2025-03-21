@@ -214,19 +214,7 @@ const LoginPage: React.FC = () => {
                 {loading ? 'Accesso in corso...' : 'Accedi'}
               </Button>
               
-              <Grid container justifyContent="space-between" sx={{ mt: 2 }}>
-                <Grid item>
-                  <Link
-                    to="/register"
-                    style={{ 
-                      color: '#1B2A4A', 
-                      textDecoration: 'none',
-                      fontSize: '0.875rem'
-                    }}
-                  >
-                    Registra nuovo account
-                  </Link>
-                </Grid>
+              <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
                 <Grid item>
                   <Link
                     to="#"

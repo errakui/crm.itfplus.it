@@ -14,6 +14,8 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.routes';
 import documentRoutes from './routes/document.routes';
 import chatbotRoutes from './routes/chatbot.routes';
+import contactRoutes from './routes/contact.routes';
+import adminRoutes from './routes/admin.routes';
 
 // Caricamento variabili d'ambiente
 dotenv.config();
@@ -54,8 +56,10 @@ console.log(`Middleware per /uploads configurato per servire file da: ${uploadsD
 
 // Configurazione delle route
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api', contactRoutes);
 
 // Endpoint di test
 app.get('/api', (req: Request, res: Response) => {

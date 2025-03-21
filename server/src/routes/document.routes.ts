@@ -1,7 +1,6 @@
 import express, { RequestHandler, Request, Response, NextFunction } from 'express';
 import * as documentController from '../controllers/document.controller';
 import { authenticateToken, isAdmin, isAuthenticated } from '../middleware/auth.middleware';
-import { logMiddleware } from '../middleware/log.middleware';
 
 const router = express.Router();
 
@@ -17,18 +16,12 @@ const logMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 // Rotte pubbliche
 router.get('/', (documentController.getAllDocuments as unknown) as RequestHandler);
-// Commento temporaneamente la route che usa una funzione non definita
-// router.get('/cities', (documentController.getAllCities as unknown) as RequestHandler);
-router.get('/:id', (documentController.getDocumentById as unknown) as RequestHandler);
 
 // Rotte che richiedono autenticazione
 router.use(authenticateToken);
 
-// Gestione documenti
+// Rotta per upload documento
 router.post('/', documentController.upload.single('file'), (documentController.uploadDocument as unknown) as RequestHandler);
-router.put('/:id', (documentController.updateDocument as unknown) as RequestHandler);
-router.delete('/:id', (documentController.deleteDocument as unknown) as RequestHandler);
-router.post('/:id/download', (documentController.incrementDownloadCount as unknown) as RequestHandler);
 
 // Ottieni tutte le città
 router.get('/cities', (documentController.getAllCities as unknown) as RequestHandler);
@@ -41,5 +34,11 @@ router.delete('/favorites/:id', logMiddleware, isAuthenticated, (documentControl
 // Rotte admin
 router.get('/admin/all', logMiddleware, isAdmin, (documentController.getAllDocumentsAdmin as unknown) as RequestHandler);
 router.post('/bulk-upload', logMiddleware, isAdmin, documentController.upload.array('files', 800), (documentController.bulkUploadDocuments as unknown) as RequestHandler);
+
+// Gestione documenti specifici (con parametri)
+router.get('/:id', (documentController.getDocumentById as unknown) as RequestHandler);
+router.put('/:id', (documentController.updateDocument as unknown) as RequestHandler);
+router.delete('/:id', (documentController.deleteDocument as unknown) as RequestHandler);
+router.post('/:id/download', (documentController.incrementDownloadCount as unknown) as RequestHandler);
 
 export default router; 

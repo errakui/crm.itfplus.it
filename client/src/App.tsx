@@ -8,7 +8,6 @@ import AdminRoute from './components/AdminRoute';
 // Pagine
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 import ViewerPage from './pages/ViewerPage';
 import AdminPage from './pages/AdminPage';
 import UserDashboard from './pages/UserDashboard';
@@ -17,8 +16,10 @@ import ProfilePage from './pages/ProfilePage';
 import SupportPage from './pages/SupportPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import Footer from './components/Footer';
 
 // Tema personalizzato
 const theme = createTheme({
@@ -106,104 +107,111 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {globalStyles}
-      <AuthProvider>
-        <Router>
-          <Navbar onMenuClick={toggleSidebar} />
-          <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <Box sx={{ pt: '64px' }}>
-            <Routes>
-              {/* Pagine pubbliche */}
-              <Route path="/public" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              
-              {/* Dashboard utente (solo utenti autenticati) */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <UserDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagina preferiti (solo utenti autenticati) */}
-              <Route
-                path="/favorites"
-                element={
-                  <ProtectedRoute>
-                    <FavoritesPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagina profilo (solo utenti autenticati) */}
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagina supporto (solo utenti autenticati) */}
-              <Route
-                path="/support"
-                element={
-                  <ProtectedRoute>
-                    <SupportPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagina FAQ (solo utenti autenticati) */}
-              <Route
-                path="/faq"
-                element={
-                  <ProtectedRoute>
-                    <FAQPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagina contatti (solo utenti autenticati) */}
-              <Route
-                path="/contact"
-                element={
-                  <ProtectedRoute>
-                    <ContactPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagine protette (solo utenti autenticati) */}
-              <Route
-                path="/viewer/:id"
-                element={
-                  <ProtectedRoute>
-                    <ViewerPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Pagine per amministratori */}
-              <Route
-                path="/admin"
-                element={
-                  <AdminRoute>
-                    <AdminPage />
-                  </AdminRoute>
-                }
-              />
-              
-              {/* Reindirizzamenti */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
+      <Router>
+        <AuthProvider>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            minHeight: '100vh' 
+          }}>
+            <Navbar onMenuClick={toggleSidebar} />
+            <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Box sx={{ pt: '64px', flexGrow: 1 }}>
+              <Routes>
+                {/* Pagine pubbliche */}
+                <Route path="/public" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                
+                {/* Dashboard utente (solo utenti autenticati) */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <UserDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagina preferiti (solo utenti autenticati) */}
+                <Route
+                  path="/favorites"
+                  element={
+                    <ProtectedRoute>
+                      <FavoritesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagina profilo (solo utenti autenticati) */}
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagina supporto (solo utenti autenticati) */}
+                <Route
+                  path="/support"
+                  element={
+                    <ProtectedRoute>
+                      <SupportPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagina FAQ (solo utenti autenticati) */}
+                <Route
+                  path="/faq"
+                  element={
+                    <ProtectedRoute>
+                      <FAQPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagina contatti (solo utenti autenticati) */}
+                <Route
+                  path="/contact"
+                  element={
+                    <ProtectedRoute>
+                      <ContactPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagine protette (solo utenti autenticati) */}
+                <Route
+                  path="/viewer/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ViewerPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Pagine per amministratori */}
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminRoute>
+                      <AdminPage />
+                    </AdminRoute>
+                  }
+                />
+                
+                {/* Reindirizzamenti */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </Box>
+            <Footer />
           </Box>
-        </Router>
-      </AuthProvider>
+        </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 };

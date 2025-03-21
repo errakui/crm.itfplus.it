@@ -36,6 +36,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  FormHelperText,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -56,6 +57,8 @@ interface User {
   email: string;
   role: 'USER' | 'ADMIN';
   createdAt: string;
+  expiresAt?: string; // Data di scadenza dell'account
+  expiresInDays?: string; // Giorni di validità per l'account (30 o 360)
 }
 
 interface Document {
@@ -658,6 +661,25 @@ const AdminPage: React.FC = () => {
                   <MenuItem value="USER">Utente</MenuItem>
                   <MenuItem value="ADMIN">Amministratore</MenuItem>
                 </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Durata Account</InputLabel>
+                <Select
+                  name="expiresInDays"
+                  value={editingUser?.expiresInDays || ''}
+                  onChange={handleUserFormChange}
+                  label="Durata Account"
+                >
+                  <MenuItem value="">Nessuna scadenza</MenuItem>
+                  <MenuItem value="30">30 giorni</MenuItem>
+                  <MenuItem value="360">360 giorni</MenuItem>
+                </Select>
+                <FormHelperText>
+                  {editingUser?.id ? 'La modifica aggiornerà la scadenza a partire da oggi' : 
+                  'Seleziona la durata del nuovo account'}
+                </FormHelperText>
               </FormControl>
             </Grid>
           </Grid>

@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -8,26 +9,30 @@ interface User {
   role: 'USER' | 'ADMIN';
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
+  userId: string | null;
+  loading: boolean;
   isAuthenticated: () => boolean;
   isAdmin: () => boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
-  loading: boolean;
+  checkAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
+  userId: null,
+  loading: false,
   isAuthenticated: () => false,
   isAdmin: () => false,
   login: async () => {},
   register: async () => {},
   logout: () => {},
-  loading: false,
+  checkAuth: () => {},
 });
 
 interface AuthProviderProps {
@@ -36,8 +41,10 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   // Verifica il token all'avvio
   useEffect(() => {
@@ -45,19 +52,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         try {
-          const response = await axios.get('http://localhost:8000/api/auth/profile', {
-            headers: {
-              Authorization: `Bearer ${storedToken}`
-            }
-          });
+          // Imposta il token nelle richieste Axios
+          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
           
-          setUser(response.data.user);
-          setToken(storedToken);
+          // Ottieni i dati dell'utente dal localStorage
+          const storedUserData = localStorage.getItem('userData');
+          if (storedUserData) {
+            const userData = JSON.parse(storedUserData);
+            setUser(userData);
+            setToken(storedToken);
+            setUserId(userData.id);
+          }
         } catch (error) {
           console.error('Errore nella verifica del token:', error);
           localStorage.removeItem('token');
+          localStorage.removeItem('userData');
           setUser(null);
           setToken(null);
+          setUserId(null);
+          delete axios.defaults.headers.common['Authorization'];
         }
       }
       setLoading(false);
@@ -66,13 +79,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     verifyToken();
   }, []);
 
-  const isAuthenticated = () => {
+  const isAuthenticated = useCallback(() => {
     return !!token && !!user;
-  };
+  }, [token, user]);
 
-  const isAdmin = () => {
+  const isAdmin = useCallback(() => {
     return isAuthenticated() && user?.role === 'ADMIN';
-  };
+  }, [isAuthenticated, user]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -84,8 +97,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { token: newToken, user: userData } = response.data;
       
       localStorage.setItem('token', newToken);
+      localStorage.setItem('userData', JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
+      setUserId(userData.id);
+      
+      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      
+      navigate('/dashboard');
     } catch (error) {
       console.error('Errore durante il login:', error);
       throw error;
@@ -109,24 +128,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userData');
     setToken(null);
     setUser(null);
+    setUserId(null);
+    delete axios.defaults.headers.common['Authorization'];
+    navigate('/login');
   };
+
+  const checkAuth = useCallback(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUserData = localStorage.getItem('userData');
+    
+    if (storedToken && storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setToken(storedToken);
+      setUser(userData);
+      setUserId(userData.id);
+      
+      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+    } else {
+      setToken(null);
+      setUser(null);
+      setUserId(null);
+    }
+    setLoading(false);
+  }, []);
 
   const value = {
     user,
     token,
+    userId,
+    loading,
     isAuthenticated,
     isAdmin,
     login,
     register,
     logout,
-    loading
+    checkAuth
   };
-
-  if (loading) {
-    return <div>Caricamento...</div>;
-  }
 
   return (
     <AuthContext.Provider value={value}>

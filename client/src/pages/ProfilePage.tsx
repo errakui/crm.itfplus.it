@@ -1,121 +1,114 @@
-import React, { useContext } from 'react';
-import { Container, Typography, Paper, Box, Avatar, Grid, TextField, Button, Divider } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
+import { Container, Typography, Box, Grid, Paper, Divider, Chip, Alert } from '@mui/material';
 import AuthContext from '../contexts/AuthContext';
+import ChangePasswordForm from '../components/ChangePasswordForm';
+import { Navigate } from 'react-router-dom';
+import axios from 'axios';
+
+interface UserDetails {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  expiresAt?: string;
+}
 
 const ProfilePage: React.FC = () => {
-  const { user } = useContext(AuthContext);
+  const { isAuthenticated, token, userId } = useContext(AuthContext);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Carica i dettagli dell'utente
+    const fetchUserDetails = async () => {
+      if (!token || !userId) return;
+
+      try {
+        // In una vera applicazione, avresti un endpoint dedicato per ottenere i dettagli dell'utente
+        // Per ora, useremo semplicemente i dati memorizzati nel localStorage
+        const userDataStr = localStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          setUserDetails({
+            id: userData.id,
+            name: userData.name || 'Utente',
+            email: userData.email,
+            role: userData.role,
+            createdAt: new Date(userData.createdAt || Date.now()).toLocaleDateString('it-IT'),
+            expiresAt: userData.expiresAt ? new Date(userData.expiresAt).toLocaleDateString('it-IT') : undefined
+          });
+        }
+      } catch (err) {
+        console.error('Errore nel caricamento dei dettagli utente:', err);
+        setError('Impossibile caricare i dettagli dell\'utente');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, [token, userId]);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Il mio profilo
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
-          Gestisci i tuoi dati personali e le preferenze
-        </Typography>
-      </Paper>
+      <Typography variant="h4" component="h1" gutterBottom 
+        sx={{ fontFamily: 'Cormorant Garamond, serif', color: '#1B2A4A', fontWeight: 600 }}>
+        Il Mio Profilo
+      </Typography>
 
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+      
       <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-              <Avatar
-                sx={{
-                  width: 120,
-                  height: 120,
-                  fontSize: 48,
-                  mb: 2,
-                  backgroundColor: 'primary.main',
-                }}
-              >
-                {user?.name?.[0] || user?.email?.[0] || 'U'}
-              </Avatar>
-              <Typography variant="h6" gutterBottom>
-                {user?.name || 'Utente'}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {user?.email || ''}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  mt: 1,
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: 1,
-                  backgroundColor: user?.role === 'ADMIN' ? 'error.light' : 'primary.light',
-                  color: 'white',
-                }}
-              >
-                {user?.role === 'ADMIN' ? 'Amministratore' : 'Utente standard'}
-              </Typography>
-            </Box>
-            <Button variant="outlined" fullWidth sx={{ mt: 2 }}>
-              Modifica avatar
-            </Button>
+        <Grid item xs={12} md={5}>
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>Informazioni Personali</Typography>
+            <Divider sx={{ mb: 2 }} />
+            
+            {userDetails && (
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Typography variant="body2" color="text.secondary">Nome</Typography>
+                  <Typography variant="body1">{userDetails.name}</Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Typography variant="body2" color="text.secondary">Email</Typography>
+                  <Typography variant="body1">{userDetails.email}</Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Typography variant="body2" color="text.secondary">Ruolo</Typography>
+                  <Chip 
+                    label={userDetails.role === 'ADMIN' ? 'Amministratore' : 'Utente'} 
+                    color={userDetails.role === 'ADMIN' ? 'primary' : 'default'} 
+                    size="small" 
+                  />
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Typography variant="body2" color="text.secondary">Data Registrazione</Typography>
+                  <Typography variant="body1">{userDetails.createdAt}</Typography>
+                </Box>
+                
+                {userDetails.expiresAt && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                    <Typography variant="body2" color="text.secondary">Scadenza Account</Typography>
+                    <Typography variant="body1">{userDetails.expiresAt}</Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
           </Paper>
         </Grid>
-
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Informazioni personali
-            </Typography>
-            <Divider sx={{ mb: 3 }} />
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Nome completo"
-                  variant="outlined"
-                  defaultValue={user?.name || ''}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  variant="outlined"
-                  defaultValue={user?.email || ''}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button variant="contained" sx={{ mt: 2 }}>
-                  Modifica informazioni
-                </Button>
-              </Grid>
-            </Grid>
-
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" gutterBottom>
-                Sicurezza
-              </Typography>
-              <Divider sx={{ mb: 3 }} />
-              
-              <Button variant="outlined" color="primary">
-                Cambia password
-              </Button>
-            </Box>
-
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" gutterBottom>
-                Preferenze
-              </Typography>
-              <Divider sx={{ mb: 3 }} />
-              
-              <Typography variant="body2" color="text.secondary" paragraph>
-                Impostazioni delle notifiche e altre preferenze personali verranno aggiunte qui.
-              </Typography>
-            </Box>
-          </Paper>
+        
+        <Grid item xs={12} md={7}>
+          <ChangePasswordForm />
         </Grid>
       </Grid>
     </Container>

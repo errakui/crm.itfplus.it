@@ -12,6 +12,7 @@ import {
   Email as EmailIcon,
   Apartment as ApartmentIcon
 } from '@mui/icons-material';
+import axios from 'axios';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,8 @@ const ContactPage: React.FC = () => {
     message: '',
     category: '',
   });
+  
+  const [loading, setLoading] = useState(false);
   
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -37,29 +40,43 @@ const ContactPage: React.FC = () => {
     setFormData(prev => ({ ...prev, category: e.target.value }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // In una situazione reale, qui invieresti i dati del form a un endpoint dell'API
-    // Per questa demo, simuliamo il successo
-    
-    console.log('Form data submitted:', formData);
-    
-    // Mostra un messaggio di successo
-    setSnackbar({
-      open: true,
-      message: 'Il tuo messaggio è stato inviato con successo. Ti risponderemo al più presto.',
-      severity: 'success',
-    });
-    
-    // Resetta il form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-      category: '',
-    });
+    try {
+      // Invio dei dati all'API
+      const response = await axios.post('http://localhost:8000/api/contact', formData);
+      
+      console.log('Risposta API:', response.data);
+      
+      // Mostra un messaggio di successo
+      setSnackbar({
+        open: true,
+        message: response.data.message || 'Il tuo messaggio è stato inviato con successo. Ti risponderemo al più presto.',
+        severity: 'success',
+      });
+      
+      // Resetta il form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+        category: '',
+      });
+    } catch (error: any) {
+      console.error('Errore nell\'invio del form:', error);
+      
+      // Mostra un messaggio di errore
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Si è verificato un errore nell\'invio del messaggio. Riprova più tardi.',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   
   const handleCloseSnackbar = () => {
@@ -154,8 +171,9 @@ const ContactPage: React.FC = () => {
                     size="large"
                     startIcon={<SendIcon />}
                     sx={{ mt: 1, px: 4 }}
+                    disabled={loading}
                   >
-                    Invia messaggio
+                    {loading ? 'Invio in corso...' : 'Invia messaggio'}
                   </Button>
                 </Grid>
               </Grid>
@@ -202,7 +220,8 @@ const ContactPage: React.FC = () => {
                     Sede principale
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Via Roma 123, 20100 Milano
+                  Via Santa Teresa, 53/A 
+                  37135 – Verona
                   </Typography>
                 </Box>
               </Box>

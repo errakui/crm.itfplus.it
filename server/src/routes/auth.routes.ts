@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
-import { register, login, logout } from '../controllers/auth.controller';
+import { register, login, logout, changePassword } from '../controllers/auth.controller';
+import { authenticateToken } from '../middleware/auth.middleware';
 
 const router: Router = express.Router();
 
@@ -12,4 +13,7 @@ router.post('/login', login);
 // Route per il logout
 router.post('/logout', logout);
 
-export default router; 
+// Rotte autenticate
+router.post('/change-password', authenticateToken, changePassword);
+
+export default router;

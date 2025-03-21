@@ -42,7 +42,7 @@ const FavoritesPage: React.FC = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        setFavorites(response.data);
+        setFavorites(response.data.documents);
         setError(null);
       } catch (err) {
         console.error('Errore nel recupero dei preferiti:', err);
@@ -61,7 +61,7 @@ const FavoritesPage: React.FC = () => {
 
   const handleRemoveFavorite = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:8000/api/documents/${id}/favorites`, {
+      await axios.delete(`http://localhost:8000/api/documents/favorites/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
