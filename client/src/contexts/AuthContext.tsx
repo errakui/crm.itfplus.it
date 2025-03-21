@@ -2,6 +2,9 @@ import React, { createContext, useState, useEffect, ReactNode, useCallback } fro
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// Aggiungo la configurazione dell'API URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 interface User {
   id: string;
   name: string;
@@ -89,7 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password
       });
@@ -113,10 +116,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register', {
-        name,
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         email,
-        password
+        password,
+        role: 'USER'
       });
       
       return response.data;

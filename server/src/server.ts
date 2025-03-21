@@ -32,7 +32,25 @@ app.use(helmet({
   contentSecurityPolicy: false, // Disabilita CSP per permettere il caricamento di PDF
   crossOriginEmbedderPolicy: false // Permette il caricamento di risorse cross-origin
 }));
-app.use(cors());
+
+// Configurazione CORS per produzione
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:3000'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Consenti richieste senza origin (come app mobile o Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS non consentito'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -53,6 +71,24 @@ app.use(express.static(path.join(__dirname, '../../public')));
 // Configura il middleware express.static per servire i file direttamente dalla directory uploads
 app.use('/uploads', express.static(uploadsDir));
 console.log(`Middleware per /uploads configurato per servire file da: ${uploadsDir}`);
+
+// Se in produzione, servi i file statici del frontend
+if (process.env.NODE_ENV === 'production') {
+  // Percorso alla cartella build del frontend
+  const clientBuildPath = path.join(__dirname, '../../client/build');
+  console.log(`Servendo file statici da: ${clientBuildPath}`);
+  
+  // Servi i file statici
+  app.use(express.static(clientBuildPath));
+  
+  // Per tutte le altre richieste, servi l'app React
+  app.get('*', (req, res) => {
+    // Escludi le richieste API
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    }
+  });
+}
 
 // Configurazione delle route
 app.use('/api/auth', authRoutes);

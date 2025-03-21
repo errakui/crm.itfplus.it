@@ -21,11 +21,14 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const client_1 = require("@prisma/client");
 // Importazione delle route
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const document_routes_1 = __importDefault(require("./routes/document.routes"));
 const chatbot_routes_1 = __importDefault(require("./routes/chatbot.routes"));
+const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
+const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 // Caricamento variabili d'ambiente
 dotenv_1.default.config();
 // Inizializzazione app Express
@@ -34,24 +37,35 @@ const port = process.env.PORT || 8000;
 // Inizializzazione Prisma
 exports.prisma = new client_1.PrismaClient();
 // Middleware
-app.use((0, helmet_1.default)());
+app.use((0, helmet_1.default)({
+    contentSecurityPolicy: false, // Disabilita CSP per permettere il caricamento di PDF
+    crossOriginEmbedderPolicy: false // Permette il caricamento di risorse cross-origin
+}));
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, morgan_1.default)('dev'));
-// Cartella per i file statici
-app.use(express_1.default.static(path_1.default.join(__dirname, '../../public')));
-app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../../uploads')));
-// Assicurati che la directory uploads esista
-const fs_1 = __importDefault(require("fs"));
-const uploadsDir = path_1.default.join(__dirname, '../../uploads');
+// Configura la directory uploads
+const uploadsDir = path_1.default.resolve(process.cwd(), 'uploads');
+console.log(`Controllando directory uploads: ${uploadsDir}`);
 if (!fs_1.default.existsSync(uploadsDir)) {
     fs_1.default.mkdirSync(uploadsDir, { recursive: true });
+    console.log(`Directory uploads creata: ${uploadsDir}`);
 }
+else {
+    console.log(`Directory uploads esistente: ${uploadsDir}`);
+}
+// Middleware per servire file statici
+app.use(express_1.default.static(path_1.default.join(__dirname, '../../public')));
+// Configura il middleware express.static per servire i file direttamente dalla directory uploads
+app.use('/uploads', express_1.default.static(uploadsDir));
+console.log(`Middleware per /uploads configurato per servire file da: ${uploadsDir}`);
 // Configurazione delle route
 app.use('/api/auth', auth_routes_1.default);
+app.use('/api/admin', admin_routes_1.default);
 app.use('/api/documents', document_routes_1.default);
 app.use('/api/chatbot', chatbot_routes_1.default);
+app.use('/api', contact_routes_1.default);
 // Endpoint di test
 app.get('/api', (req, res) => {
     res.json({ message: 'ITFPLUS API funzionante!' });

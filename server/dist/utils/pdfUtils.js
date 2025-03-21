@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.textContainsSearchTerm = exports.normalizeForSearch = exports.identifyCities = exports.extractTextFromPDF = exports.ITALIAN_CITIES = void 0;
+exports.getTextSnippet = exports.textContainsSearchTerm = exports.normalizeForSearch = exports.identifyCities = exports.extractTextFromPDF = exports.ITALIAN_CITIES = void 0;
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const pdf_parse_1 = __importDefault(require("pdf-parse"));
 // Lista di città italiane (aggiunte le città più grandi, puoi espandere questa lista)
@@ -78,4 +78,33 @@ const textContainsSearchTerm = (text, searchTerm) => {
     return normalizedText.includes(normalizedSearchTerm);
 };
 exports.textContainsSearchTerm = textContainsSearchTerm;
+/**
+ * Estrae un frammento di testo (snippet) contenente la parola chiave cercata
+ * @param text - Il testo completo del documento
+ * @param searchTerm - Il termine di ricerca
+ * @param snippetLength - Lunghezza massima dello snippet (caratteri prima e dopo il termine)
+ * @returns Frammento di testo con il termine di ricerca evidenziato
+ */
+const getTextSnippet = (text, searchTerm, snippetLength = 100) => {
+    if (!text || !searchTerm)
+        return null;
+    const normalizedText = (0, exports.normalizeForSearch)(text);
+    const normalizedSearchTerm = (0, exports.normalizeForSearch)(searchTerm);
+    // Trova la posizione del termine di ricerca nel testo normalizzato
+    const termPosition = normalizedText.indexOf(normalizedSearchTerm);
+    if (termPosition === -1)
+        return null;
+    // Calcola l'inizio e la fine dello snippet
+    const snippetStart = Math.max(0, termPosition - snippetLength);
+    const snippetEnd = Math.min(normalizedText.length, termPosition + normalizedSearchTerm.length + snippetLength);
+    // Estrai lo snippet dal testo originale
+    // Nota: usiamo il testo originale per lo snippet, non quello normalizzato
+    // ma usiamo le posizioni trovate nel testo normalizzato
+    const textSnippet = text.substring(snippetStart, snippetEnd);
+    // Aggiungi ellissi se necessario
+    const prefix = snippetStart > 0 ? '...' : '';
+    const suffix = snippetEnd < text.length ? '...' : '';
+    return `${prefix}${textSnippet}${suffix}`;
+};
+exports.getTextSnippet = getTextSnippet;
 //# sourceMappingURL=pdfUtils.js.map

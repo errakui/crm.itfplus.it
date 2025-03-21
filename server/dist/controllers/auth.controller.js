@@ -23,10 +23,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.login = exports.register = void 0;
+exports.changePassword = exports.deleteUser = exports.updateUser = exports.createUser = exports.getUserById = exports.getAllUsers = exports.logout = exports.login = exports.register = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const server_1 = require("../server");
+const emailService_1 = require("../utils/emailService");
 // Enum per i ruoli (corrispondente all'enum nel database)
 var Role;
 (function (Role) {
@@ -84,6 +85,11 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(401).json({ message: 'Credenziali non valide' });
             return;
         }
+        // Verifica se l'account è scaduto
+        if (user.expiresAt && new Date() > user.expiresAt) {
+            res.status(401).json({ message: 'Il tuo account è scaduto. Contatta l\'amministratore.' });
+            return;
+        }
         // Verifica della password
         const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
         if (!isPasswordValid) {
@@ -135,4 +141,245 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.logout = logout;
+// ----- FUNZIONI ADMIN PER GESTIONE UTENTI -----
+// Ottiene tutti gli utenti
+const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield server_1.prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                createdAt: true,
+                expiresAt: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        res.status(200).json({ users });
+    }
+    catch (error) {
+        console.error('Errore nel recupero degli utenti:', error);
+        res.status(500).json({ message: 'Errore nel recupero degli utenti' });
+    }
+});
+exports.getAllUsers = getAllUsers;
+// Ottiene un utente specifico
+const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const user = yield server_1.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                createdAt: true,
+                expiresAt: true,
+            },
+        });
+        if (!user) {
+            res.status(404).json({ message: 'Utente non trovato' });
+            return;
+        }
+        res.status(200).json({ user });
+    }
+    catch (error) {
+        console.error('Errore nel recupero dell\'utente:', error);
+        res.status(500).json({ message: 'Errore nel recupero dell\'utente' });
+    }
+});
+exports.getUserById = getUserById;
+// Crea un nuovo utente
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, name, role, expiresInDays } = req.body;
+        // Verifica se l'utente esiste già
+        const existingUser = yield server_1.prisma.user.findUnique({
+            where: { email },
+        });
+        if (existingUser) {
+            res.status(400).json({ message: 'L\'utente con questa email esiste già' });
+            return;
+        }
+        // Genera una password casuale
+        const generatedPassword = Math.random().toString(36).slice(-8);
+        // Hash della password
+        const hashedPassword = yield bcrypt_1.default.hash(generatedPassword, 10);
+        // Calcola la data di scadenza dell'account
+        let expiresAt = null;
+        if (expiresInDays) {
+            expiresAt = new Date();
+            // Impostiamo la data di scadenza esattamente a expiresInDays giorni dalla creazione
+            // Usiamo setUTCHours(0,0,0,0) per impostare l'ora a mezzanotte
+            expiresAt.setUTCHours(0, 0, 0, 0);
+            expiresAt.setDate(expiresAt.getDate() + parseInt(expiresInDays.toString()));
+        }
+        // Crea l'utente nel database
+        const newUser = yield server_1.prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                name,
+                role,
+                expiresAt,
+            },
+        });
+        // Invia email con le credenziali
+        try {
+            yield (0, emailService_1.sendAccountEmail)(email, name, generatedPassword, expiresInDays);
+            console.log(`Email di credenziali inviata a ${email}`);
+        }
+        catch (emailError) {
+            console.error('Errore nell\'invio dell\'email con le credenziali:', emailError);
+            // Non interrompiamo la creazione dell'utente se l'email fallisce
+        }
+        // Ometti la password nel risultato
+        const { password } = newUser, userWithoutPassword = __rest(newUser, ["password"]);
+        res.status(201).json({
+            message: 'Utente creato con successo',
+            user: userWithoutPassword,
+        });
+    }
+    catch (error) {
+        console.error('Errore nella creazione dell\'utente:', error);
+        res.status(500).json({ message: 'Errore nella creazione dell\'utente' });
+    }
+});
+exports.createUser = createUser;
+// Aggiorna un utente esistente
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { email, name, role, expiresInDays } = req.body;
+        // Verifica se l'utente esiste
+        const existingUser = yield server_1.prisma.user.findUnique({
+            where: { id },
+        });
+        if (!existingUser) {
+            res.status(404).json({ message: 'Utente non trovato' });
+            return;
+        }
+        // Verifica che l'email non sia già in uso da un altro utente
+        if (email !== existingUser.email) {
+            const emailExists = yield server_1.prisma.user.findUnique({
+                where: { email },
+            });
+            if (emailExists) {
+                res.status(400).json({ message: 'L\'email è già in uso da un altro utente' });
+                return;
+            }
+        }
+        // Calcola la nuova data di scadenza dell'account
+        let expiresAt = existingUser.expiresAt;
+        if (expiresInDays) {
+            expiresAt = new Date();
+            // Impostiamo la data di scadenza esattamente a expiresInDays giorni
+            // Usiamo setUTCHours(0,0,0,0) per impostare l'ora a mezzanotte
+            expiresAt.setUTCHours(0, 0, 0, 0);
+            expiresAt.setDate(expiresAt.getDate() + parseInt(expiresInDays.toString()));
+        }
+        // Aggiorna l'utente
+        const updatedUser = yield server_1.prisma.user.update({
+            where: { id },
+            data: {
+                email,
+                name,
+                role,
+                expiresAt,
+            },
+        });
+        // Ometti la password nel risultato
+        const { password } = updatedUser, userWithoutPassword = __rest(updatedUser, ["password"]);
+        res.status(200).json({
+            message: 'Utente aggiornato con successo',
+            user: userWithoutPassword,
+        });
+    }
+    catch (error) {
+        console.error('Errore nell\'aggiornamento dell\'utente:', error);
+        res.status(500).json({ message: 'Errore nell\'aggiornamento dell\'utente' });
+    }
+});
+exports.updateUser = updateUser;
+// Elimina un utente
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        // Verifica se l'utente esiste
+        const existingUser = yield server_1.prisma.user.findUnique({
+            where: { id },
+        });
+        if (!existingUser) {
+            res.status(404).json({ message: 'Utente non trovato' });
+            return;
+        }
+        // Elimina prima tutte le sessioni dell'utente
+        yield server_1.prisma.session.deleteMany({
+            where: { userId: id },
+        });
+        // Elimina l'utente
+        yield server_1.prisma.user.delete({
+            where: { id },
+        });
+        res.status(200).json({ message: 'Utente eliminato con successo' });
+    }
+    catch (error) {
+        console.error('Errore nell\'eliminazione dell\'utente:', error);
+        res.status(500).json({ message: 'Errore nell\'eliminazione dell\'utente' });
+    }
+});
+exports.deleteUser = deleteUser;
+// Cambio password utente
+const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            res.status(401).json({ message: 'Utente non autenticato' });
+            return;
+        }
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) {
+            res.status(400).json({ message: 'Password attuale e nuova password sono richieste' });
+            return;
+        }
+        if (newPassword.length < 6) {
+            res.status(400).json({ message: 'La nuova password deve essere di almeno 6 caratteri' });
+            return;
+        }
+        // Trova l'utente
+        const user = yield server_1.prisma.user.findUnique({
+            where: { id: userId }
+        });
+        if (!user) {
+            res.status(404).json({ message: 'Utente non trovato' });
+            return;
+        }
+        // Verifica la password attuale
+        const isCurrentPasswordValid = yield bcrypt_1.default.compare(currentPassword, user.password);
+        if (!isCurrentPasswordValid) {
+            res.status(401).json({ message: 'Password attuale non valida' });
+            return;
+        }
+        // Hash della nuova password
+        const hashedNewPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        // Aggiorna la password dell'utente
+        yield server_1.prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedNewPassword }
+        });
+        // Invia email di notifica
+        yield (0, emailService_1.sendPasswordChangedEmail)(user.email, user.name || 'Utente');
+        res.status(200).json({ message: 'Password aggiornata con successo' });
+    }
+    catch (error) {
+        console.error('Errore nel cambio password:', error);
+        res.status(500).json({ message: 'Errore interno durante il cambio password' });
+    }
+});
+exports.changePassword = changePassword;
 //# sourceMappingURL=auth.controller.js.map

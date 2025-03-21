@@ -1,0 +1,11 @@
+{
+  "name": "ITFPLUS",
+  "description": "ITFPLUS - Applicazione di gestione documenti legali",
+  "repository": "https://github.com/TUOUSERNAME/itfplus",
+  "keywords": ["node", "express", "react", "typescript"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+} 

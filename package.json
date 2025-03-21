@@ -1,0 +1,17 @@
+{
+  "name": "itfplus",
+  "version": "1.0.0",
+  "description": "ITFPLUS - Applicazione full-stack",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "cd server && npm start",
+    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run build",
+    "heroku-postbuild": "cd client && npm install && npm run build && cd ../server && npm install && npm run build"
+  },
+  "cacheDirectories": [
+    "client/node_modules",
+    "server/node_modules"
+  ]
+} 

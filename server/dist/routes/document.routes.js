@@ -40,24 +40,34 @@ const express_1 = __importDefault(require("express"));
 const documentController = __importStar(require("../controllers/document.controller"));
 const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = express_1.default.Router();
+// Log middleware per debugging
+const logMiddleware = (req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log("Headers:", JSON.stringify(req.headers));
+    console.log("Body:", req.body);
+    console.log("Files:", req.files ? (Array.isArray(req.files) ? req.files.length : 'non è un array') : 'nessun file');
+    console.log("User:", req.user);
+    next();
+};
 // Rotte pubbliche
 router.get('/', documentController.getAllDocuments);
-router.get('/cities', documentController.getAllCities);
-router.get('/:id', documentController.getDocumentById);
 // Rotte che richiedono autenticazione
 router.use(auth_middleware_1.authenticateToken);
-// Gestione documenti
+// Rotta per upload documento
 router.post('/', documentController.upload.single('file'), documentController.uploadDocument);
+// Ottieni tutte le città
+router.get('/cities', documentController.getAllCities);
+// Rotte per i preferiti
+router.get('/favorites', logMiddleware, auth_middleware_1.isAuthenticated, documentController.getFavorites);
+router.post('/favorites', logMiddleware, auth_middleware_1.isAuthenticated, documentController.addToFavorites);
+router.delete('/favorites/:id', logMiddleware, auth_middleware_1.isAuthenticated, documentController.removeFromFavorites);
+// Rotte admin
+router.get('/admin/all', logMiddleware, auth_middleware_1.isAdmin, documentController.getAllDocumentsAdmin);
+router.post('/bulk-upload', logMiddleware, auth_middleware_1.isAdmin, documentController.upload.array('files', 800), documentController.bulkUploadDocuments);
+// Gestione documenti specifici (con parametri)
+router.get('/:id', documentController.getDocumentById);
 router.put('/:id', documentController.updateDocument);
 router.delete('/:id', documentController.deleteDocument);
 router.post('/:id/download', documentController.incrementDownloadCount);
-// Caricamento multiplo (solo admin)
-router.post('/bulk-upload', auth_middleware_1.isAdmin, documentController.upload.array('files', 800), documentController.bulkUploadDocuments);
-// Gestione preferiti
-router.get('/favorites', documentController.getFavorites);
-router.post('/favorites', documentController.addToFavorites);
-router.delete('/favorites/:id', documentController.removeFromFavorites);
-// Rotte per admin
-router.get('/admin/all', auth_middleware_1.isAdmin, documentController.getAllDocumentsAdmin);
 exports.default = router;
 //# sourceMappingURL=document.routes.js.map

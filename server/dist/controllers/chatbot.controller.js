@@ -76,7 +76,7 @@ const getChatResponse = (req, res) => __awaiter(void 0, void 0, void 0, function
             }
             // Costruisci un prompt arricchito con il contesto del documento
             prompt = `
-Ecco il testo di una sentenza legale. Per favore, rispondi alla seguente domanda basandoti sul contenuto della sentenza.
+Ecco il testo di una sentenza legale. Per favore, rispondi alla seguente domanda basandoti ESCLUSIVAMENTE sul contenuto della sentenza.
 
 CONTENUTO SENTENZA:
 ${documentText.substring(0, 15000)} 
@@ -84,7 +84,7 @@ ${documentText.length > 15000 ? '... (testo troncato per limiti di dimensione)' 
 
 DOMANDA: ${message}
 
-Rispondi in modo chiaro, preciso e diretto, facendo riferimento alle parti rilevanti della sentenza quando necessario.
+Rispondi in modo chiaro, preciso e diretto, facendo riferimento alle parti rilevanti della sentenza quando necessario. Se la domanda non è pertinente al contenuto della sentenza, spiega cortesemente che puoi rispondere solo a domande relative al documento visualizzato.
 `;
         }
         else if (context) {
@@ -97,41 +97,100 @@ DOMANDA: ${message}
 Rispondi in modo chiaro, preciso e diretto, facendo riferimento alle informazioni pertinenti quando necessario.
 `;
         }
-        // Chiamata all'API di Perplexity
+        // Chiave API
         const apiKey = process.env.PERPLEXITY_API_KEY;
         if (!apiKey) {
             return res.status(500).json({ message: 'Chiave API non configurata' });
         }
-        const response = yield axios_1.default.post('https://api.perplexity.ai/chat/completions', {
-            model: 'llama-3-sonar-small-32k-chat',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'Sei un assistente legale esperto che aiuta a comprendere le sentenze legali italiane. Fornisci risposte precise, accurate e utili, citando le parti rilevanti del documento quando necessario. Spiega i termini legali in modo comprensibile e fornisci analisi contestualizzate.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
+        // Log per debug
+        console.log('Tentativo di chiamata a Perplexity API con modello sonar-pro');
+        try {
+            // Chiamata all'API di Perplexity
+            const response = yield axios_1.default.post('https://api.perplexity.ai/chat/completions', {
+                model: 'sonar-pro',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Sei un assistente legale esperto che aiuta a comprendere le sentenze legali italiane. Fornisci risposte precise, accurate e utili, citando le parti rilevanti del documento quando necessario. Spiega i termini legali in modo comprensibile e fornisci analisi contestualizzate. Rispondi SOLO in base al contenuto del documento.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 1000
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
                 }
-            ],
-            max_tokens: 1000
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+            });
+            console.log('Risposta ricevuta da Perplexity API');
+            // Estrai e restituisci la risposta
+            const botResponse = response.data.choices[0].message.content;
+            return res.status(200).json({
+                response: botResponse,
+                documentContext: documentId ? true : false
+            });
+        }
+        catch (apiError) {
+            console.error('Errore nella chiamata a Perplexity API:', apiError);
+            // Fallback a un altro modello se il primo fallisce
+            console.log('Tentativo fallback con modello sonar-medium-chat');
+            try {
+                const fallbackResponse = yield axios_1.default.post('https://api.perplexity.ai/chat/completions', {
+                    model: 'sonar-medium-chat',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Sei un assistente legale esperto che aiuta a comprendere le sentenze legali italiane. Fornisci risposte precise, accurate e utili, citando le parti rilevanti del documento quando necessario. Spiega i termini legali in modo comprensibile e fornisci analisi contestualizzate.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    max_tokens: 1000
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+                console.log('Risposta ricevuta da modello fallback');
+                const fallbackBotResponse = fallbackResponse.data.choices[0].message.content;
+                return res.status(200).json({
+                    response: fallbackBotResponse,
+                    documentContext: documentId ? true : false,
+                    fallback: true
+                });
             }
-        });
-        // Estrai e restituisci la risposta
-        const botResponse = response.data.choices[0].message.content;
-        return res.status(200).json({
-            response: botResponse,
-            documentContext: documentId ? true : false
-        });
+            catch (fallbackError) {
+                console.error('Errore anche nel fallback:', fallbackError);
+                // Log dettagliato dell'errore
+                if (fallbackError.response) {
+                    console.error('Dettagli errore API fallback:', {
+                        status: fallbackError.response.status,
+                        data: fallbackError.response.data
+                    });
+                    return res.status(500).json({
+                        message: `Errore dall'API di Perplexity: ${fallbackError.response.status}`,
+                        error: fallbackError.response.data || fallbackError.message
+                    });
+                }
+                else {
+                    return res.status(500).json({
+                        message: 'Errore durante la comunicazione con il servizio chatbot',
+                        error: fallbackError.message || 'Errore sconosciuto'
+                    });
+                }
+            }
+        }
     }
     catch (error) {
-        console.error('Errore nella generazione della risposta del chatbot:', error);
+        console.error('Errore generale nel controller chatbot:', error);
         return res.status(500).json({
-            message: 'Errore durante la comunicazione con il servizio chatbot',
+            message: 'Errore durante elaborazione della richiesta',
             error: error.message
         });
     }
