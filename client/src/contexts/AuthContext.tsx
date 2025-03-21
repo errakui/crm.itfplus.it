@@ -5,6 +5,41 @@ import { useNavigate } from 'react-router-dom';
 // Aggiungo la configurazione dell'API URL
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+// Funzione helper migliorata per costruire correttamente gli URL delle API
+const buildApiUrl = (endpoint: string) => {
+  const apiUrl = API_URL || '';
+  
+  // Rimuovi doppi slash e normalizza endpoint
+  let cleanEndpoint = endpoint;
+  
+  // Rimuovi prefisso 'api/' o '/api/' se presente
+  if (cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.substring(5);
+  } else if (cleanEndpoint.startsWith('api/')) {
+    cleanEndpoint = cleanEndpoint.substring(4);
+  }
+  
+  // Rimuovi slash iniziale se presente
+  if (cleanEndpoint.startsWith('/')) {
+    cleanEndpoint = cleanEndpoint.substring(1);
+  }
+  
+  // Gestisci diversi formati di API_URL
+  if (apiUrl.includes('?path=')) {
+    // Formato /api?path=
+    return `${apiUrl}${cleanEndpoint}`;
+  } else if (apiUrl.endsWith('/api')) {
+    // Formato con /api alla fine
+    return `${apiUrl}/${cleanEndpoint}`;
+  } else if (apiUrl.endsWith('/api/')) {
+    // Formato con /api/ alla fine 
+    return `${apiUrl}${cleanEndpoint}`;
+  } else {
+    // Formato base senza trailing slash
+    return `${apiUrl}/api/${cleanEndpoint}`;
+  }
+};
+
 interface User {
   id: string;
   name: string;
@@ -92,7 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
+      const response = await axios.post(buildApiUrl('auth/login'), {
         email,
         password
       });
@@ -116,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, {
+      const response = await axios.post(buildApiUrl('auth/register'), {
         email,
         password,
         role: 'USER'
