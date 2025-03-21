@@ -14,6 +14,7 @@
     }
   ],
   "routes": [
+    { "src": "/api/api/(.*)", "dest": "/api?path=$1" },
     { "src": "/api/(.*)", "dest": "/api?path=$1" },
     { "src": "/(.*)", "dest": "/client/$1" }
   ],
