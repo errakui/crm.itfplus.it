@@ -43,17 +43,26 @@ app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
     console.log('Tentativo di login ricevuto:', { email });
     
+    // DEBUG: Stampa tutti i dati della richiesta
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    
     if (email && password) {
       console.log('Login valido, generazione risposta');
+      
+      // IMPORTANTE: Esattamente la struttura che il frontend si aspetta
+      const token = 'mock-token-123456';
+      const userData = {
+        id: '1',
+        name: 'Admin ITFPLUS',
+        email: email,
+        role: 'ADMIN'
+      };
+      
+      // Risposta corretta per il frontend
       res.status(200).json({
-        message: 'Login effettuato con successo',
-        user: {
-          id: '1',
-          name: 'Admin ITFPLUS',
-          email: email,
-          role: 'ADMIN'
-        },
-        token: 'mock-token-123456'
+        token: token,
+        user: userData
       });
     } else {
       console.log('Credenziali mancanti');
