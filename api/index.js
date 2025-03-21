@@ -30,15 +30,68 @@ try {
   console.error('Errore nella configurazione uploads:', error);
 }
 
-// Endpoint per il login (mock)
-app.post('/api/auth/login', (req, res) => {
+// NUOVO ROUTER per gestire le richieste in base al parametro path
+const handleRequest = (req, res) => {
+  // Debug info
+  console.log('URL completo:', req.url);
+  console.log('Metodo:', req.method);
+  console.log('Query params:', req.query);
+  console.log('Body:', req.body);
+  
+  const path = req.query.path || '';
+  console.log('Path estratto:', path);
+  
+  // Login endpoint
+  if (req.method === 'POST' && (path === 'auth/login' || path === 'api/auth/login')) {
+    handleLogin(req, res);
+    return;
+  }
+  
+  // User endpoints
+  if (req.method === 'GET' && (path === 'users/me' || path === 'api/users/me')) {
+    handleGetCurrentUser(req, res);
+    return;
+  }
+  
+  if (req.method === 'GET' && (path === 'users' || path === 'api/users')) {
+    handleGetUsers(req, res);
+    return;
+  }
+  
+  // Documents endpoint
+  if (req.method === 'GET' && (path === 'documents' || path === 'api/documents')) {
+    handleGetDocuments(req, res);
+    return;
+  }
+  
+  // Clients endpoint
+  if (req.method === 'GET' && (path === 'clients' || path === 'api/clients')) {
+    handleGetClients(req, res);
+    return;
+  }
+  
+  // Test endpoint
+  if (req.method === 'GET' && (path === 'test' || path === 'api/test')) {
+    handleTest(req, res);
+    return;
+  }
+  
+  // Default api homepage
+  if (!path || path === '' || path === 'api') {
+    handleAPIHome(req, res);
+    return;
+  }
+  
+  // Not found
+  console.log(`Endpoint non trovato: ${req.method} ${path}`);
+  res.status(404).json({ message: 'Endpoint non trovato' });
+};
+
+// Handler per il login
+const handleLogin = (req, res) => {
   try {
     const { email, password } = req.body;
     console.log('Tentativo di login ricevuto:', { email });
-    
-    // DEBUG: Stampa tutti i dati della richiesta
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
     
     if (email && password) {
       console.log('Login valido, generazione risposta');
@@ -65,10 +118,10 @@ app.post('/api/auth/login', (req, res) => {
     console.error('Errore durante il login:', error);
     res.status(500).json({ message: 'Errore durante il login' });
   }
-});
+};
 
-// Endpoint per ottenere l'utente corrente
-app.get('/api/users/me', (req, res) => {
+// Handler per ottenere l'utente corrente
+const handleGetCurrentUser = (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     console.log('Richiesta utente corrente, auth:', authHeader ? 'presente' : 'assente');
@@ -87,10 +140,10 @@ app.get('/api/users/me', (req, res) => {
     console.error('Errore nel recupero utente:', error);
     res.status(500).json({ message: 'Errore nel recupero utente' });
   }
-});
+};
 
-// Endpoint per altri utenti
-app.get('/api/users', (req, res) => {
+// Handler per ottenere tutti gli utenti
+const handleGetUsers = (req, res) => {
   try {
     console.log('Richiesta lista utenti');
     res.json([
@@ -101,10 +154,10 @@ app.get('/api/users', (req, res) => {
     console.error('Errore nel recupero utenti:', error);
     res.status(500).json({ message: 'Errore nel recupero utenti' });
   }
-});
+};
 
-// Endpoint per documenti
-app.get('/api/documents', (req, res) => {
+// Handler per ottenere documenti
+const handleGetDocuments = (req, res) => {
   try {
     console.log('Richiesta lista documenti');
     res.json([
@@ -123,10 +176,10 @@ app.get('/api/documents', (req, res) => {
     console.error('Errore nel recupero documenti:', error);
     res.status(500).json({ message: 'Errore nel recupero documenti' });
   }
-});
+};
 
-// Endpoint per clienti
-app.get('/api/clients', (req, res) => {
+// Handler per ottenere clienti
+const handleGetClients = (req, res) => {
   try {
     console.log('Richiesta lista clienti');
     res.json([
@@ -146,10 +199,10 @@ app.get('/api/clients', (req, res) => {
     console.error('Errore nel recupero clienti:', error);
     res.status(500).json({ message: 'Errore nel recupero clienti' });
   }
-});
+};
 
-// Endpoint di test
-app.get('/api/test', (req, res) => {
+// Handler per il test
+const handleTest = (req, res) => {
   try {
     console.log('Richiesta test API');
     res.json({ 
@@ -161,10 +214,10 @@ app.get('/api/test', (req, res) => {
     console.error('Errore nel test API:', error);
     res.status(500).json({ message: 'Errore nel test API' });
   }
-});
+};
 
-// Home page API
-app.get('/api', (req, res) => {
+// Handler per la home API
+const handleAPIHome = (req, res) => {
   try {
     console.log('Richiesta home page API');
     res.send(`
@@ -183,14 +236,15 @@ app.get('/api', (req, res) => {
             <h2>API funzionante!</h2>
             <p>Il backend è attivo e risponde alle richieste.</p>
             <p>Timestamp: ${new Date().toISOString()}</p>
+            <p>Path: ${req.query.path || 'nessun path'}</p>
           </div>
           <div class="card">
             <h3>Endpoint disponibili:</h3>
             <ul>
-              <li><a href="/api/test">/api/test</a> - Test API</li>
-              <li><a href="/api/users">/api/users</a> - Lista utenti</li>
-              <li><a href="/api/clients">/api/clients</a> - Lista clienti</li>
-              <li><a href="/api/documents">/api/documents</a> - Lista documenti</li>
+              <li><a href="/api?path=test">/api?path=test</a> - Test API</li>
+              <li><a href="/api?path=users">/api?path=users</a> - Lista utenti</li>
+              <li><a href="/api?path=clients">/api?path=clients</a> - Lista clienti</li>
+              <li><a href="/api?path=documents">/api?path=documents</a> - Lista documenti</li>
             </ul>
           </div>
         </body>
@@ -200,25 +254,20 @@ app.get('/api', (req, res) => {
     console.error('Errore nella home page API:', error);
     res.status(500).send('Errore nella generazione della home page API');
   }
-});
-
-// Gestione errori generica
-app.use((err, req, res, next) => {
-  console.error('Errore non gestito:', err);
-  res.status(500).json({ 
-    message: 'Si è verificato un errore sul server',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// Gestione 404 per le routes non trovate
-app.use((req, res) => {
-  console.log(`Richiesta a endpoint non esistente: ${req.method} ${req.url}`);
-  res.status(404).json({ message: 'Endpoint non trovato' });
-});
+};
 
 // Per utilizzo serverless su Vercel
 module.exports = async (req, res) => {
   console.log(`Richiesta serverless: ${req.method} ${req.url}`);
-  return app(req, res);
+  
+  try {
+    // Gestisci tutte le richieste tramite il router centrale
+    handleRequest(req, res);
+  } catch (error) {
+    console.error('Errore non gestito:', error);
+    res.status(500).json({ 
+      message: 'Si è verificato un errore sul server',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 }; 
