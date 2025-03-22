@@ -3,14 +3,25 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { PrismaClient } = require('@prisma/client');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
+
+// Carica variabili d'ambiente
+dotenv.config();
 
 // Crea l'app Express
 const app = express();
+
+// Inizializza Prisma Client
+const prisma = new PrismaClient();
 
 // Configurazione per debug
 console.log('Node environment:', process.env.NODE_ENV);
 console.log('Current working directory:', process.cwd());
 console.log('Available env variables:', Object.keys(process.env).filter(key => !key.includes('SECRET')));
+console.log('DATABASE_URL configurato:', !!process.env.DATABASE_URL);
 
 // Configura middleware essenziali
 app.use(express.json());
@@ -75,76 +86,142 @@ const normalizePathMiddleware = (req, res, next) => {
 // NUOVO ROUTER per gestire le richieste in base al parametro path
 const handleRequest = (req, res) => {
   // Applica il middleware di normalizzazione
-  normalizePathMiddleware(req, res, () => {
-    // Ora usa req.normalizedPath che è già stato normalizzato
-    const path = req.normalizedPath;
-    
-    // Login endpoint - gestione universale
-    if (req.method === 'POST' && path.includes('auth/login')) {
-      handleLogin(req, res);
-      return;
+  normalizePathMiddleware(req, res, async () => {
+    try {
+      // Ora usa req.normalizedPath che è già stato normalizzato
+      const path = req.normalizedPath;
+      
+      // Login endpoint - gestione universale
+      if (req.method === 'POST' && path.includes('auth/login')) {
+        await handleLogin(req, res);
+        return;
+      }
+      
+      // User endpoints
+      if (req.method === 'GET' && path.includes('users/me')) {
+        await handleGetCurrentUser(req, res);
+        return;
+      }
+      
+      if (req.method === 'GET' && (path === 'users' || path.endsWith('/users'))) {
+        await handleGetUsers(req, res);
+        return;
+      }
+      
+      // Documents endpoint
+      if (req.method === 'GET' && (path === 'documents' || path.endsWith('/documents'))) {
+        await handleGetDocuments(req, res);
+        return;
+      }
+      
+      // Clients endpoint
+      if (req.method === 'GET' && (path === 'clients' || path.endsWith('/clients'))) {
+        await handleGetClients(req, res);
+        return;
+      }
+      
+      // Test endpoint
+      if (req.method === 'GET' && (path === 'test' || path.endsWith('/test'))) {
+        await handleTest(req, res);
+        return;
+      }
+      
+      // Default api homepage
+      if (!path || path === '' || path === 'api') {
+        handleAPIHome(req, res);
+        return;
+      }
+      
+      // Not found
+      console.log(`Endpoint non trovato: ${req.method} ${path}`);
+      res.status(404).json({ 
+        message: 'Endpoint non trovato',
+        url: req.url,
+        method: req.method,
+        path: req.path,
+        normalizedPath: path,
+        query: req.query
+      });
+    } catch (error) {
+      console.error('Errore durante la gestione della richiesta:', error);
+      res.status(500).json({ 
+        message: 'Errore interno del server',
+        error: process.env.API_DEBUG_MODE === 'true' ? error.message : undefined
+      });
     }
-    
-    // User endpoints
-    if (req.method === 'GET' && path.includes('users/me')) {
-      handleGetCurrentUser(req, res);
-      return;
-    }
-    
-    if (req.method === 'GET' && (path === 'users' || path.endsWith('/users'))) {
-      handleGetUsers(req, res);
-      return;
-    }
-    
-    // Documents endpoint
-    if (req.method === 'GET' && (path === 'documents' || path.endsWith('/documents'))) {
-      handleGetDocuments(req, res);
-      return;
-    }
-    
-    // Clients endpoint
-    if (req.method === 'GET' && (path === 'clients' || path.endsWith('/clients'))) {
-      handleGetClients(req, res);
-      return;
-    }
-    
-    // Test endpoint
-    if (req.method === 'GET' && (path === 'test' || path.endsWith('/test'))) {
-      handleTest(req, res);
-      return;
-    }
-    
-    // Default api homepage
-    if (!path || path === '' || path === 'api') {
-      handleAPIHome(req, res);
-      return;
-    }
-    
-    // Not found
-    console.log(`Endpoint non trovato: ${req.method} ${path}`);
-    res.status(404).json({ 
-      message: 'Endpoint non trovato',
-      url: req.url,
-      method: req.method,
-      path: req.path,
-      normalizedPath: path,
-      query: req.query
-    });
   });
 };
 
-// Handler per il login
-const handleLogin = (req, res) => {
+// Handler per il login con supporto al database
+const handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log('Tentativo di login ricevuto:', { email });
     
-    // NOTA: In produzione, entrambi i campi dovrebbero essere obbligatori
-    // Ma per facilitare i test, permettiamo qualsiasi credenziale
-    if (email || password) {
-      console.log('Login valido, generazione risposta');
+    if (!email) {
+      console.log('Email mancante');
+      return res.status(401).json({ message: 'Credenziali non valide' });
+    }
+    
+    // Prima prova con il database reale
+    try {
+      // Cerca l'utente nel database
+      const user = await prisma.user.findUnique({
+        where: { email }
+      });
       
-      // IMPORTANTE: Esattamente la struttura che il frontend si aspetta
+      // Se l'utente esiste e la password è corretta
+      if (user) {
+        // In produzione, verifica la password
+        let isPasswordValid = false;
+        
+        if (process.env.NODE_ENV === 'production' && password) {
+          // Confronta la password con hash
+          isPasswordValid = await bcrypt.compare(password, user.password);
+        } else {
+          // In modalità sviluppo o test, accetta qualsiasi password per facilitare i test
+          isPasswordValid = true;
+        }
+        
+        if (isPasswordValid) {
+          console.log('Login valido con database, generazione token');
+          
+          // Genera token JWT
+          const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            process.env.JWT_SECRET || 'itfplus_jwt_secret_key',
+            { expiresIn: '1d' }
+          );
+          
+          // Crea sessione
+          await prisma.session.create({
+            data: {
+              userId: user.id,
+              token,
+              expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 1 giorno
+            }
+          });
+          
+          // Ometti la password dalla risposta
+          const { password: _, ...userWithoutPassword } = user;
+          
+          return res.status(200).json({
+            token,
+            user: userWithoutPassword
+          });
+        }
+      }
+      
+      // Se siamo qui, le credenziali non sono valide o l'utente non esiste
+      console.log('Credenziali non valide nel database reale');
+    } catch (dbError) {
+      console.error('Errore nell\'accesso al database:', dbError);
+      // Continua con il fallback in caso di errore del database
+    }
+    
+    // FALLBACK: Usa credenziali di test se il database non funziona o l'utente non esiste
+    if (process.env.NODE_ENV !== 'production' || process.env.API_DEBUG_MODE === 'true') {
+      console.log('Utilizzando credenziali mock per il login');
       const token = 'mock-token-123456';
       const userData = {
         id: '1',
@@ -153,37 +230,76 @@ const handleLogin = (req, res) => {
         role: 'ADMIN'
       };
       
-      // Risposta corretta per il frontend
-      res.status(200).json({
+      return res.status(200).json({
         token: token,
         user: userData
       });
-    } else {
-      console.log('Credenziali mancanti');
-      res.status(401).json({ message: 'Credenziali non valide' });
     }
+    
+    // Se arriviamo qui, le credenziali non sono valide
+    return res.status(401).json({ message: 'Credenziali non valide' });
   } catch (error) {
     console.error('Errore durante il login:', error);
     res.status(500).json({ message: 'Errore durante il login' });
   }
 };
 
-// Handler per ottenere l'utente corrente
-const handleGetCurrentUser = (req, res) => {
+// Handler per ottenere l'utente corrente dal database
+const handleGetCurrentUser = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     console.log('Richiesta utente corrente, auth:', authHeader ? 'presente' : 'assente');
     
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      res.json({
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Non autorizzato' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    
+    try {
+      // Verifica il token e ottieni l'ID utente
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'itfplus_jwt_secret_key');
+      
+      // Cerca la sessione nel database
+      const session = await prisma.session.findFirst({
+        where: { 
+          token,
+          expiresAt: { gt: new Date() }
+        }
+      });
+      
+      if (!session) {
+        return res.status(401).json({ message: 'Sessione non valida o scaduta' });
+      }
+      
+      // Cerca l'utente nel database
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id }
+      });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'Utente non trovato' });
+      }
+      
+      // Ometti la password dalla risposta
+      const { password, ...userWithoutPassword } = user;
+      
+      return res.status(200).json(userWithoutPassword);
+    } catch (dbError) {
+      console.error('Errore nell\'accesso al database:', dbError);
+    }
+    
+    // FALLBACK: Usa dati di test se il database non funziona
+    if (process.env.NODE_ENV !== 'production' || process.env.API_DEBUG_MODE === 'true') {
+      return res.json({
         id: '1',
         name: 'Admin ITFPLUS',
         email: 'admin@itfplus.it',
         role: 'ADMIN'
       });
-    } else {
-      res.status(401).json({ message: 'Non autorizzato' });
     }
+    
+    return res.status(401).json({ message: 'Non autorizzato' });
   } catch (error) {
     console.error('Errore nel recupero utente:', error);
     res.status(500).json({ message: 'Errore nel recupero utente' });
@@ -191,13 +307,11 @@ const handleGetCurrentUser = (req, res) => {
 };
 
 // Handler per ottenere tutti gli utenti
-const handleGetUsers = (req, res) => {
+const handleGetUsers = async (req, res) => {
   try {
     console.log('Richiesta lista utenti');
-    res.json([
-      { id: '1', name: 'Admin ITFPLUS', email: 'admin@itfplus.it', role: 'ADMIN' },
-      { id: '2', name: 'Utente Cliente', email: 'cliente@example.com', role: 'USER' }
-    ]);
+    const users = await prisma.user.findMany();
+    res.json(users);
   } catch (error) {
     console.error('Errore nel recupero utenti:', error);
     res.status(500).json({ message: 'Errore nel recupero utenti' });
@@ -205,21 +319,11 @@ const handleGetUsers = (req, res) => {
 };
 
 // Handler per ottenere documenti
-const handleGetDocuments = (req, res) => {
+const handleGetDocuments = async (req, res) => {
   try {
     console.log('Richiesta lista documenti');
-    res.json([
-      { 
-        id: '1', 
-        title: 'Manuale ITFPLUS', 
-        description: 'Manuale utente del sistema ITFPLUS', 
-        fileUrl: '/uploads/manual.pdf',
-        fileName: 'manual.pdf',
-        mimetype: 'application/pdf',
-        size: 12345,
-        createdAt: new Date().toISOString()
-      }
-    ]);
+    const documents = await prisma.document.findMany();
+    res.json(documents);
   } catch (error) {
     console.error('Errore nel recupero documenti:', error);
     res.status(500).json({ message: 'Errore nel recupero documenti' });
@@ -227,22 +331,11 @@ const handleGetDocuments = (req, res) => {
 };
 
 // Handler per ottenere clienti
-const handleGetClients = (req, res) => {
+const handleGetClients = async (req, res) => {
   try {
     console.log('Richiesta lista clienti');
-    res.json([
-      { 
-        id: '1', 
-        name: 'Azienda Esempio', 
-        contact: 'Mario Rossi',
-        email: 'info@esempio.it', 
-        phone: '123456789',
-        address: 'Via Esempio 123',
-        city: 'Milano',
-        notes: 'Cliente attivo',
-        createdAt: new Date().toISOString()
-      }
-    ]);
+    const clients = await prisma.client.findMany();
+    res.json(clients);
   } catch (error) {
     console.error('Errore nel recupero clienti:', error);
     res.status(500).json({ message: 'Errore nel recupero clienti' });
@@ -250,14 +343,15 @@ const handleGetClients = (req, res) => {
 };
 
 // Handler per il test
-const handleTest = (req, res) => {
+const handleTest = async (req, res) => {
   try {
     console.log('Richiesta test API');
-    res.json({ 
+    const testData = {
       message: 'API funzionante!',
       timestamp: new Date().toISOString(),
       env: process.env.NODE_ENV || 'development'
-    });
+    };
+    res.json(testData);
   } catch (error) {
     console.error('Errore nel test API:', error);
     res.status(500).json({ message: 'Errore nel test API' });
