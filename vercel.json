@@ -25,7 +25,8 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "DATABASE_URL": "postgresql://ITF_owner:npg_BJrN0halMs9c@ep-weathered-snow-ab09rh0a-pooler.eu-west-2.aws.neon.tech/ITF?sslmode=require",
+    "DATABASE_URL": "postgres://neondb_owner:npg_FRsC1c8YaJdz@ep-aged-art-a2904ttw-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+    "POSTGRES_PRISMA_URL": "postgres://neondb_owner:npg_FRsC1c8YaJdz@ep-aged-art-a2904ttw-pooler.eu-central-1.aws.neon.tech/neondb?pgbouncer=true&connect_timeout=15&sslmode=require",
     "JWT_SECRET": "itfplus_jwt_secret_key",
     "API_DEBUG_MODE": "true"
   }

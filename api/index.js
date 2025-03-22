@@ -14,14 +14,22 @@ dotenv.config();
 // Crea l'app Express
 const app = express();
 
-// Inizializza Prisma Client
-const prisma = new PrismaClient();
+// Inizializza Prisma Client con le opzioni corrette
+console.log('Configurazioni database disponibili:', {
+  DATABASE_URL: !!process.env.DATABASE_URL,
+  POSTGRES_PRISMA_URL: !!process.env.POSTGRES_PRISMA_URL
+});
+
+// Prisma Client con opzioni di logging per debug
+const prisma = new PrismaClient({
+  log: process.env.API_DEBUG_MODE === 'true' ? ['query', 'error', 'warn'] : ['error'],
+  errorFormat: 'pretty'
+});
 
 // Configurazione per debug
 console.log('Node environment:', process.env.NODE_ENV);
 console.log('Current working directory:', process.cwd());
-console.log('Available env variables:', Object.keys(process.env).filter(key => !key.includes('SECRET')));
-console.log('DATABASE_URL configurato:', !!process.env.DATABASE_URL);
+console.log('Available env variables:', Object.keys(process.env).filter(key => !key.includes('SECRET') && !key.includes('PASSWORD')));
 
 // Configura middleware essenziali
 app.use(express.json());
@@ -158,6 +166,25 @@ const handleLogin = async (req, res) => {
     const { email, password } = req.body;
     console.log('Tentativo di login ricevuto:', { email });
     
+    // Se API_DEBUG_MODE è attivo, consentiamo il login con credenziali di test
+    if (process.env.API_DEBUG_MODE === 'true') {
+      console.log('Modalità debug attiva, uso credenziali di test');
+      
+      const token = 'mock-token-123456';
+      const userData = {
+        id: '1',
+        name: 'Admin ITFPLUS',
+        email: email || 'admin@itfplus.it',
+        role: 'ADMIN'
+      };
+      
+      return res.status(200).json({
+        token: token,
+        user: userData
+      });
+    }
+    
+    // Altrimenti procediamo con il flusso normale
     if (!email) {
       console.log('Email mancante');
       return res.status(401).json({ message: 'Credenziali non valide' });
@@ -169,6 +196,8 @@ const handleLogin = async (req, res) => {
       const user = await prisma.user.findUnique({
         where: { email }
       });
+      
+      console.log('Utente trovato nel database:', !!user);
       
       // Se l'utente esiste e la password è corretta
       if (user) {
@@ -219,9 +248,9 @@ const handleLogin = async (req, res) => {
       // Continua con il fallback in caso di errore del database
     }
     
-    // FALLBACK: Usa credenziali di test se il database non funziona o l'utente non esiste
-    if (process.env.NODE_ENV !== 'production' || process.env.API_DEBUG_MODE === 'true') {
-      console.log('Utilizzando credenziali mock per il login');
+    // Fallback per facilitare i test
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Utilizzando credenziali mock per il login (modalità fallback)');
       const token = 'mock-token-123456';
       const userData = {
         id: '1',
@@ -240,7 +269,10 @@ const handleLogin = async (req, res) => {
     return res.status(401).json({ message: 'Credenziali non valide' });
   } catch (error) {
     console.error('Errore durante il login:', error);
-    res.status(500).json({ message: 'Errore durante il login' });
+    res.status(500).json({ 
+      message: 'Errore durante il login',
+      error: process.env.API_DEBUG_MODE === 'true' ? error.message : undefined
+    });
   }
 };
 

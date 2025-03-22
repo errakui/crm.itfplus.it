@@ -23,6 +23,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "seed": "node seed.js"
   }
 } 
