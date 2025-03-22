@@ -209,15 +209,11 @@ export const uploadDocument = async (req: Request, res: Response) => {
     
     // Utilizza il nome file originale sanitizzato anziché generare un UUID
     const sanitizedFileName = sanitizeFileName(req.file.originalname);
-    const uploadsDir = path.resolve(process.env.UPLOADS_DIR || 'uploads');
     
-    // Assicurati che la directory esista
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log(`Directory uploads creata: ${uploadsDir}`);
-    }
+    // Assicuriamoci che la directory esista prima di salvare il file
+    ensureUploadsDir();
     
-    const filePath = path.join(uploadsDir, sanitizedFileName);
+    const filePath = path.join(UPLOADS_DIR, sanitizedFileName);
     const fileUrl = `/uploads/${sanitizedFileName}`;
     
     console.log(`Salvataggio file in: ${filePath}`);
@@ -695,3 +691,10 @@ export const bulkUploadDocuments = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Funzione di utility per assicurarsi che la directory esista
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+}
