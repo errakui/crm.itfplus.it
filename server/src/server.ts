@@ -23,6 +23,16 @@ dotenv.config();
 // Inizializzazione app Express
 const app: Express = express();
 const port = process.env.PORT || 8000;
+const isProduction = process.env.NODE_ENV === 'production';
+const appUrl = process.env.APP_URL || `http://localhost:${port}`;
+
+// CORS configuration
+const corsOptions = {
+  origin: isProduction 
+    ? ['https://itfplus2.vercel.app', /\.vercel\.app$/] 
+    : ['http://localhost:3000', 'http://localhost:8000'],
+  credentials: true
+};
 
 // Inizializzazione Prisma
 export const prisma = new PrismaClient();
@@ -32,10 +42,10 @@ app.use(helmet({
   contentSecurityPolicy: false, // Disabilita CSP per permettere il caricamento di PDF
   crossOriginEmbedderPolicy: false // Permette il caricamento di risorse cross-origin
 }));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(morgan(isProduction ? 'combined' : 'dev'));
 
 // Configura la directory uploads
 const uploadsDir = path.resolve(process.cwd(), 'uploads');
@@ -63,7 +73,11 @@ app.use('/api', contactRoutes);
 
 // Endpoint di test
 app.get('/api', (req: Request, res: Response) => {
-  res.json({ message: 'ITFPLUS API funzionante!' });
+  res.json({ 
+    message: 'ITFPLUS API funzionante!',
+    environment: process.env.NODE_ENV,
+    appUrl: appUrl
+  });
 });
 
 // Rotta principale per reindirizzare alla pagina di login
@@ -81,9 +95,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Avvio del server
-app.listen(port, () => {
-  console.log(`Server in esecuzione su http://localhost:${port}`);
-});
+if (!isProduction || process.env.VERCEL_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server in esecuzione su ${appUrl}`);
+    console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 // Gestione chiusura server
 process.on('SIGINT', async () => {
@@ -91,3 +108,6 @@ process.on('SIGINT', async () => {
   console.log('Connessione al database chiusa');
   process.exit(0);
 });
+
+// Esportazione per Vercel
+export default app;
