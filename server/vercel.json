@@ -17,6 +17,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "framework": "node"
+  }
 } 
