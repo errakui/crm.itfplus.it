@@ -20,5 +20,7 @@
   },
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "framework": "node",
+  "nodeVersion": "18.x"
 } 

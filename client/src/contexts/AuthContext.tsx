@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/api';
 
 interface User {
   id: string;
@@ -89,10 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', {
-        email,
-        password
-      });
+      const response = await apiService.login({ email, password });
       
       const { token: newToken, user: userData } = response.data;
       
@@ -113,11 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register', {
-        name,
-        email,
-        password
-      });
+      const response = await apiService.register({ name, email, password });
       
       return response.data;
     } catch (error) {
