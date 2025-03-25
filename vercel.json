@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "node build.js && cd client && npm install && npm run build",
+  "outputDirectory": "client/build",
+  "installCommand": "npm install && npx prisma generate",
   "builds": [
     {
       "src": "api/**/*.js",
