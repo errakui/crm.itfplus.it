@@ -57,6 +57,7 @@ const ChangePasswordForm: React.FC = () => {
 
     try {
       setLoading(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const response = await axios.post(
         `${apiUrl}/api/auth/change-password`,
         {

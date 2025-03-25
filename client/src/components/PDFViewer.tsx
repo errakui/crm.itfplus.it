@@ -121,7 +121,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         URL.revokeObjectURL(pdfUrl);
       }
     };
-  }, [documentId, token, isAuthenticated, documentUrl]);
+  }, [documentId, token, isAuthenticated, documentUrl, pdfUrl]);
 
   const handleRetry = () => {
     setLoading(true);

@@ -13,7 +13,6 @@ import {
   Paper,
   Chip,
   Autocomplete,
-  Alert,
 } from '@mui/material';
 import { Search as SearchIcon, FilterList as FilterListIcon } from '@mui/icons-material';
 import DocumentCard from '../components/DocumentCard';

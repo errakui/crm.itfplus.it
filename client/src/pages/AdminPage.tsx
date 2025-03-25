@@ -35,7 +35,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider,
   FormHelperText,
 } from '@mui/material';
 import {
@@ -46,7 +45,6 @@ import {
   FileUpload as FileUploadIcon,
   InsertDriveFile as FileIcon,
   CloudUpload as CloudUploadIcon,
-  ErrorOutline as ErrorOutlineIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
@@ -131,6 +129,7 @@ const AdminPage: React.FC = () => {
     
     // Carica i dati per la tab corrente
     loadTabData(tabValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAdmin, tabValue]);
 
   const loadTabData = async (tab: number) => {

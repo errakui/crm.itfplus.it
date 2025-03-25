@@ -13,7 +13,6 @@ import {
   Avatar,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   AccountCircle,
   Menu as MenuIcon,
   Logout as LogoutIcon,
