@@ -1,14 +1,60 @@
 // Questo file è il punto di ingresso per le funzioni serverless di Vercel
-// Importa e utilizza il server Express dal progetto server
+// Importa e utilizza il server Express
 
-// Importa il modulo path per gestire i percorsi dei file
-const path = require('path');
+// Controlla se siamo in produzione o sviluppo
+const isProduction = process.env.NODE_ENV === 'production';
 
-// Determina il percorso alla directory del server
-const serverPath = path.join(process.cwd(), 'server/dist/server.js');
+try {
+  // Importa il modulo path per gestire i percorsi dei file
+  const path = require('path');
 
-// Importa l'app Express dal server
-const app = require(serverPath).default;
+  // Determina il percorso alla directory del server
+  const serverPath = path.join(process.cwd(), 'server/dist/server.js');
+  console.log('Caricamento server da: ' + serverPath);
 
-// Esporta l'app Express per l'utilizzo con Vercel
-module.exports = app; 
+  // Importa l'app Express dal server
+  const appServer = require(serverPath);
+  const app = appServer.default;
+
+  // Esporta l'handler per Vercel
+  module.exports = (req, res) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    
+    // Aggiungi header CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Gestisci le richieste OPTIONS (preflight CORS)
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    // Usa l'app Express per gestire la richiesta
+    return app(req, res);
+  };
+} catch (error) {
+  console.error('Errore nel caricamento del server:', error);
+  
+  // Fallback nel caso in cui il server non possa essere caricato
+  module.exports = (req, res) => {
+    console.error('Utilizzando handler di fallback:', req.method, req.url);
+    
+    // Aggiungi header CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Gestisci le richieste OPTIONS (preflight CORS)
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    // Informa del problema
+    res.status(500).json({
+      error: 'Errore nel caricamento del server',
+      message: isProduction ? 'Servizio temporaneamente non disponibile' : error.message,
+      time: new Date().toISOString()
+    });
+  };
+} 
