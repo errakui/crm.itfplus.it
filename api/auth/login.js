@@ -1,9 +1,16 @@
-// Importiamo i moduli necessari
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
-// Handler per la richiesta di login
+// Endpoint semplificato per il login senza dipendenze esterne
 module.exports = async (req, res) => {
+  // Abilita CORS per tutte le richieste
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+  // Gestisce le richieste OPTIONS per CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Controlla che il metodo sia POST
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Metodo non consentito' });
@@ -12,28 +19,22 @@ module.exports = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Qui dovresti avere la logica per verificare le credenziali
-    // Per ora, per test, accettiamo qualsiasi credenziale
+    // Validazione base
     if (!email || !password) {
       return res.status(400).json({ message: 'Email e password sono richiesti' });
     }
 
-    // In un'applicazione reale, verificheresti con il database
-    // Per ora, per test, creiamo un utente fittizio
+    // Simula l'autenticazione (accetta qualsiasi credenziale)
     const user = {
       id: '1',
       email: email,
       name: 'Utente Test',
-      role: 'USER',
+      role: 'ADMIN', // Per test assegniamo ruolo admin
       createdAt: new Date().toISOString()
     };
 
-    // Genera un token JWT
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'secret-fallback',
-      { expiresIn: '1d' }
-    );
+    // Crea un token semplice (non JWT) per test
+    const token = Buffer.from(`${user.id}:${user.email}:${Date.now()}`).toString('base64');
 
     // Risposta di successo
     return res.status(200).json({

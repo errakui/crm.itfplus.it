@@ -1,9 +1,16 @@
-// Importiamo i moduli necessari
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
-// Handler per la richiesta di registrazione
+// Endpoint semplificato per la registrazione senza dipendenze esterne
 module.exports = async (req, res) => {
+  // Abilita CORS per tutte le richieste
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+  // Gestisce le richieste OPTIONS per CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Controlla che il metodo sia POST
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Metodo non consentito' });
@@ -12,17 +19,12 @@ module.exports = async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
+    // Validazione base
     if (!email || !password) {
       return res.status(400).json({ message: 'Email e password sono richiesti' });
     }
 
-    // In un'applicazione reale, verificheresti se l'utente esiste già e lo salveresti nel database
-    // Per ora, per test, simuliamo solo un successo
-
-    // Hash della password (non usato realmente ma per completezza)
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crea un utente fittizio
+    // Crea un utente fittizio (simuliamo la registrazione)
     const newUser = {
       id: Math.random().toString(36).substring(2, 15),
       email: email,
@@ -31,12 +33,8 @@ module.exports = async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    // Genera un token JWT
-    const token = jwt.sign(
-      { id: newUser.id, email: newUser.email, role: newUser.role },
-      process.env.JWT_SECRET || 'secret-fallback',
-      { expiresIn: '1d' }
-    );
+    // Crea un token semplice (non JWT) per test
+    const token = Buffer.from(`${newUser.id}:${newUser.email}:${Date.now()}`).toString('base64');
 
     // Risposta di successo
     return res.status(201).json({
