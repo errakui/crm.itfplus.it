@@ -24,6 +24,7 @@ interface PDFViewerProps {
   title: string;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  autoDownload?: boolean;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ 
@@ -31,7 +32,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   documentUrl, 
   title,
   isFavorite = false,
-  onToggleFavorite 
+  onToggleFavorite,
+  autoDownload = false
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
