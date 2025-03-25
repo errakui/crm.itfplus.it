@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Container, Typography, Paper, Box, 
-  Grid, Card, CardContent, Button, 
+  Grid, Button, 
   TextField, List, ListItem, ListItemIcon, 
   ListItemText, Divider, Snackbar, Alert
 } from '@mui/material';

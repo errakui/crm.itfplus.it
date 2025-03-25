@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import { 
   Send as SendIcon,
-  LocationOn as LocationOnIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
   Apartment as ApartmentIcon

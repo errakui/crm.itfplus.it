@@ -52,6 +52,7 @@ const UserDashboard: React.FC = () => {
     fetchDocuments();
     fetchFavorites();
     fetchCities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDocuments = async () => {

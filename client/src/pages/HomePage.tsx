@@ -13,10 +13,7 @@ import {
   Paper,
   Chip,
   Autocomplete,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
+  Alert,
 } from '@mui/material';
 import { Search as SearchIcon, FilterList as FilterListIcon } from '@mui/icons-material';
 import DocumentCard from '../components/DocumentCard';
@@ -55,6 +52,7 @@ const HomePage: React.FC = () => {
   // Carica i documenti quando cambia il termine di ricerca o le città selezionate
   useEffect(() => {
     fetchDocuments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAuthenticated, searchTerm, selectedCities]);
 
   // Carica le città disponibili al caricamento del componente

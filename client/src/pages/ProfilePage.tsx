@@ -3,7 +3,6 @@ import { Container, Typography, Box, Grid, Paper, Divider, Chip, Alert } from '@
 import AuthContext from '../contexts/AuthContext';
 import ChangePasswordForm from '../components/ChangePasswordForm';
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
 
 interface UserDetails {
   id: string;
@@ -17,7 +16,6 @@ interface UserDetails {
 const ProfilePage: React.FC = () => {
   const { isAuthenticated, token, userId } = useContext(AuthContext);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,8 +41,6 @@ const ProfilePage: React.FC = () => {
       } catch (err) {
         console.error('Errore nel caricamento dei dettagli utente:', err);
         setError('Impossibile caricare i dettagli dell\'utente');
-      } finally {
-        setLoading(false);
       }
     };
 
