@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
+import api, { apiService } from '../services/api';
 
 interface PDFViewerProps {
   documentId: string;
@@ -130,76 +131,98 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     window.location.reload();
   };
 
-  const handleDownload = async () => {
-    if (documentId && isAuthenticated()) {
-      try {
-        console.log("Avvio download per documento:", documentId);
-        
-        // Usa fetch con responseType blob per scaricare direttamente il file
-        const response = await fetch(
-          `http://localhost:8000/api/documents/${documentId}/download`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Errore durante il download: ${response.status} ${response.statusText}`);
-        }
-        
-        // Verifica se la risposta è JSON o un file binario
-        const contentType = response.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-          // Se è JSON, il server ha restituito un URL invece del file
-          const data = await response.json();
-          console.log("Server ha restituito un URL:", data.fileUrl);
-          
-          if (data.fileUrl) {
-            // Crea un link per il download usando l'URL fornito
-            const fullUrl = `http://localhost:8000${data.fileUrl}`;
-            console.log("URL completo per il download:", fullUrl);
-            
-            const link = document.createElement('a');
-            link.href = fullUrl;
-            link.download = `${title || 'documento'}.pdf`;
-            link.target = "_blank"; // Apre in una nuova finestra/tab
-            console.log("Download link creato:", link.download);
-            
-            // Clicca sul link per avviare il download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            return;
-          }
-        }
-        
-        // Altrimenti procedi con il download del blob
-        const blob = await response.blob();
-        
-        // Crea un URL per il blob
-        const url = window.URL.createObjectURL(blob);
-        
-        // Crea un link per il download
+  const fetchDocumentAndDownload = async () => {
+    if (!documentId) return;
+    setLoading(true);
+    try {
+      // Ottieni i dettagli del documento
+      const response = await apiService.getDocument(documentId);
+      setPdfUrl(response.data.fileUrl);
+      
+      // Scarica il file PDF
+      const downloadResponse = await apiService.downloadDocument(documentId);
+      
+      // Crea un URL per il blob e aprilo in un iframe
+      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(blob);
+      setPdfUrl(fileURL);
+      
+      // Puoi anche salvare il file localmente se necessario
+      if (autoDownload) {
         const link = document.createElement('a');
-        link.href = url;
-        link.download = `${title || 'documento'}.pdf`;
-        console.log("Download link creato:", link.download);
-        
-        // Clicca sul link per avviare il download
+        link.href = fileURL;
+        link.setAttribute('download', `${response.data.title || 'document'}.pdf`);
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        
-        // Libera la memoria
-        window.URL.revokeObjectURL(url);
-      } catch (err) {
-        console.error('Errore durante il download:', err);
       }
+    } catch (error) {
+      console.error('Errore nel caricamento del documento:', error);
+      setError('Impossibile caricare il documento. Verifica che il file esista e che tu abbia i permessi per visualizzarlo.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleDownload = async () => {
+    if (!documentId) return;
+    
+    try {
+      setLoading(true);
+      const response = await apiService.downloadDocument(documentId);
+      
+      // Crea un URL per il blob e usa un link per il download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${title || 'document'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Errore durante il download:', error);
+      setError('Impossibile scaricare il documento');
+    }
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+    
+    if (error) {
+      return (
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Typography color="error">{error}</Typography>
+          <Button variant="outlined" onClick={fetchDocumentAndDownload} sx={{ mt: 2 }}>
+            Riprova
+          </Button>
+        </Box>
+      );
+    }
+    
+    if (pdfUrl) {
+      return (
+        <iframe
+          src={pdfUrl}
+          style={{ width: '100%', height: '100%', border: 'none' }}
+          title="PDF Viewer"
+        />
+      );
+    }
+    
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography>Nessun documento caricato</Typography>
+      </Box>
+    );
   };
 
   return (
@@ -276,58 +299,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           position: 'relative'
         }}
       >
-        {loading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
-            <CircularProgress size={40} sx={{ mb: 2 }} />
-            <Typography variant="body1">Caricamento documento...</Typography>
-          </Box>
-        ) : error ? (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            height: '100%',
-            p: 3,
-            textAlign: 'center'
-          }}>
-            <Typography variant="h6" color="error" sx={{ mb: 2 }}>
-              Errore di caricamento
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 3 }}>
-              {error}
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={handleRetry}
-              sx={{ backgroundColor: '#1B2A4A' }}
-            >
-              Riprova
-            </Button>
-          </Box>
-        ) : pdfUrl ? (
-          <iframe 
-            src={`${pdfUrl}#toolbar=1&navpanes=1&view=FitH`}
-            title={title || "PDF Viewer"}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none'
-            }}
-          />
-        ) : (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            height: '100%',
-            p: 3
-          }}>
-            <Typography variant="body1">Nessun documento disponibile</Typography>
-          </Box>
-        )}
+        {renderContent()}
       </Box>
     </Paper>
   );

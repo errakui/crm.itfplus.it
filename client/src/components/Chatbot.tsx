@@ -10,7 +10,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Send as SendIcon, DeleteOutline as ClearIcon } from '@mui/icons-material';
-import axios from 'axios';
+import { apiService } from '../services/api';
 import AuthContext from '../contexts/AuthContext';
 
 interface Message {
@@ -80,15 +80,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
         ...(documentId && { documentId }),
       };
 
-      const response = await axios.post(
-        'http://localhost:8000/api/chatbot/chat',
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await apiService.sendChatMessage(payload);
 
       // Aggiungi la risposta del bot
       const botMessage: Message = {

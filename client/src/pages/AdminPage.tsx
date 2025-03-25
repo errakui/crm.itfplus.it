@@ -48,6 +48,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
+import { apiService } from '../services/api';
 
 interface User {
   id: string;
@@ -132,23 +133,19 @@ const AdminPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAdmin, tabValue]);
 
-  const loadTabData = async (tab: number) => {
+  const loadTabData = async (tabIndex: number) => {
     setLoading(true);
     setError(null);
     
     try {
-      if (tab === 0) {
+      if (tabIndex === 0) {
         // Carica utenti
-        const response = await axios.get('http://localhost:8000/api/admin/users', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUsers(response.data.users || []);
-      } else if (tab === 1) {
+        const response = await apiService.getUsers();
+        setUsers(response.data);
+      } else {
         // Carica documenti
-        const response = await axios.get('http://localhost:8000/api/documents/admin/all', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setDocuments(response.data.documents || []);
+        const response = await apiService.getAllDocuments();
+        setDocuments(response.data);
       }
     } catch (err: any) {
       console.error('Errore nel caricamento dei dati:', err);
@@ -193,19 +190,11 @@ const AdminPage: React.FC = () => {
     try {
       if (editingUser?.id) {
         // Aggiorna utente
-        await axios.put(
-          `http://localhost:8000/api/admin/users/${editingUser.id}`,
-          editingUser,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await apiService.updateUser(editingUser.id, editingUser);
         setSuccess('Utente aggiornato con successo!');
       } else {
         // Crea utente
-        await axios.post(
-          'http://localhost:8000/api/admin/users',
-          editingUser,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await apiService.createUser(editingUser);
         setSuccess('Utente creato con successo!');
       }
       setOpenUserDialog(false);
@@ -254,42 +243,33 @@ const AdminPage: React.FC = () => {
     setSuccess(null);
     
     try {
-      if (editingDocument?.id) {
-        // Aggiorna documento (solo metadati)
-        await axios.put(
-          `http://localhost:8000/api/documents/${editingDocument.id}`,
-          editingDocument,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      if (!editingDocument) return;
+      
+      if (editingDocument.id) {
+        // Aggiorna documento
+        await apiService.updateDocument(editingDocument.id, editingDocument);
         setSuccess('Documento aggiornato con successo!');
       } else {
-        // Crea documento (richiede file)
+        // Carica nuovo documento
         if (!documentFile) {
-          setError('Devi selezionare un file PDF.');
+          setError('Seleziona un file da caricare');
           setLoading(false);
           return;
         }
         
         const formData = new FormData();
         formData.append('file', documentFile);
-        formData.append('title', editingDocument?.title || '');
-        formData.append('description', editingDocument?.description || '');
-        if (editingDocument?.keywords && editingDocument.keywords.length > 0) {
+        formData.append('title', editingDocument.title || '');
+        formData.append('description', editingDocument.description || '');
+        
+        if (editingDocument.keywords && editingDocument.keywords.length > 0) {
           formData.append('keywords', JSON.stringify(editingDocument.keywords));
         }
         
-        await axios.post(
-          'http://localhost:8000/api/documents',
-          formData,
-          { 
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            } 
-          }
-        );
+        await apiService.createDocument(formData);
         setSuccess('Documento caricato con successo!');
       }
+      
       setOpenDocumentDialog(false);
       loadTabData(1);
     } catch (err: any) {
@@ -316,21 +296,17 @@ const AdminPage: React.FC = () => {
     
     try {
       if (deleteItemType === 'user') {
-        await axios.delete(`http://localhost:8000/api/admin/users/${deleteItemId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiService.deleteUser(deleteItemId);
         setSuccess('Utente eliminato con successo!');
         loadTabData(0);
-      } else if (deleteItemType === 'document') {
-        await axios.delete(`http://localhost:8000/api/documents/${deleteItemId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      } else {
+        await apiService.deleteDocument(deleteItemId);
         setSuccess('Documento eliminato con successo!');
         loadTabData(1);
       }
     } catch (err: any) {
-      console.error('Errore nell\'eliminazione:', err);
-      setError(err.response?.data?.message || 'Errore nell\'eliminazione.');
+      console.error('Errore durante l\'eliminazione:', err);
+      setError(err.response?.data?.message || 'Errore durante l\'eliminazione.');
     } finally {
       setLoading(false);
       setOpenDeleteDialog(false);
@@ -386,23 +362,7 @@ const AdminPage: React.FC = () => {
         formData.append('files', file);
       });
       
-      console.log("Token di autorizzazione:", token ? token.substring(0, 20) + "..." : "Mancante");
-      
-      // Usiamo axios invece di fetch per mantenere consistenza con il resto dell'app
-      const response = await axios.post(
-        'http://localhost:8000/api/documents/bulk-upload',
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
-            setUploadProgress(percentCompleted);
-          }
-        }
-      );
+      const response = await apiService.bulkUploadDocuments(formData);
       
       console.log("Risposta del server:", response.status);
       
@@ -418,13 +378,9 @@ const AdminPage: React.FC = () => {
       
       const message = `Caricamento completato: ${result.results.successful} file caricati con successo, ${result.results.failed} falliti.`;
       setSuccess(message);
-    } catch (error: any) {
-      console.error('Errore durante il caricamento multiplo:', error);
-      if (error.response) {
-        console.error("Dettagli errore:", error.response.status, error.response.data);
-      }
-      setUploadFailed(bulkFiles.map(file => file.name));
-      setError(`Errore durante il caricamento multiplo: ${error.response?.data?.message || error.message}`);
+    } catch (err: any) {
+      console.error('Errore nel caricamento multiplo:', err);
+      setError(err.response?.data?.message || 'Errore nel caricamento dei file.');
     } finally {
       setIsUploading(false);
     }

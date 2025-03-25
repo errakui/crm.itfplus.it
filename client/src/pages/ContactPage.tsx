@@ -11,7 +11,7 @@ import {
   Email as EmailIcon,
   Apartment as ApartmentIcon
 } from '@mui/icons-material';
-import axios from 'axios';
+import { apiService } from '../services/api';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -41,22 +41,28 @@ const ContactPage: React.FC = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setSnackbar({
+        open: true,
+        message: 'Per favore compila tutti i campi richiesti',
+        severity: 'error',
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      // Invio dei dati all'API
-      const response = await axios.post('http://localhost:8000/api/contact', formData);
+      const response = await apiService.sendContactForm(formData);
       
-      console.log('Risposta API:', response.data);
-      
-      // Mostra un messaggio di successo
       setSnackbar({
         open: true,
-        message: response.data.message || 'Il tuo messaggio è stato inviato con successo. Ti risponderemo al più presto.',
+        message: response.data.message || 'Messaggio inviato con successo! Ti risponderemo al più presto.',
         severity: 'success',
       });
       
-      // Resetta il form
+      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -65,9 +71,8 @@ const ContactPage: React.FC = () => {
         category: '',
       });
     } catch (error: any) {
-      console.error('Errore nell\'invio del form:', error);
+      console.error('Errore nell\'invio del messaggio:', error);
       
-      // Mostra un messaggio di errore
       setSnackbar({
         open: true,
         message: error.response?.data?.message || 'Si è verificato un errore nell\'invio del messaggio. Riprova più tardi.',

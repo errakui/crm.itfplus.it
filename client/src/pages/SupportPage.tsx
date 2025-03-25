@@ -13,7 +13,7 @@ import {
   Assignment as AssignmentIcon,
   VideoCall as VideoCallIcon
 } from '@mui/icons-material';
-import axios from 'axios';
+import { apiService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const SupportPage: React.FC = () => {
@@ -54,7 +54,7 @@ const SupportPage: React.FC = () => {
     
     try {
       // Invio dei dati all'API
-      const response = await axios.post('http://localhost:8000/api/support', formData);
+      const response = await apiService.sendSupportRequest(formData);
       
       console.log('Risposta API:', response.data);
       
