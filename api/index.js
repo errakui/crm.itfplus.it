@@ -1,5 +1,10 @@
-// API proxy per reindirizzare le chiamate API al server Express
-module.exports = (req, res) => {
+// API proxy per reindirizzare le chiamate API
+const { PrismaClient } = require('@prisma/client');
+
+// Inizializza Prisma Client
+const prisma = new PrismaClient();
+
+module.exports = async (req, res) => {
   // Aggiungi header CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -10,29 +15,21 @@ module.exports = (req, res) => {
     return res.status(200).end();
   }
   
-  // Gestisci ogni richiesta API
-  if (req.url.startsWith('/api/auth/login') && req.method === 'POST') {
-    // Restituisci una risposta mock di login per testare
+  try {
+    // Log della richiesta ricevuta
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    
+    // Informazioni di stato dell'API
     return res.status(200).json({
-      token: 'mock-token-1234567890',
-      user: {
-        id: '1',
-        email: 'admin@itfplus.it',
-        name: 'Admin',
-        role: 'ADMIN'
-      },
-      message: 'Login effettuato con successo'
+      status: 'online',
+      message: 'API ITF Plus funzionanti',
+      time: new Date().toISOString(),
+      version: '1.0.0'
     });
+  } catch (error) {
+    console.error('Errore nella gestione della richiesta:', error);
+    return res.status(500).json({ error: 'Errore interno del server' });
+  } finally {
+    await prisma.$disconnect();
   }
-  
-  // Log della richiesta ricevuta
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  
-  // Risposta temporanea generica per tutte le altre API
-  return res.status(200).json({
-    message: 'API ITFPLUS in manutenzione - In arrivo',
-    endpoint: req.url,
-    method: req.method,
-    time: new Date().toISOString()
-  });
 };

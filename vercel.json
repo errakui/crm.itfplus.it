@@ -15,8 +15,68 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.js"
+    },
+    {
+      "src": "/api/auth/register",
+      "dest": "/api/auth/register.js"
+    },
+    {
+      "src": "/api/auth/change-password",
+      "dest": "/api/auth/change-password.js"
+    },
+    {
+      "src": "/api/documents/favorites",
+      "dest": "/api/documents/favorites.js"
+    },
+    {
+      "src": "/api/documents/favorites/(.*)",
+      "dest": "/api/documents/favorites/[id].js?id=$1"
+    },
+    {
+      "src": "/api/documents/search",
+      "dest": "/api/documents/search.js"
+    },
+    {
+      "src": "/api/documents/cities",
+      "dest": "/api/documents/cities.js"
+    },
+    {
+      "src": "/api/documents/admin/all",
+      "dest": "/api/documents/admin/all.js"
+    },
+    {
+      "src": "/api/documents/bulk-upload",
+      "dest": "/api/documents/bulk-upload.js"
+    },
+    {
+      "src": "/api/documents/(.*)/download",
+      "dest": "/api/documents/[id]/download.js?id=$1"
+    },
+    {
+      "src": "/api/documents/(.*)",
+      "dest": "/api/documents/[id].js?id=$1"
+    },
+    {
+      "src": "/api/documents",
+      "dest": "/api/documents/index.js"
+    },
+    {
+      "src": "/api/admin/users",
+      "dest": "/api/admin/users.js"
+    },
+    {
+      "src": "/api/chatbot/chat",
+      "dest": "/api/chatbot/chat.js"
+    },
+    {
+      "src": "/api/support",
+      "dest": "/api/support.js"
+    },
+    {
+      "src": "/api/contact",
+      "dest": "/api/contact.js"
     },
     {
       "src": "/(.*)",
