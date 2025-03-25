@@ -29,7 +29,7 @@ const appUrl = process.env.APP_URL || `http://localhost:${port}`;
 // CORS configuration
 const corsOptions = {
   origin: isProduction 
-    ? ['https://itfplus2.vercel.app', /\.vercel\.app$/] 
+    ? ['https://crm-itfplus-it-beryl.vercel.app', /\.vercel\.app$/] 
     : ['http://localhost:3000', 'http://localhost:8000'],
   credentials: true
 };
