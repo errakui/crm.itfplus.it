@@ -11,10 +11,4 @@ const serverPath = path.join(process.cwd(), 'server/dist/server.js');
 const app = require(serverPath).default;
 
 // Esporta l'app Express per l'utilizzo con Vercel
-module.exports = (req, res) => {
-  res.status(200).json({ 
-    message: 'ITFPLUS API funzionante!',
-    environment: process.env.NODE_ENV,
-    time: new Date().toISOString()
-  });
-}; 
+module.exports = app; 

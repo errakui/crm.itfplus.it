@@ -34,6 +34,15 @@ dotenv_1.default.config();
 // Inizializzazione app Express
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8000;
+const isProduction = process.env.NODE_ENV === 'production';
+const appUrl = process.env.APP_URL || `http://localhost:${port}`;
+// CORS configuration
+const corsOptions = {
+    origin: isProduction
+        ? ['https://crm-itfplus-it-beryl.vercel.app', /\.vercel\.app$/]
+        : ['http://localhost:3000', 'http://localhost:8000'],
+    credentials: true
+};
 // Inizializzazione Prisma
 exports.prisma = new client_1.PrismaClient();
 // Middleware
@@ -41,10 +50,10 @@ app.use((0, helmet_1.default)({
     contentSecurityPolicy: false, // Disabilita CSP per permettere il caricamento di PDF
     crossOriginEmbedderPolicy: false // Permette il caricamento di risorse cross-origin
 }));
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use((0, morgan_1.default)('dev'));
+app.use((0, morgan_1.default)(isProduction ? 'combined' : 'dev'));
 // Configura la directory uploads
 const uploadsDir = path_1.default.resolve(process.cwd(), 'uploads');
 console.log(`Controllando directory uploads: ${uploadsDir}`);
@@ -68,7 +77,11 @@ app.use('/api/chatbot', chatbot_routes_1.default);
 app.use('/api', contact_routes_1.default);
 // Endpoint di test
 app.get('/api', (req, res) => {
-    res.json({ message: 'ITFPLUS API funzionante!' });
+    res.json({
+        message: 'ITFPLUS API funzionante!',
+        environment: process.env.NODE_ENV,
+        appUrl: appUrl
+    });
 });
 // Rotta principale per reindirizzare alla pagina di login
 app.get('/', (req, res) => {
@@ -83,13 +96,18 @@ app.use((err, req, res, next) => {
     });
 });
 // Avvio del server
-app.listen(port, () => {
-    console.log(`Server in esecuzione su http://localhost:${port}`);
-});
+if (!isProduction || process.env.VERCEL_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Server in esecuzione su ${appUrl}`);
+        console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    });
+}
 // Gestione chiusura server
 process.on('SIGINT', () => __awaiter(void 0, void 0, void 0, function* () {
     yield exports.prisma.$disconnect();
     console.log('Connessione al database chiusa');
     process.exit(0);
 }));
+// Esportazione per Vercel
+exports.default = app;
 //# sourceMappingURL=server.js.map
