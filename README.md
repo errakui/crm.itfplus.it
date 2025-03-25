@@ -1,55 +1,40 @@
-# ITFPlus - Piattaforma di Gestione Documenti
+# ITF Plus - Sistema di Gestione Documenti
 
-ITFPlus è una piattaforma web completa per la gestione, consultazione e analisi di documenti legali. Offre un'interfaccia moderna per visualizzare, gestire e consultare documenti con l'assistenza di intelligenza artificiale.
+Sistema di gestione documenti sviluppato per ITF Plus, che permette agli utenti di cercare, visualizzare e gestire documenti PDF.
 
-## Caratteristiche Principali
+## Funzionalità
 
-- **Autenticazione Sicura**: Sistema di login con JWT e gestione ruoli (Admin/Utente)
-- **Gestione Documenti**: Upload, visualizzazione e download di documenti PDF
-- **Ricerca Avanzata**: Ricerca per titolo, contenuto o città di riferimento
-- **Chat AI Integrata**: Interazione con i documenti tramite modelli AI di Perplexity
-- **Pannello Amministrativo**: Gestione utenti, statistiche e monitoraggio
-- **Database PostgreSQL**: Archiviazione dati su Neon Serverless Postgres
-- **Responsive Design**: Interfaccia adattiva per desktop e dispositivi mobili
+- Autenticazione utenti (login/registrazione)
+- Gestione documenti PDF
+- Ricerca documenti per titolo, descrizione e parole chiave
+- Gestione preferiti
+- Sistema di supporto
+- Chatbot integrato
+- Pannello amministratore
+- Gestione utenti
+- Upload bulk di documenti
 
-## Struttura del Progetto
+## Tecnologie Utilizzate
 
-Il progetto è strutturato in due componenti principali:
-
-### Server (Backend)
-
-- Framework: Express.js con Node.js
-- Database: PostgreSQL con Prisma ORM
-- API RESTful: Endpoint completi per tutte le funzionalità
-- Middleware: Autenticazione JWT, logging, gestione upload
-- Servizi: Email, elaborazione PDF, AI Chatbot
-
-### Client (Frontend)
-
-- Framework: React con TypeScript
-- UI: Material-UI per componenti moderni
-- State Management: Context API
-- Routing: React Router
-- Componenti principali:
-  - Visualizzatore PDF
-  - Chat AI
-  - Dashboard utente e admin
-  - Gestione profilo
+- Frontend: React.js
+- Backend: Node.js con Express
+- Database: PostgreSQL
+- ORM: Prisma
+- Autenticazione: JWT
+- Hosting: Vercel
 
 ## Requisiti di Sistema
 
-- Node.js v18+
-- PostgreSQL (o connessione a Neon Database)
-- 1GB RAM minimo
-- 1GB spazio su disco (esclusi documenti archiviati)
+- Node.js >= 14.x
+- PostgreSQL >= 12.x
+- npm o yarn
 
 ## Installazione
 
-### Configurazione Server
-
-1. Naviga nella directory server:
+1. Clona il repository:
 ```bash
-cd server
+git clone https://github.com/errakui/crm.itfplus.it.git
+cd crm.itfplus.it
 ```
 
 2. Installa le dipendenze:
@@ -57,60 +42,81 @@ cd server
 npm install
 ```
 
-3. Configura le variabili d'ambiente nel file `.env`:
-```
-DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
-PORT=8000
-JWT_SECRET=your_jwt_secret
-PERPLEXITY_API_KEY=your_perplexity_api_key
-EMAIL_HOST=your_email_host
-EMAIL_PORT=465
-EMAIL_USER=your_email_user
-EMAIL_PASS=your_email_password
-EMAIL_TO=default_contact_email
-EMAIL_SECURE=true
-```
+3. Configura le variabili d'ambiente:
+- Crea un file `.env` nella root del progetto
+- Copia il contenuto da `.env.example`
+- Modifica le variabili secondo le tue necessità
 
-4. Avvia il server:
+4. Inizializza il database:
 ```bash
-npm start
+npx prisma generate
+npx prisma migrate dev
 ```
 
-### Configurazione Client
-
-1. Naviga nella directory client:
+5. Avvia l'applicazione in modalità sviluppo:
 ```bash
-cd client
+npm run dev
 ```
 
-2. Installa le dipendenze:
-```bash
-npm install
-npm install @jridgewell/sourcemap-codec
+## Struttura del Progetto
+
+```
+├── api/                    # API endpoints
+│   ├── auth/              # Autenticazione
+│   ├── documents/         # Gestione documenti
+│   ├── admin/            # Funzionalità admin
+│   ├── chatbot/          # Chatbot
+│   └── support/          # Supporto e contatti
+├── client/               # Frontend React
+├── prisma/              # Schema e migrazioni database
+└── public/              # File statici
 ```
 
-3. Avvia il client:
-```bash
-npm start
-```
+## API Endpoints
 
-## Deployment
+### Autenticazione
+- POST /api/auth/login
+- POST /api/auth/register
+- POST /api/auth/change-password
 
-Il progetto è configurato per il deployment su:
-- Render.com (sia frontend che backend)
-- Heroku (configurazione alternativa)
+### Documenti
+- GET /api/documents
+- GET /api/documents/[id]
+- POST /api/documents
+- PUT /api/documents/[id]
+- DELETE /api/documents/[id]
+- GET /api/documents/search
+- GET /api/documents/cities
+- GET /api/documents/[id]/download
 
-### Variabili d'ambiente per produzione
+### Preferiti
+- GET /api/documents/favorites
+- POST /api/documents/favorites
+- DELETE /api/documents/favorites/[id]
 
-Oltre alle variabili di base, in produzione configurare:
-- `NODE_ENV=production`
-- `APP_URL=https://your-production-url.com`
+### Admin
+- GET /api/admin/users
+- POST /api/admin/users
+- PUT /api/admin/users
+- DELETE /api/admin/users
+- GET /api/documents/admin/all
+- POST /api/documents/bulk-upload
 
-## Autenticazione
+### Supporto e Contatti
+- POST /api/support
+- POST /api/contact
 
-- **Admin Default**: admin@itfplus.it / admin123
-- La piattaforma supporta registrazione utenti da parte degli amministratori
+### Chatbot
+- POST /api/chatbot/chat
+
+## Contribuire
+
+1. Fai il fork del repository
+2. Crea un branch per la tua feature (`git checkout -b feature/AmazingFeature`)
+3. Committa le tue modifiche (`git commit -m 'Add some AmazingFeature'`)
+4. Pusha al branch (`git push origin feature/AmazingFeature`)
+5. Apri una Pull Request
 
 ## Licenza
 
-Tutti i diritti riservati © 2025 ITFPlus
+Questo progetto è sotto licenza MIT. Vedi il file `LICENSE` per maggiori dettagli.
