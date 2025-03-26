@@ -1,4 +1,5 @@
 import api from './apiService';
+import { AxiosResponse } from 'axios';
 
 // Funzioni di utilità per le chiamate API comuni
 export const apiService = {
@@ -13,14 +14,22 @@ export const apiService = {
     api.post('/auth/change-password', data),
   
   // Documents
-  getDocuments: (params?: any) => 
-    api.get('/documents', { params }),
+  getDocuments: (params?: any) => {
+    // Rimuovi i parametri undefined
+    const cleanParams = Object.fromEntries(
+      Object.entries(params || {}).filter(([_, value]) => value !== undefined)
+    );
+    return api.get('/documents', { params: cleanParams });
+  },
   
   getDocument: (id: string) => 
     api.get(`/documents/${id}`),
   
-  downloadDocument: (id: string) => 
-    api.get(`/documents/${id}/download`, { responseType: 'blob' }),
+  downloadDocument: async (documentId: string): Promise<AxiosResponse> => {
+    return api.get(`/api/documents/${documentId}/download`, {
+      responseType: 'arraybuffer'
+    });
+  },
   
   // Favorites
   getFavorites: () => 

@@ -64,9 +64,13 @@ const HomePage: React.FC = () => {
         // Carica documenti con apiService
         const response = await apiService.getDocuments({
           search: searchTerm,
-          cities: selectedCities,
+          cities: selectedCities.length > 0 ? selectedCities : undefined,
           sort: sortOrder,
         });
+        
+        if (!response.data) {
+          throw new Error('Dati non ricevuti dal server');
+        }
         
         setDocuments(response.data.documents || []);
         setTotalDocuments(response.data.total || 0);
@@ -77,9 +81,9 @@ const HomePage: React.FC = () => {
         setFavorites(favoriteIds);
         
         setLoading(false);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Errore nel recupero documenti:', err);
-        setError('Errore nel caricamento dei documenti');
+        setError(err.message || 'Errore nel caricamento dei documenti');
         setLoading(false);
       }
     };
@@ -125,6 +129,7 @@ const HomePage: React.FC = () => {
 
   const handleCityChange = (_: any, newValue: string[]) => {
     setSelectedCities(newValue);
+    setPage(1); // Reset della pagina quando cambiano i filtri
   };
 
   // Filtra per tab attivo (tutti i documenti o preferiti)
