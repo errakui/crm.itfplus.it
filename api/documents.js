@@ -155,7 +155,7 @@ module.exports = async (req, res) => {
               fileSize: req.file.size,
               fileUrl: uploadResult.secure_url,
               cloudinaryPublicId: uploadResult.public_id,
-              uploadedBy: { connect: { id: userId } }
+              user: { connect: { id: userId } }
             }
           });
           

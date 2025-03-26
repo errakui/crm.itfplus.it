@@ -118,7 +118,9 @@ module.exports = async (req, res) => {
                 fileUrl: uploadResult.secure_url,
                 cloudinaryPublicId: uploadResult.public_id,
                 city: 'Automatico',
-                addedBy: user.id,
+                user: {
+                  connect: { id: user.id }
+                },
                 isActive: true
               }
             });
