@@ -349,7 +349,7 @@ const AdminPage: React.FC = () => {
       // Aggiungi tutti i file al FormData
       bulkFiles.forEach(file => {
         console.log("Aggiunto file:", file.name, file.type, file.size);
-        formData.append('files', file);
+        formData.append('documents', file);
       });
       
       console.log("Invio richiesta di caricamento multiplo...");
