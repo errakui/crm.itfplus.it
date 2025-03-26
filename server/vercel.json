@@ -2,20 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**", "uploads/**", "node_modules/**", ".env"]
-      }
+      "src": "src/server.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/server.js"
+      "dest": "src/server.ts"
     }
   ],
   "env": {
-    "NODE_ENV": "production"
-  }
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret"
+  },
+  "buildCommand": "npx prisma generate && npx prisma db push --accept-data-loss && npm run build"
 } 
