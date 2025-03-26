@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
           take: parseInt(limit),
           orderBy: { createdAt: 'desc' },
           include: {
-            addedByUser: {
+            user: {
               select: {
                 id: true,
                 name: true,

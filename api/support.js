@@ -113,6 +113,15 @@ module.exports = async (req, res) => {
       console.log('Email inviata con successo:', emailResult);
     } catch (emailError) {
       console.error('Errore nell\'invio dell\'email:', emailError);
+      console.error('Dettagli errore Mailgun:', {
+        statusCode: emailError.statusCode,
+        message: emailError.message,
+        details: emailError.details || 'Nessun dettaglio disponibile',
+        apiKey: process.env.MAILGUN_API_KEY ? process.env.MAILGUN_API_KEY.substring(0, 8) + '...' : 'Non configurata',
+        dominio: process.env.MAILGUN_DOMAIN || 'Non configurato',
+        from: emailData.from,
+        to: emailData.to
+      });
       // Non fallire la richiesta se l'email non viene inviata,
       // almeno la richiesta è stata salvata nel database
     }

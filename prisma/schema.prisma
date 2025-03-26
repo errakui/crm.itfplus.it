@@ -83,6 +83,7 @@ model ContactMessage {
   email     String
   subject   String
   message   String
+  category  String   @default("GENERAL")
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
 }

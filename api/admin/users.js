@@ -82,13 +82,7 @@ module.exports = async (req, res) => {
     // Gestione POST - Nuovo utente
     if (req.method === 'POST') {
       console.log('Elaborazione richiesta POST per nuovo utente');
-      const { email, password, name, role } = req.body;
-
-      // Verifica password
-      if (!password) {
-        console.error("❌ Password mancante:", password);
-        return res.status(400).json({ error: "Password mancante" });
-      }
+      const { email, name, role, expiresInDays = '30' } = req.body;
 
       // Verifica se l'utente esiste già
       console.log('Verifica se l\'email è già registrata:', email);
@@ -101,9 +95,13 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'Email già registrata' });
       }
 
+      // Genera una password casuale
+      console.log('Generazione password casuale');
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).toUpperCase().slice(-4);
+      
       // Hash della password
       console.log('Generazione hash della password');
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
       // Crea il nuovo utente
       try {
@@ -134,7 +132,7 @@ module.exports = async (req, res) => {
             <p>Gentile ${name},</p>
             <p>Ti diamo il benvenuto nella piattaforma ITFPlus. Di seguito trovi le tue credenziali di accesso:</p>
             <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Password:</strong> ${password}</p>
+            <p><strong>Password:</strong> ${randomPassword}</p>
             <p>Ti consigliamo di cambiare la password dopo il primo accesso per maggiore sicurezza.</p>
             <p>Per accedere alla piattaforma, visita <a href="https://crm-itfplus-it-beryl.vercel.app/login">ITFPlus</a>.</p>
             <p>Cordiali saluti,<br>Il team di ITFPlus</p>
