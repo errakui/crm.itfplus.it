@@ -3,11 +3,25 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configura mailgun
+/**
+ * Configura il client Mailgun
+ */
 const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY!,
-  domain: process.env.MAILGUN_DOMAIN!
+  apiKey: process.env.MAILGUN_API_KEY || '',
+  domain: process.env.MAILGUN_DOMAIN || ''
 });
+
+/**
+ * Tipo per messaggio Mailgun con header personalizzati
+ */
+interface MailgunMessageData {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  [key: string]: any; // Permette header personalizzati come 'h:Reply-To'
+}
 
 /**
  * Invia un'email usando Mailgun
@@ -28,6 +42,10 @@ export const sendEmail = async (
   replyTo?: string
 ): Promise<any> => {
   try {
+    if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
+      throw new Error('Configurazione Mailgun mancante');
+    }
+
     // Log per debug
     console.log('Invio email usando Mailgun:');
     console.log('- API Key configurata:', process.env.MAILGUN_API_KEY ? 'Sì' : 'No');
@@ -35,8 +53,8 @@ export const sendEmail = async (
     console.log('- Destinatario:', to);
     console.log('- Mittente:', from || process.env.EMAIL_FROM);
     
-    const data = {
-      from: from || process.env.EMAIL_FROM || 'noreply@itfplus.it',
+    const data: MailgunMessageData = {
+      from: from || `ITFPlus <${process.env.EMAIL_FROM || 'noreply@itfplus.it'}>`,
       to: Array.isArray(to) ? to.join(',') : to,
       subject,
       html,

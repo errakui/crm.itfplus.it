@@ -18,17 +18,25 @@ const fs_1 = __importDefault(require("fs"));
 const client_1 = require("@prisma/client");
 const pdfUtils_1 = require("../utils/pdfUtils");
 const multer_1 = __importDefault(require("multer"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
+const streamifier_1 = __importDefault(require("streamifier"));
+// Configura Cloudinary
+cloudinary_1.default.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 // Rimosso l'import esplicito dei tipi
 // I file .d.ts vengono riconosciuti automaticamente da TypeScript
 // senza bisogno di importarli esplicitamente
 const prismaClient = new client_1.PrismaClient();
-// Directory per i file caricati
+// Directory per i file caricati temporaneamente (solo per estrazione testo)
 const UPLOADS_DIR = path_1.default.resolve(__dirname, '../../../uploads');
 // Assicuriamoci che la directory esista
 if (!fs_1.default.existsSync(UPLOADS_DIR)) {
     fs_1.default.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
-// Configurazione di Multer per il caricamento dei file
+// Configurazione di Multer per il caricamento dei file in memoria
 const storage = multer_1.default.memoryStorage();
 exports.upload = (0, multer_1.default)({
     storage,
@@ -42,6 +50,37 @@ exports.upload = (0, multer_1.default)({
         else {
             cb(null, false);
             return cb(new Error('Solo i file PDF sono supportati'));
+        }
+    }
+});
+// Funzione per caricare file su Cloudinary
+const uploadToCloudinary = (buffer, folderName = 'documents') => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary_1.default.v2.uploader.upload_stream({
+            folder: folderName,
+            resource_type: 'auto'
+        }, (error, result) => {
+            if (error)
+                return reject(error);
+            resolve(result);
+        });
+        streamifier_1.default.createReadStream(buffer).pipe(uploadStream);
+    });
+};
+// Funzione per estrarre testo dai PDF
+const extractTextFromPDFBuffer = (buffer) => __awaiter(void 0, void 0, void 0, function* () {
+    // Salva temporaneamente il buffer su disco per l'estrazione
+    const tempFileName = `temp-${Date.now()}.pdf`;
+    const tempFilePath = path_1.default.join(UPLOADS_DIR, tempFileName);
+    fs_1.default.writeFileSync(tempFilePath, buffer);
+    try {
+        const text = yield (0, pdfUtils_1.extractTextFromPDF)(tempFilePath);
+        return text;
+    }
+    finally {
+        // Pulizia: rimuovi il file temporaneo
+        if (fs_1.default.existsSync(tempFilePath)) {
+            fs_1.default.unlinkSync(tempFilePath);
         }
     }
 });
@@ -190,41 +229,40 @@ const uploadDocument = (req, res) => __awaiter(void 0, void 0, void 0, function*
             return res.status(401).json({ message: 'Utente non autenticato' });
         }
         console.log(`File ricevuto: ${req.file.originalname}, Dimensione: ${req.file.size} bytes`);
-        // Utilizza il nome file originale sanitizzato anziché generare un UUID
+        // Utilizza il nome file originale sanitizzato
         const sanitizedFileName = sanitizeFileName(req.file.originalname);
-        // Assicuriamoci che la directory esista prima di salvare il file
-        ensureUploadsDir();
-        const filePath = path_1.default.join(UPLOADS_DIR, sanitizedFileName);
-        const fileUrl = `/uploads/${sanitizedFileName}`;
-        console.log(`Salvataggio file in: ${filePath}`);
-        console.log(`URL del file: ${fileUrl}`);
-        // Scrivi il file su disco
-        fs_1.default.writeFileSync(filePath, req.file.buffer);
-        // Estrai il testo dal PDF se è un file PDF
-        let content = '';
-        let cities = [];
-        const fileExtension = path_1.default.extname(req.file.originalname).toLowerCase();
-        if (fileExtension === '.pdf') {
-            console.log('Estrazione testo dal PDF...');
-            content = yield (0, pdfUtils_1.extractTextFromPDF)(filePath);
-            // Estrai il titolo dal nome del file originale
-            const title = req.file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
-            // Identifica le città nel testo e nel titolo
-            cities = (0, pdfUtils_1.identifyCities)(content, title);
-            console.log(`Città identificate: ${cities.join(', ')}`);
-        }
+        console.log("Caricamento file su Cloudinary...");
+        // Carica su Cloudinary
+        const cloudinaryResult = yield uploadToCloudinary(req.file.buffer);
+        console.log("File caricato su Cloudinary:", cloudinaryResult.secure_url);
+        // Estrai il testo dal PDF
+        console.log('Estrazione testo dal PDF...');
+        let content = yield extractTextFromPDFBuffer(req.file.buffer);
+        // Estrai il titolo dal nome del file originale
+        const title = req.body.title || req.file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+        // Identifica le città nel testo e nel titolo
+        const cities = (0, pdfUtils_1.identifyCities)(content, title);
+        console.log(`Città identificate: ${cities.join(', ')}`);
         // Ottieni altri campi dalla richiesta
-        const { title, description, keywords } = req.body;
-        const keywordArray = keywords ? keywords.split(',').map((k) => k.trim()) : [];
+        const { description, keywords } = req.body;
+        const keywordArray = keywords ?
+            (typeof keywords === 'string' ?
+                (keywords.startsWith('[') ? JSON.parse(keywords) : keywords.split(',').map((k) => k.trim()))
+                : keywords)
+            : [];
         // Salva il documento nel database
         const document = yield prismaClient.document.create({
             data: {
-                title: title || req.file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " "),
+                title,
                 description: description || "",
                 keywords: keywordArray,
-                filePath,
-                fileUrl,
+                filePath: cloudinaryResult.secure_url, // URL Cloudinary
+                fileUrl: cloudinaryResult.secure_url, // URL Cloudinary
+                cloudinaryPublicId: cloudinaryResult.public_id,
                 fileSize: req.file.size,
+                fileName: sanitizedFileName,
+                fileType: 'pdf',
+                mimeType: req.file.mimetype,
                 user: {
                     connect: { id: userId }
                 },
@@ -551,46 +589,37 @@ const bulkUploadDocuments = (req, res) => __awaiter(void 0, void 0, void 0, func
             failedFiles: []
         };
         console.log(`Elaborazione di ${req.files.length} file iniziata`);
-        const uploadsDir = path_1.default.resolve(process.env.UPLOADS_DIR || 'uploads');
-        // Assicurati che la directory esista
-        if (!fs_1.default.existsSync(uploadsDir)) {
-            fs_1.default.mkdirSync(uploadsDir, { recursive: true });
-            console.log(`Directory uploads creata: ${uploadsDir}`);
-        }
         // Processa ogni file
         for (const file of req.files) {
             try {
                 console.log(`Elaborazione file: ${file.originalname}`);
                 // Utilizza il nome file originale sanitizzato
                 const sanitizedFileName = sanitizeFileName(file.originalname);
-                const filePath = path_1.default.join(uploadsDir, sanitizedFileName);
-                const fileUrl = `/uploads/${sanitizedFileName}`;
-                // Scrivi il file su disco
-                fs_1.default.writeFileSync(filePath, file.buffer);
-                console.log(`File salvato in: ${filePath}`);
-                console.log(`URL del file: ${fileUrl}`);
-                // Estrai il testo dal PDF se è un file PDF
-                let content = '';
-                let cities = [];
-                const fileExtension = path_1.default.extname(file.originalname).toLowerCase();
-                if (fileExtension === '.pdf') {
-                    console.log('Estrazione testo dal PDF...');
-                    content = yield (0, pdfUtils_1.extractTextFromPDF)(filePath);
-                    // Estrai il titolo dal nome del file originale
-                    const title = file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
-                    // Identifica le città nel testo e nel titolo
-                    cities = (0, pdfUtils_1.identifyCities)(content, title);
-                    console.log(`Città identificate: ${cities.join(', ')}`);
-                }
+                // Carica su Cloudinary
+                console.log(`Caricamento su Cloudinary: ${sanitizedFileName}`);
+                const cloudinaryResult = yield uploadToCloudinary(file.buffer);
+                console.log(`File caricato su Cloudinary: ${cloudinaryResult.secure_url}`);
+                // Estrai il testo dal PDF
+                console.log('Estrazione testo dal PDF...');
+                let content = yield extractTextFromPDFBuffer(file.buffer);
+                // Estrai il titolo dal nome del file originale
+                const title = file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+                // Identifica le città nel testo e nel titolo
+                const cities = (0, pdfUtils_1.identifyCities)(content, title);
+                console.log(`Città identificate: ${cities.join(', ')}`);
                 // Salva il documento nel database
                 const document = yield prismaClient.document.create({
                     data: {
-                        title: file.originalname.replace(/\.[^/.]+$/, "").replace(/_/g, " "),
+                        title,
                         description: "",
                         keywords: [],
-                        filePath,
-                        fileUrl,
+                        filePath: cloudinaryResult.secure_url,
+                        fileUrl: cloudinaryResult.secure_url,
+                        cloudinaryPublicId: cloudinaryResult.public_id,
                         fileSize: file.size,
+                        fileName: sanitizedFileName,
+                        fileType: 'pdf',
+                        mimeType: file.mimetype,
                         user: {
                             connect: { id: userId }
                         },

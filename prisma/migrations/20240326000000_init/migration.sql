@@ -1,11 +1,23 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'Role') THEN
+        CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+    END IF;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "Priority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'Priority') THEN
+        CREATE TYPE "Priority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+    END IF;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('OPEN', 'IN_PROGRESS', 'CLOSED');
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'Status') THEN
+        CREATE TYPE "Status" AS ENUM ('OPEN', 'IN_PROGRESS', 'CLOSED');
+    END IF;
+END $$;
 
 -- CreateTable
 CREATE TABLE "User" (

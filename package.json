@@ -4,13 +4,12 @@
   "description": "Sistema di gestione documenti ITF Plus",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "npx prisma generate && npx prisma migrate deploy",
-    "vercel-build": "npx prisma generate && npx prisma migrate deploy",
-    "postinstall": "npx prisma generate",
-    "deploy": "vercel --prod",
-    "test": "jest"
+    "start": "node ./dist/server.js",
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "deploy": "npm run build && npm run start",
+    "test": "jest",
+    "vercel-build": "npx prisma generate && npx prisma db push --accept-data-loss"
   },
   "engines": {
     "node": "22.x"
@@ -28,7 +27,9 @@
     "streamifier": "^0.1.1"
   },
   "devDependencies": {
+    "@types/mailgun-js": "^0.22.18",
     "@types/node": "^20.8.6",
+    "@types/streamifier": "^0.1.2",
     "jest": "^29.7.0",
     "nodemon": "^3.0.1",
     "prisma": "^6.5.0",
