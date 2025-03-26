@@ -20,7 +20,6 @@ import { apiService } from '../services/api';
 
 interface PDFViewerProps {
   documentId: string;
-  documentUrl: string;
   title: string;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
@@ -29,7 +28,6 @@ interface PDFViewerProps {
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ 
   documentId, 
-  documentUrl, 
   title,
   isFavorite = false,
   onToggleFavorite,
@@ -40,38 +38,32 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const { token, isAuthenticated } = React.useContext(AuthContext);
 
+  const loadPdf = async () => {
+    if (!documentId) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Incrementa il contatore di visualizzazioni
+      const docResponse = await apiService.getDocument(documentId);
+      if (!docResponse.data || !docResponse.data.fileUrl) {
+        throw new Error('URL del documento non trovato');
+      }
+      
+      // Carica il PDF direttamente da Cloudinary
+      setPdfUrl(docResponse.data.fileUrl);
+      
+    } catch (err: any) {
+      console.error('Errore durante il caricamento del PDF:', err);
+      setError(`Impossibile caricare il documento. ${err.response?.data?.message || err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
-
-    const loadPdf = async () => {
-      if (!documentId) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Incrementa il contatore di visualizzazioni
-        await apiService.getDocument(documentId);
-        
-        // Carica il PDF
-        const response = await apiService.downloadDocument(documentId);
-        
-        if (!isMounted) return;
-
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const objectUrl = URL.createObjectURL(blob);
-        setPdfUrl(objectUrl);
-      } catch (err: any) {
-        console.error('Errore durante il caricamento del PDF:', err);
-        if (isMounted) {
-          setError(`Impossibile caricare il documento. Errore: ${err.message}`);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
     
     loadPdf();
     
@@ -81,13 +73,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         URL.revokeObjectURL(pdfUrl);
       }
     };
-  }, [documentId]); // Rimuoviamo documentUrl dalle dipendenze
+  }, [documentId]);
 
   const handleRetry = () => {
     setLoading(true);
     setError(null);
-    // Force reload
-    window.location.reload();
+    loadPdf();
   };
 
   const handleDownload = async () => {
@@ -97,6 +88,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       setLoading(true);
       const response = await apiService.downloadDocument(documentId);
       
+      // Crea un blob dal buffer ricevuto
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -107,10 +99,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Errore durante il download:', error);
-      setError('Impossibile scaricare il documento');
+      setError(`Impossibile scaricare il documento. ${error.response?.data?.message || error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +119,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     if (error) {
       return (
         <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography color="error">{error}</Typography>
+          <Typography color="error" gutterBottom>{error}</Typography>
           <Button variant="outlined" onClick={handleRetry} sx={{ mt: 2 }}>
             Riprova
           </Button>
@@ -140,6 +133,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           src={pdfUrl}
           style={{ width: '100%', height: '100%', border: 'none' }}
           title="PDF Viewer"
+          onError={() => setError('Errore nel caricamento del PDF')}
         />
       );
     }

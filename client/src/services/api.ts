@@ -26,7 +26,7 @@ export const apiService = {
     api.get(`/documents/${id}`),
   
   downloadDocument: async (documentId: string): Promise<AxiosResponse> => {
-    return api.get(`/api/documents/${documentId}/download`, {
+    return api.get(`/documents/${documentId}/download`, {
       responseType: 'arraybuffer'
     });
   },

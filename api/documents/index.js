@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
 
       if (cities) {
         // Gestisci sia stringa singola che array di città
-        const cityArray = Array.isArray(cities) ? cities : [cities];
+        const cityArray = Array.isArray(cities) ? cities : cities.split(',').map(c => c.trim());
         where.city = {
           in: cityArray
         };
@@ -75,7 +75,11 @@ module.exports = async (req, res) => {
             fileUrl: true,
             fileSize: true,
             createdAt: true,
-            keywords: true
+            keywords: true,
+            fileName: true,
+            viewCount: true,
+            downloadCount: true,
+            favoriteCount: true
           }
         }),
         prisma.document.count({ where })

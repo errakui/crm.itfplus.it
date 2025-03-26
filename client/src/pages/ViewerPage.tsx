@@ -33,14 +33,15 @@ const ViewerPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      if (!id) {
+        setError('ID documento non valido');
+        setLoading(false);
+        return;
+      }
       
       try {
-        if (!id) {
-          setError('ID documento non valido');
-          setIsLoading(false);
-          return;
-        }
+        setLoading(true);
+        setError(null);
         
         // Carica dettagli documento
         const response = await apiService.getDocument(id);
@@ -51,11 +52,11 @@ const ViewerPage: React.FC = () => {
         const favoriteIds = favoritesResponse.data.map((fav: any) => fav.documentId);
         setIsFavorite(favoriteIds.includes(id));
         
-        setIsLoading(false);
+        setLoading(false);
       } catch (error) {
         console.error('Errore nel recupero documento:', error);
         setError('Errore nel caricamento del documento');
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     
@@ -135,9 +136,6 @@ const ViewerPage: React.FC = () => {
             <Box sx={{ height: { xs: 'calc(100vh - 300px)', md: 'calc(100vh - 200px)' } }}>
               <PDFViewer
                 documentId={document.id}
-                documentUrl={document.fileUrl ? 
-                  `/api/documents/${document.id}/download` 
-                  : ''}
                 title={document.title}
                 isFavorite={isFavorite}
                 onToggleFavorite={toggleFavorite}

@@ -49,6 +49,7 @@ const HomePage: React.FC = () => {
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [totalDocuments, setTotalDocuments] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [sortOrder, setSortOrder] = useState<string>('asc');
   const [page, setPage] = useState<number>(1);
 
@@ -61,19 +62,21 @@ const HomePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Carica documenti con apiService
-        const response = await apiService.getDocuments({
+        const params = {
           search: searchTerm,
           cities: selectedCities.length > 0 ? selectedCities : undefined,
-          sort: sortOrder,
-        });
+          page,
+          limit: 10
+        };
         
+        const response = await apiService.getDocuments(params);
         if (!response.data) {
-          throw new Error('Dati non ricevuti dal server');
+          throw new Error('Nessun dato ricevuto dal server');
         }
         
         setDocuments(response.data.documents || []);
         setTotalDocuments(response.data.total || 0);
+        setTotalPages(response.data.pagination?.totalPages || 1);
         
         // Carica preferiti per marcare i documenti
         const favoritesResponse = await apiService.getFavorites();
@@ -82,14 +85,14 @@ const HomePage: React.FC = () => {
         
         setLoading(false);
       } catch (err: any) {
-        console.error('Errore nel recupero documenti:', err);
-        setError(err.message || 'Errore nel caricamento dei documenti');
+        console.error('Errore nel caricamento dei documenti:', err);
+        setError(err.response?.data?.message || 'Errore nel caricamento dei documenti');
         setLoading(false);
       }
     };
     
     fetchDocuments();
-  }, [isAuthenticated, searchTerm, selectedCities, sortOrder]);
+  }, [isAuthenticated, searchTerm, selectedCities, page]);
 
   // Carica le città disponibili al caricamento del componente
   useEffect(() => {
@@ -127,9 +130,9 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const handleCityChange = (_: any, newValue: string[]) => {
+  const handleCityChange = (event: any, newValue: string[]) => {
     setSelectedCities(newValue);
-    setPage(1); // Reset della pagina quando cambiano i filtri
+    setPage(1); // Reset page when filters change
   };
 
   // Filtra per tab attivo (tutti i documenti o preferiti)

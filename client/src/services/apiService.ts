@@ -21,4 +21,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export default api; 
+export default api;
+
+export const downloadDocument = async (documentId: string) => {
+  return api.get(`/api/documents/${documentId}/download`, {
+    responseType: 'arraybuffer'
+  });
+}; 
