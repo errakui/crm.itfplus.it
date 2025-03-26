@@ -59,11 +59,12 @@ const HomePage: React.FC = () => {
       
       try {
         setLoading(true);
+        setError(null);
         
         // Carica documenti con apiService
         const response = await apiService.getDocuments({
           search: searchTerm,
-          city: selectedCities.join(','),
+          cities: selectedCities,
           sort: sortOrder,
         });
         
@@ -75,13 +76,10 @@ const HomePage: React.FC = () => {
         const favoriteIds = favoritesResponse.data.map((doc: any) => doc.documentId || doc.id);
         setFavorites(favoriteIds);
         
-        // Carica elenco città disponibili
-        const citiesResponse = await apiService.getCities();
-        setAvailableCities(citiesResponse.data || []);
-        
         setLoading(false);
       } catch (err) {
         console.error('Errore nel recupero documenti:', err);
+        setError('Errore nel caricamento dei documenti');
         setLoading(false);
       }
     };
@@ -91,17 +89,17 @@ const HomePage: React.FC = () => {
 
   // Carica le città disponibili al caricamento del componente
   useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await apiService.getCities();
+        setAvailableCities(response.data || []);
+      } catch (error) {
+        console.error('Errore nel recupero delle città:', error);
+      }
+    };
+    
     fetchCities();
   }, []);
-
-  const fetchCities = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/documents/cities');
-      setAvailableCities(response.data.cities || []);
-    } catch (error) {
-      console.error('Errore nel recupero delle città:', error);
-    }
-  };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -114,17 +112,19 @@ const HomePage: React.FC = () => {
   const handleToggleFavorite = async (documentId: string) => {
     try {
       if (favorites.includes(documentId)) {
-        // Rimuovi dai preferiti
         await apiService.removeFavorite(documentId);
         setFavorites(favorites.filter(id => id !== documentId));
       } else {
-        // Aggiungi ai preferiti
         await apiService.addFavorite(documentId);
         setFavorites([...favorites, documentId]);
       }
     } catch (err) {
       console.error('Errore nella gestione dei preferiti:', err);
     }
+  };
+
+  const handleCityChange = (_: any, newValue: string[]) => {
+    setSelectedCities(newValue);
   };
 
   // Filtra per tab attivo (tutti i documenti o preferiti)
@@ -212,7 +212,7 @@ const HomePage: React.FC = () => {
                 id="cities-filter"
                 options={availableCities}
                 value={selectedCities}
-                onChange={(_, newValue) => setSelectedCities(newValue)}
+                onChange={handleCityChange}
                 renderInput={(params) => (
                   <TextField
                     {...params}

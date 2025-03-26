@@ -41,43 +41,33 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const { token, isAuthenticated } = React.useContext(AuthContext);
 
   useEffect(() => {
-    // Debug: stampa l'URL del documento
-    console.log("URL del documento:", documentUrl);
-    
-    // Incrementa il contatore di visualizzazioni quando il documento viene caricato
-    const incrementViewCount = async () => {
-      if (documentId) {
-        try {
-          // Questa chiamata aggiorna il contatore di visualizzazioni nel backend
-          await apiService.getDocument(documentId);
-        } catch (err) {
-          console.error('Errore nell\'incrementare il contatore di visualizzazioni:', err);
-        }
-      }
-    };
+    let isMounted = true;
 
-    incrementViewCount();
-    
-    // Carica il PDF utilizzando l'API di download
     const loadPdf = async () => {
-      if (documentId) {
-        try {
-          setLoading(true);
-          setError(null);
-          
-          console.log("Caricamento PDF per visualizzazione, ID:", documentId);
-          
-          // Usa apiService per il download del documento
-          const response = await apiService.downloadDocument(documentId);
-          
-          // Crea un URL per il blob e impostalo come URL del PDF
-          const blob = new Blob([response.data], { type: 'application/pdf' });
-          const objectUrl = URL.createObjectURL(blob);
-          setPdfUrl(objectUrl);
-          setLoading(false);
-        } catch (err: any) {
-          console.error('Errore durante il caricamento del PDF:', err);
+      if (!documentId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Incrementa il contatore di visualizzazioni
+        await apiService.getDocument(documentId);
+        
+        // Carica il PDF
+        const response = await apiService.downloadDocument(documentId);
+        
+        if (!isMounted) return;
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const objectUrl = URL.createObjectURL(blob);
+        setPdfUrl(objectUrl);
+      } catch (err: any) {
+        console.error('Errore durante il caricamento del PDF:', err);
+        if (isMounted) {
           setError(`Impossibile caricare il documento. Errore: ${err.message}`);
+        }
+      } finally {
+        if (isMounted) {
           setLoading(false);
         }
       }
@@ -85,51 +75,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     
     loadPdf();
     
-    // Cleanup
     return () => {
+      isMounted = false;
       if (pdfUrl && pdfUrl.startsWith('blob:')) {
         URL.revokeObjectURL(pdfUrl);
       }
     };
-  }, [documentId, documentUrl]);
+  }, [documentId]); // Rimuoviamo documentUrl dalle dipendenze
 
   const handleRetry = () => {
     setLoading(true);
     setError(null);
     // Force reload
     window.location.reload();
-  };
-
-  const fetchDocumentAndDownload = async () => {
-    if (!documentId) return;
-    setLoading(true);
-    try {
-      // Ottieni i dettagli del documento
-      const response = await apiService.getDocument(documentId);
-      setPdfUrl(response.data.fileUrl);
-      
-      // Scarica il file PDF
-      const downloadResponse = await apiService.downloadDocument(documentId);
-      
-      // Crea un URL per il blob e aprilo in un iframe
-      const blob = new Blob([downloadResponse.data], { type: 'application/pdf' });
-      const fileURL = URL.createObjectURL(blob);
-      setPdfUrl(fileURL);
-      
-      // Puoi anche salvare il file localmente se necessario
-      if (autoDownload) {
-        const link = document.createElement('a');
-        link.href = fileURL;
-        link.setAttribute('download', `${response.data.title || 'document'}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-      }
-    } catch (error) {
-      console.error('Errore nel caricamento del documento:', error);
-      setError('Impossibile caricare il documento. Verifica che il file esista e che tu abbia i permessi per visualizzarlo.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleDownload = async () => {
@@ -139,7 +97,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       setLoading(true);
       const response = await apiService.downloadDocument(documentId);
       
-      // Crea un URL per il blob e usa un link per il download
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -170,7 +127,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       return (
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography color="error">{error}</Typography>
-          <Button variant="outlined" onClick={fetchDocumentAndDownload} sx={{ mt: 2 }}>
+          <Button variant="outlined" onClick={handleRetry} sx={{ mt: 2 }}>
             Riprova
           </Button>
         </Box>
