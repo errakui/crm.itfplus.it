@@ -14,6 +14,8 @@ import {
 import axios from 'axios';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import AuthContext from '../contexts/AuthContext';
+import { apiService } from '../services/api';
 
 const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -36,50 +38,36 @@ const ChangePasswordForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
+    
     // Validazione
     if (!currentPassword || !newPassword || !confirmPassword) {
       setError('Tutti i campi sono obbligatori');
       return;
     }
-
-    if (newPassword.length < 8) {
-      setError('La nuova password deve essere di almeno 8 caratteri');
-      return;
-    }
-
+    
     if (newPassword !== confirmPassword) {
-      setError('La nuova password e la conferma non corrispondono');
+      setError('Le nuove password non corrispondono');
       return;
     }
-
+    
     try {
       setLoading(true);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const response = await axios.post(
-        `${apiUrl}/api/auth/change-password`,
-        {
-          currentPassword,
-          newPassword
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
-
-      setSuccess('Password modificata con successo. Ti è stata inviata un\'email di conferma.');
-      resetForm();
+      setError(null);
+      setSuccess(null);
+      
+      // Usa apiService per la modifica della password
+      await apiService.changePassword({
+        currentPassword,
+        newPassword
+      });
+      
+      setSuccess('Password aggiornata con successo');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (err: any) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('Si è verificato un errore durante il cambio della password');
-      }
-      console.error('Errore durante il cambio password:', err);
+      console.error('Errore nel cambio password:', err);
+      setError(err.response?.data?.message || 'Errore durante il cambio della password');
     } finally {
       setLoading(false);
     }

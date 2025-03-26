@@ -16,7 +16,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
-import api, { apiService } from '../services/api';
+import { apiService } from '../services/api';
 
 interface PDFViewerProps {
   documentId: string;
@@ -46,14 +46,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     
     // Incrementa il contatore di visualizzazioni quando il documento viene caricato
     const incrementViewCount = async () => {
-      if (documentId && isAuthenticated()) {
+      if (documentId) {
         try {
           // Questa chiamata aggiorna il contatore di visualizzazioni nel backend
-          await axios.get(`http://localhost:8000/api/documents/${documentId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
+          await apiService.getDocument(documentId);
         } catch (err) {
           console.error('Errore nell\'incrementare il contatore di visualizzazioni:', err);
         }
@@ -64,50 +60,21 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     
     // Carica il PDF utilizzando l'API di download
     const loadPdf = async () => {
-      if (documentId && isAuthenticated()) {
+      if (documentId) {
         try {
           setLoading(true);
           setError(null);
           
           console.log("Caricamento PDF per visualizzazione, ID:", documentId);
           
-          // Usa fetch con responseType blob per scaricare direttamente il file
-          const response = await fetch(
-            `http://localhost:8000/api/documents/${documentId}/download`,
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            }
-          );
+          // Usa apiService per il download del documento
+          const response = await apiService.downloadDocument(documentId);
           
-          if (!response.ok) {
-            throw new Error(`Errore durante il caricamento: ${response.status} ${response.statusText}`);
-          }
-          
-          // Verifica se la risposta è JSON o un file binario
-          const contentType = response.headers.get('content-type');
-          
-          if (contentType && contentType.includes('application/json')) {
-            // Se è JSON, il server ha restituito un URL invece del file
-            const data = await response.json();
-            console.log("Server ha restituito un URL:", data.fileUrl);
-            
-            if (data.fileUrl) {
-              // Usa direttamente l'URL per il visualizzatore
-              const fullUrl = `http://localhost:8000${data.fileUrl}`;
-              console.log("URL completo per la visualizzazione:", fullUrl);
-              setPdfUrl(fullUrl);
-              setLoading(false);
-            }
-          } else {
-            // Altrimenti procedi con il blob direttamente dalla risposta
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
-            setPdfUrl(objectUrl);
-            setLoading(false);
-          }
+          // Crea un URL per il blob e impostalo come URL del PDF
+          const blob = new Blob([response.data], { type: 'application/pdf' });
+          const objectUrl = URL.createObjectURL(blob);
+          setPdfUrl(objectUrl);
+          setLoading(false);
         } catch (err: any) {
           console.error('Errore durante il caricamento del PDF:', err);
           setError(`Impossibile caricare il documento. Errore: ${err.message}`);
@@ -124,7 +91,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         URL.revokeObjectURL(pdfUrl);
       }
     };
-  }, [documentId, token, isAuthenticated, documentUrl, pdfUrl]);
+  }, [documentId, documentUrl]);
 
   const handleRetry = () => {
     setLoading(true);

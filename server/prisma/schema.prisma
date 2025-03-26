@@ -42,6 +42,10 @@ model Document {
   filePath        String     @unique
   fileUrl         String
   fileSize        Int
+  fileName        String?    // Nome del file originale
+  fileType        String?    // Tipo di file (pdf, doc, etc)
+  mimeType        String?    // MIME type del file
+  cloudinaryPublicId String? // ID pubblico Cloudinary per gestire il file
   uploadDate      DateTime   @default(now())
   viewCount       Int        @default(0)
   downloadCount   Int        @default(0)
@@ -57,6 +61,7 @@ model Document {
   user            User        @relation(fields: [userId], references: [id])
   favorites       Favorite[]
   viewedBy        User[]       @relation("RecentlyViewed")
+  isActive        Boolean     @default(true)
 
   @@map("documents")
 }

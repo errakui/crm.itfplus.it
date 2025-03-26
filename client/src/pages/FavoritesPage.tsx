@@ -17,6 +17,7 @@ import { Favorite as FavoriteIcon, Description as DescriptionIcon } from '@mui/i
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
+import { apiService } from '../services/api';
 
 interface Document {
   id: string;
@@ -30,19 +31,17 @@ const FavoritesPage: React.FC = () => {
   const [favorites, setFavorites] = useState<Document[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { token } = useContext(AuthContext);
+  const { token, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFavorites = async () => {
+      if (!isAuthenticated()) return;
+      
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:8000/api/documents/favorites', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setFavorites(response.data.documents);
+        const response = await apiService.getFavorites();
+        setFavorites(response.data || []);
         setError(null);
       } catch (err) {
         console.error('Errore nel recupero dei preferiti:', err);
@@ -51,25 +50,21 @@ const FavoritesPage: React.FC = () => {
         setLoading(false);
       }
     };
-
+    
     fetchFavorites();
-  }, [token]);
+  }, [isAuthenticated, token]);
 
   const handleViewDocument = (id: string) => {
     navigate(`/viewer/${id}`);
   };
 
-  const handleRemoveFavorite = async (id: string) => {
+  const handleRemoveFavorite = async (documentId: string) => {
     try {
-      await axios.delete(`http://localhost:8000/api/documents/favorites/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      // Aggiorna la lista dei preferiti dopo la rimozione
-      setFavorites(favorites.filter(doc => doc.id !== id));
+      await apiService.removeFavorite(documentId);
+      
+      setFavorites(favorites.filter(doc => doc.id !== documentId));
     } catch (err) {
-      console.error('Errore nella rimozione dai preferiti:', err);
+      console.error('Errore nella rimozione del preferito:', err);
       setError('Impossibile rimuovere il documento dai preferiti.');
     }
   };

@@ -141,15 +141,23 @@ const AdminPage: React.FC = () => {
       if (tabIndex === 0) {
         // Carica utenti
         const response = await apiService.getUsers();
-        setUsers(response.data);
+        setUsers(Array.isArray(response.data) ? response.data : []);
       } else {
         // Carica documenti
         const response = await apiService.getAllDocuments();
-        setDocuments(response.data);
+        // Assicurati che documents sia sempre un array
+        const documentsData = response.data?.documents;
+        setDocuments(Array.isArray(documentsData) ? documentsData : []);
       }
     } catch (err: any) {
       console.error('Errore nel caricamento dei dati:', err);
       setError(err.response?.data?.message || 'Errore nel caricamento dei dati.');
+      // Imposta array vuoti in caso di errore
+      if (tabIndex === 0) {
+        setUsers([]);
+      } else {
+        setDocuments([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -266,7 +274,9 @@ const AdminPage: React.FC = () => {
           formData.append('keywords', JSON.stringify(editingDocument.keywords));
         }
         
-        await apiService.createDocument(formData);
+        console.log("Inizio upload documento...");
+        const response = await apiService.createDocument(formData);
+        console.log("Upload completato", response);
         setSuccess('Documento caricato con successo!');
       }
       
@@ -274,7 +284,9 @@ const AdminPage: React.FC = () => {
       loadTabData(1);
     } catch (err: any) {
       console.error('Errore nella gestione del documento:', err);
-      setError(err.response?.data?.message || 'Errore nella gestione del documento.');
+      const errorMessage = err.response?.data?.message || 'Errore nella gestione del documento. Verifica la connessione al server.';
+      setError(errorMessage);
+      alert(`Si è verificato un errore: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -362,25 +374,28 @@ const AdminPage: React.FC = () => {
         formData.append('files', file);
       });
       
+      console.log("Invio richiesta di caricamento multiplo...");
       const response = await apiService.bulkUploadDocuments(formData);
       
-      console.log("Risposta del server:", response.status);
+      console.log("Risposta del server:", response.status, response.data);
       
       const result = response.data;
       
       setUploadProgress(100);
       setCurrentFileIndex(bulkFiles.length);
-      setUploadSuccess(Array(result.results.successful).fill('').map((_, i) => `File ${i+1}`));
-      setUploadFailed(result.results.failedFiles);
+      setUploadSuccess(result.results?.successful || 0);
+      setUploadFailed(result.results?.failedFiles || []);
       
       // Aggiorna la lista dei documenti dopo il caricamento
       loadTabData(1);
       
-      const message = `Caricamento completato: ${result.results.successful} file caricati con successo, ${result.results.failed} falliti.`;
+      const message = `Caricamento completato: ${result.results?.successful || 0} file caricati con successo, ${result.results?.failed || 0} falliti.`;
       setSuccess(message);
     } catch (err: any) {
       console.error('Errore nel caricamento multiplo:', err);
-      setError(err.response?.data?.message || 'Errore nel caricamento dei file.');
+      const errorMessage = err.response?.data?.message || 'Errore nel caricamento dei file. Verifica la connessione al server.';
+      setError(errorMessage);
+      alert(`Si è verificato un errore nel caricamento multiplo: ${errorMessage}`);
     } finally {
       setIsUploading(false);
     }
@@ -522,19 +537,15 @@ const AdminPage: React.FC = () => {
         {/* Tab Gestione Documenti */}
         <TabPanel value={tabValue} index={1}>
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
             </Box>
-          ) : documents.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="body1" color="text.secondary">
-                Nessun documento trovato.
-              </Typography>
-            </Box>
-          ) : (
+          ) : error ? (
+            <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>
+          ) : documents && documents.length > 0 ? (
             <TableContainer component={Paper}>
               <Table>
-                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                <TableHead>
                   <TableRow>
                     <TableCell>Titolo</TableCell>
                     <TableCell>Data Caricamento</TableCell>
@@ -548,10 +559,10 @@ const AdminPage: React.FC = () => {
                   {documents.map((doc) => (
                     <TableRow key={doc.id}>
                       <TableCell>{doc.title}</TableCell>
-                      <TableCell>{formatDate(doc.uploadDate)}</TableCell>
-                      <TableCell>{doc.viewCount}</TableCell>
-                      <TableCell>{doc.downloadCount}</TableCell>
-                      <TableCell>{doc.favoriteCount}</TableCell>
+                      <TableCell>{formatDate(doc.createdAt || '')}</TableCell>
+                      <TableCell>{doc.viewCount || 0}</TableCell>
+                      <TableCell>{doc.downloadCount || 0}</TableCell>
+                      <TableCell>{doc.favoriteCount || 0}</TableCell>
                       <TableCell align="right">
                         <Tooltip title="Modifica">
                           <IconButton onClick={() => openDocumentForm(doc)}>
@@ -572,6 +583,12 @@ const AdminPage: React.FC = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                Nessun documento trovato.
+              </Typography>
+            </Box>
           )}
         </TabPanel>
       </Box>

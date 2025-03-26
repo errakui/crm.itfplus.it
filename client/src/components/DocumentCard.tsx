@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
+import { apiService } from '../services/api';
 
 interface DocumentCardProps {
   document: {
@@ -38,6 +39,7 @@ interface DocumentCardProps {
     keywords?: string[];
     cities?: string[];
     textSnippet?: string;
+    isPublic: boolean;
   };
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
@@ -50,6 +52,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated, token } = useContext(AuthContext);
+  const [loading, setLoading] = useState<boolean>(false);
   
   const handleView = () => {
     if (isAuthenticated()) {
@@ -81,26 +84,30 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
     }
 
     try {
-      // Incrementa il contatore di download
-      await axios.post(
-        `http://localhost:8000/api/documents/${document.id}/download`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      setLoading(true);
       
-      // Avvia il download
+      // Usa apiService per scaricare il documento
+      const response = await apiService.downloadDocument(document.id);
+      
+      // Crea un URL blob per il download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      
+      // Crea un elemento di link per il download
       const link = window.document.createElement('a');
-      link.href = document.fileUrl;
-      link.download = `${document.title || 'documento'}.pdf`;
+      link.href = url;
+      link.setAttribute('download', `${document.title}.pdf`);
       window.document.body.appendChild(link);
       link.click();
+      
+      // Pulisci
       window.document.body.removeChild(link);
-    } catch (err) {
-      console.error('Errore durante il download:', err);
+      window.URL.revokeObjectURL(url);
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Errore nel download del documento:', error);
+      setLoading(false);
     }
   };
 

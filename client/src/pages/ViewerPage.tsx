@@ -6,6 +6,7 @@ import PDFViewer from '../components/PDFViewer';
 import Chatbot from '../components/Chatbot';
 import AuthContext from '../contexts/AuthContext';
 import { ArrowBack } from '@mui/icons-material';
+import api, { apiService } from '../services/api';
 
 interface Document {
   id: string;
@@ -28,74 +29,63 @@ const ViewerPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchDocument = async () => {
-      if (!id || !isAuthenticated()) return;
-
+    const fetchData = async () => {
+      setIsLoading(true);
+      
       try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get(`http://localhost:8000/api/documents/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        setDocument(response.data.document);
-
-        // Verifica se il documento è nei preferiti
-        try {
-          const favoritesResponse = await axios.get(`http://localhost:8000/api/documents/favorites`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-
-          const favorites = favoritesResponse.data.documents || [];
-          const isFav = favorites.some((doc: any) => doc.id === id);
-          setIsFavorite(isFav);
-        } catch (err) {
-          console.error('Errore nel recupero dei preferiti:', err);
+        if (!id) {
+          setError('ID documento non valido');
+          setIsLoading(false);
+          return;
         }
-      } catch (err: any) {
-        console.error('Errore nel recupero del documento:', err);
-        setError(err.response?.data?.message || 'Errore nel caricamento del documento.');
-      } finally {
-        setLoading(false);
+        
+        // Carica dettagli documento
+        const response = await apiService.getDocument(id);
+        setDocument(response.data);
+        
+        // Carica preferiti dell'utente
+        const favoritesResponse = await apiService.getFavorites();
+        const favoriteIds = favoritesResponse.data.map((fav: any) => fav.documentId);
+        setIsFavorite(favoriteIds.includes(id));
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Errore nel recupero documento:', error);
+        setError('Errore nel caricamento del documento');
+        setIsLoading(false);
       }
     };
+    
+    fetchData();
+  }, [id]);
 
-    fetchDocument();
-  }, [id, token, isAuthenticated]);
-
-  const handleToggleFavorite = async () => {
-    if (!document || !isAuthenticated()) return;
-
+  const toggleFavorite = async () => {
     try {
+      if (!document) return;
+      
       if (isFavorite) {
         // Rimuovi dai preferiti
-        await axios.delete(`http://localhost:8000/api/documents/favorites/${document.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setIsFavorite(false);
+        await apiService.removeFavorite(document.id);
       } else {
         // Aggiungi ai preferiti
-        await axios.post(
-          `http://localhost:8000/api/documents/favorites`,
-          { documentId: document.id },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-        setIsFavorite(true);
+        await apiService.addFavorite(document.id);
       }
-    } catch (err) {
-      console.error('Errore nella gestione dei preferiti:', err);
+      
+      setIsFavorite(!isFavorite);
+      // Aggiorna il conteggio dei preferiti sulla UI
+      if (document) {
+        setDocument({
+          ...document,
+          favoriteCount: isFavorite 
+            ? (document.favoriteCount || 1) - 1 
+            : (document.favoriteCount || 0) + 1
+        });
+      }
+    } catch (error) {
+      console.error('Errore nella gestione del preferito:', error);
     }
   };
 
@@ -145,12 +135,12 @@ const ViewerPage: React.FC = () => {
             <Box sx={{ height: { xs: 'calc(100vh - 300px)', md: 'calc(100vh - 200px)' } }}>
               <PDFViewer
                 documentId={document.id}
-                documentUrl={document.fileUrl.startsWith('http') 
-                  ? document.fileUrl 
-                  : `http://localhost:8000${document.fileUrl.startsWith('/') ? '' : '/'}${document.fileUrl}`}
+                documentUrl={document.fileUrl ? 
+                  `/api/documents/${document.id}/download` 
+                  : ''}
                 title={document.title}
                 isFavorite={isFavorite}
-                onToggleFavorite={handleToggleFavorite}
+                onToggleFavorite={toggleFavorite}
               />
             </Box>
           </Grid>

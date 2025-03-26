@@ -27,21 +27,28 @@ model User {
 }
 
 model Document {
-  id          String    @id @default(uuid())
-  title       String
-  description String
-  filePath    String
-  fileSize    Int
-  mimeType    String
-  keywords    String?
-  city        String?
-  isActive    Boolean   @default(true)
-  addedBy     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  favorites   Favorite[]
-  downloads   Download[]
-  user        User      @relation("AddedByUser", fields: [addedBy], references: [id])
+  id                String    @id @default(uuid())
+  title             String
+  description       String
+  fileName          String?
+  filePath          String?  // Mantenuto per compatibilità
+  fileUrl           String?  // URL Cloudinary
+  cloudinaryPublicId String?  // Public ID per Cloudinary
+  fileSize          Int?
+  fileType          String?
+  mimeType          String?  // Mantenuto per compatibilità
+  keywords          String?
+  city              String?
+  isActive          Boolean   @default(true)
+  viewCount         Int       @default(0)
+  downloadCount     Int       @default(0)
+  favoriteCount     Int       @default(0)
+  addedBy           String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  favorites         Favorite[]
+  downloads         Download[]
+  user              User      @relation("AddedByUser", fields: [addedBy], references: [id])
 }
 
 model Favorite {

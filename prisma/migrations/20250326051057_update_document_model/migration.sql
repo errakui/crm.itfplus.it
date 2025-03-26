@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Document" ADD COLUMN     "cloudinaryPublicId" TEXT,
+ADD COLUMN     "downloadCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "favoriteCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "fileName" TEXT,
+ADD COLUMN     "fileType" TEXT,
+ADD COLUMN     "fileUrl" TEXT,
+ADD COLUMN     "viewCount" INTEGER NOT NULL DEFAULT 0,
+ALTER COLUMN "filePath" DROP NOT NULL,
+ALTER COLUMN "fileSize" DROP NOT NULL,
+ALTER COLUMN "mimeType" DROP NOT NULL;

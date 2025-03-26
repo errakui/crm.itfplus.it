@@ -18,6 +18,7 @@ import { Search as SearchIcon, FilterList as FilterListIcon } from '@mui/icons-m
 import DocumentCard from '../components/DocumentCard';
 import AuthContext from '../contexts/AuthContext';
 import axios from 'axios';
+import { apiService } from '../services/api';
 
 interface Document {
   id: string;
@@ -38,7 +39,7 @@ interface Document {
 const HomePage: React.FC = () => {
   const { isAuthenticated, token } = useContext(AuthContext);
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [favorites, setFavorites] = useState<Document[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -47,61 +48,51 @@ const HomePage: React.FC = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [totalDocuments, setTotalDocuments] = useState<number>(0);
+  const [sortOrder, setSortOrder] = useState<string>('asc');
+  const [page, setPage] = useState<number>(1);
 
-  // Carica i documenti quando cambia il termine di ricerca o le città selezionate
+  // Carica i documenti
   useEffect(() => {
+    const fetchDocuments = async () => {
+      if (!isAuthenticated()) return;
+      
+      try {
+        setLoading(true);
+        
+        // Carica documenti con apiService
+        const response = await apiService.getDocuments({
+          search: searchTerm,
+          city: selectedCities.join(','),
+          sort: sortOrder,
+        });
+        
+        setDocuments(response.data.documents || []);
+        setTotalDocuments(response.data.total || 0);
+        
+        // Carica preferiti per marcare i documenti
+        const favoritesResponse = await apiService.getFavorites();
+        const favoriteIds = favoritesResponse.data.map((doc: any) => doc.documentId || doc.id);
+        setFavorites(favoriteIds);
+        
+        // Carica elenco città disponibili
+        const citiesResponse = await apiService.getCities();
+        setAvailableCities(citiesResponse.data || []);
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('Errore nel recupero documenti:', err);
+        setLoading(false);
+      }
+    };
+    
     fetchDocuments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, isAuthenticated, searchTerm, selectedCities]);
+  }, [isAuthenticated, searchTerm, selectedCities, sortOrder]);
 
   // Carica le città disponibili al caricamento del componente
   useEffect(() => {
     fetchCities();
   }, []);
-
-  const fetchDocuments = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Costruisci i parametri di query
-      const params = new URLSearchParams();
-      if (searchTerm) {
-        params.append('searchTerm', searchTerm);
-      }
-      selectedCities.forEach(city => {
-        params.append('cities', city);
-      });
-      
-      const queryString = params.toString() ? `?${params.toString()}` : '';
-      
-      // Fetch documenti con filtri
-      const response = await axios.get(`http://localhost:8000/api/documents${queryString}`, {
-        headers: isAuthenticated() ? { Authorization: `Bearer ${token}` } : {}
-      });
-      
-      setDocuments(response.data.documents || []);
-      
-      // Se l'utente è autenticato, recupera anche i preferiti
-      if (isAuthenticated()) {
-        try {
-          const favResponse = await axios.get('http://localhost:8000/api/documents/favorites', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          setFavorites(favResponse.data.documents || []);
-          setUserFavorites((favResponse.data.documents || []).map((doc: Document) => doc.id));
-        } catch (err) {
-          console.error('Errore nel recupero dei preferiti:', err);
-        }
-      }
-    } catch (err: any) {
-      console.error('Errore nel recupero dei documenti:', err);
-      setError(err.response?.data?.message || 'Errore nel caricamento dei documenti.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchCities = async () => {
     try {
@@ -120,34 +111,16 @@ const HomePage: React.FC = () => {
     setActiveTab(newValue);
   };
 
-  const toggleFavorite = async (documentId: string) => {
-    if (!isAuthenticated()) return;
-
+  const handleToggleFavorite = async (documentId: string) => {
     try {
-      const isFavorite = userFavorites.includes(documentId);
-      
-      if (isFavorite) {
+      if (favorites.includes(documentId)) {
         // Rimuovi dai preferiti
-        await axios.delete(`http://localhost:8000/api/documents/favorites/${documentId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        setFavorites(favorites.filter(doc => doc.id !== documentId));
-        setUserFavorites(userFavorites.filter(id => id !== documentId));
+        await apiService.removeFavorite(documentId);
+        setFavorites(favorites.filter(id => id !== documentId));
       } else {
         // Aggiungi ai preferiti
-        await axios.post(
-          'http://localhost:8000/api/documents/favorites',
-          { documentId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        // Aggiungi alla lista dei preferiti
-        const docToAdd = documents.find(doc => doc.id === documentId);
-        if (docToAdd) {
-          setFavorites([...favorites, docToAdd]);
-          setUserFavorites([...userFavorites, documentId]);
-        }
+        await apiService.addFavorite(documentId);
+        setFavorites([...favorites, documentId]);
       }
     } catch (err) {
       console.error('Errore nella gestione dei preferiti:', err);
@@ -155,7 +128,9 @@ const HomePage: React.FC = () => {
   };
 
   // Filtra per tab attivo (tutti i documenti o preferiti)
-  const displayedDocuments = activeTab === 0 ? documents : favorites;
+  const displayedDocuments = activeTab === 0 
+    ? documents 
+    : documents.filter(doc => favorites.includes(doc.id));
 
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
@@ -363,8 +338,8 @@ const HomePage: React.FC = () => {
             <Grid item xs={12} sm={6} md={4} lg={3} key={doc.id}>
               <DocumentCard 
                 document={doc}
-                isFavorite={userFavorites.includes(doc.id)}
-                onToggleFavorite={() => toggleFavorite(doc.id)}
+                isFavorite={favorites.includes(doc.id)}
+                onToggleFavorite={() => handleToggleFavorite(doc.id)}
               />
             </Grid>
           ))}
