@@ -26,6 +26,7 @@ export interface Document {
   city?: string;
   cities?: string[];
   isActive?: boolean;
+  isPublic?: boolean;
   viewCount?: number;
   downloadCount?: number;
   favoriteCount?: number;

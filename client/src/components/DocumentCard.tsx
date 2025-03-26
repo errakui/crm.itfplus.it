@@ -39,7 +39,7 @@ interface DocumentCardProps {
     keywords?: string[];
     cities?: string[];
     textSnippet?: string;
-    isPublic: boolean;
+    isPublic?: boolean;
   };
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
@@ -55,7 +55,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   
   const handleView = () => {
-    if (isAuthenticated()) {
+    if (isAuthenticated() || document.isPublic) {
       navigate(`/viewer/${document.id}`);
     } else {
       navigate('/login', { state: { from: `/viewer/${document.id}` } });
@@ -78,7 +78,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   };
 
   const handleDownload = async () => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated() && !document.isPublic) {
       navigate('/login', { state: { from: '/' } });
       return;
     }
