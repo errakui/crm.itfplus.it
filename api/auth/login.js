@@ -33,19 +33,6 @@ module.exports = async (req, res) => {
     console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Configurato' : 'Non configurato');
     console.log('EMAIL_HOST:', process.env.EMAIL_HOST ? 'Configurato' : 'Non configurato');
 
-    // Verifica variabili d'ambiente
-    if (!process.env.DATABASE_URL) {
-      console.warn('DATABASE_URL non configurato - usando modalità di simulazione');
-      // Modalità di simulazione come fallback
-      return handleSimulatedLogin(req, res);
-    }
-    
-    if (!process.env.JWT_SECRET) {
-      console.warn('JWT_SECRET non configurato - usando modalità di simulazione');
-      // Modalità di simulazione come fallback
-      return handleSimulatedLogin(req, res);
-    }
-
     // Verifica corpo della richiesta
     if (!req.body) {
       return res.status(400).json({ error: 'Corpo della richiesta mancante' });
@@ -61,8 +48,7 @@ module.exports = async (req, res) => {
 
     // Verifica che Prisma Client sia stato inizializzato
     if (!prisma) {
-      console.warn('Prisma Client non inizializzato - usando modalità di simulazione');
-      return handleSimulatedLogin(req, res);
+      return res.status(500).json({ error: 'Errore di connessione al database' });
     }
 
     // Cerca l'utente nel database
@@ -74,10 +60,6 @@ module.exports = async (req, res) => {
 
     // Verifica se l'utente esiste
     if (!user) {
-      // Se è un utente admin predefinito, usa la simulazione
-      if (email === 'admin@itfplus.it') {
-        return handleSimulatedLogin(req, res);
-      }
       return res.status(401).json({ error: 'Credenziali non valide' });
     }
 
@@ -96,7 +78,7 @@ module.exports = async (req, res) => {
         email: user.email,
         role: user.role
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'secret-fallback',
       { expiresIn: '24h' }
     );
 
@@ -116,14 +98,6 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Errore durante il login:', error);
     
-    // Se c'è un errore di database, usa la simulazione
-    if (error.name === 'PrismaClientInitializationError' || 
-        error.name === 'PrismaClientKnownRequestError' || 
-        error.message.includes('database')) {
-      console.warn('Errore di database - usando modalità di simulazione');
-      return handleSimulatedLogin(req, res);
-    }
-    
     // Messaggio di errore più dettagliato
     return res.status(500).json({ 
       error: 'Errore del server durante il login',
@@ -136,29 +110,4 @@ module.exports = async (req, res) => {
       await prisma.$disconnect();
     }
   }
-};
-
-// Funzione per gestire il login simulato
-function handleSimulatedLogin(req, res) {
-  const { email, password } = req.body;
-  
-  console.log('Attivata modalità di simulazione per:', email);
-  
-  // Accetta solo l'utente admin predefinito
-  if (email === 'admin@itfplus.it' && password === 'admin123') {
-    const token = 'simulated-jwt-token-1234567890';
-    
-    return res.status(200).json({
-      token,
-      user: {
-        id: '1',
-        email: 'admin@itfplus.it',
-        name: 'Admin',
-        role: 'ADMIN'
-      },
-      message: 'Login effettuato con successo (modalità simulazione)'
-    });
-  } else {
-    return res.status(401).json({ error: 'Credenziali non valide' });
-  }
-} 
+}; 
