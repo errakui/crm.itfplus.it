@@ -49,29 +49,7 @@ import {
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
 import { apiService } from '../services/api';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'USER' | 'ADMIN';
-  createdAt: string;
-  expiresAt?: string; // Data di scadenza dell'account
-  expiresInDays?: string; // Giorni di validità per l'account (30 o 360)
-}
-
-interface Document {
-  id: string;
-  title: string;
-  description?: string;
-  fileUrl: string;
-  fileSize: number;
-  uploadDate: string;
-  viewCount: number;
-  downloadCount: number;
-  favoriteCount: number;
-  keywords?: string[];
-}
+import { User, Document } from '../types';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -559,7 +537,7 @@ const AdminPage: React.FC = () => {
                   {documents.map((doc) => (
                     <TableRow key={doc.id}>
                       <TableCell>{doc.title}</TableCell>
-                      <TableCell>{formatDate(doc.createdAt || '')}</TableCell>
+                      <TableCell>{formatDate(doc.uploadDate || '')}</TableCell>
                       <TableCell>{doc.viewCount || 0}</TableCell>
                       <TableCell>{doc.downloadCount || 0}</TableCell>
                       <TableCell>{doc.favoriteCount || 0}</TableCell>

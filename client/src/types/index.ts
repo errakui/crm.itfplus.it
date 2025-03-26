@@ -13,6 +13,7 @@ export interface Document {
   title: string;
   description?: string;
   createdAt?: string;
+  uploadDate?: string;
   userId?: string;
   fileName?: string;
   filePath?: string;
@@ -23,6 +24,7 @@ export interface Document {
   mimeType?: string;
   keywords?: string[];
   city?: string;
+  cities?: string[];
   isActive?: boolean;
   viewCount?: number;
   downloadCount?: number;
