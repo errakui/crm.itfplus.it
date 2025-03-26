@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 
     // Gestione GET - Lista documenti
     if (req.method === 'GET') {
-      const { search, city, page = 1, limit = 10 } = req.query;
+      const { search, cities, page = 1, limit = 10 } = req.query;
       const skip = (page - 1) * limit;
 
       // Costruisci la query
@@ -46,12 +46,17 @@ module.exports = async (req, res) => {
         where.OR = [
           { title: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
-          { keywords: { has: search } }
+          { keywords: { has: search } },
+          { content: { contains: search, mode: 'insensitive' } }
         ];
       }
 
-      if (city) {
-        where.city = city;
+      if (cities) {
+        // Gestisci sia stringa singola che array di città
+        const cityArray = Array.isArray(cities) ? cities : [cities];
+        where.city = {
+          in: cityArray
+        };
       }
 
       // Recupera i documenti
@@ -60,13 +65,51 @@ module.exports = async (req, res) => {
           where,
           skip,
           take: parseInt(limit),
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            content: true,
+            city: true,
+            fileUrl: true,
+            fileSize: true,
+            createdAt: true,
+            keywords: true
+          }
         }),
         prisma.document.count({ where })
       ]);
 
+      // Formatta i risultati per evidenziare le corrispondenze
+      const formattedDocuments = documents.map(doc => {
+        const matches = {
+          title: search ? doc.title.toLowerCase().includes(search.toLowerCase()) : false,
+          description: search ? doc.description?.toLowerCase().includes(search.toLowerCase()) : false,
+          content: search ? doc.content?.toLowerCase().includes(search.toLowerCase()) : false,
+          keywords: search ? doc.keywords.some(k => k.toLowerCase().includes(search.toLowerCase())) : false
+        };
+
+        // Estrai un snippet dal contenuto se c'è una corrispondenza
+        let contentSnippet = null;
+        if (matches.content && doc.content) {
+          const index = doc.content.toLowerCase().indexOf(search.toLowerCase());
+          if (index !== -1) {
+            const start = Math.max(0, index - 100);
+            const end = Math.min(doc.content.length, index + 100);
+            contentSnippet = doc.content.substring(start, end);
+          }
+        }
+
+        return {
+          ...doc,
+          matches,
+          contentSnippet
+        };
+      });
+
       return res.status(200).json({
-        documents,
+        documents: formattedDocuments,
         pagination: {
           total,
           page: parseInt(page),

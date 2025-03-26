@@ -40,6 +40,7 @@ interface DocumentCardProps {
     cities?: string[];
     textSnippet?: string;
     isPublic?: boolean;
+    contentSnippet?: string;
   };
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
@@ -171,7 +172,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           </Typography>
         )}
         
-        {document.textSnippet && (
+        {document.contentSnippet && (
           <Paper
             elevation={0}
             sx={{
@@ -190,7 +191,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {document.textSnippet}
+            {document.contentSnippet}
           </Paper>
         )}
         

@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
+const pdfParse = require('pdf-parse');
 
 // Inizializza Prisma Client
 const prisma = new PrismaClient();
@@ -23,6 +24,17 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
+
+// Funzione per estrarre il testo da un PDF
+async function extractTextFromPDF(buffer) {
+  try {
+    const data = await pdfParse(buffer);
+    return data.text;
+  } catch (error) {
+    console.error('Errore nell\'estrazione del testo dal PDF:', error);
+    return null;
+  }
+}
 
 module.exports = async (req, res) => {
   // Log per debug
@@ -97,6 +109,12 @@ module.exports = async (req, res) => {
           
           console.log('Dati documento:', { title, description, category, city });
           
+          // Estrai il testo dal PDF
+          let content = null;
+          if (req.file.mimetype === 'application/pdf') {
+            content = await extractTextFromPDF(req.file.buffer);
+          }
+          
           // Upload su Cloudinary
           console.log('Caricamento su Cloudinary...');
           const fileBuffer = req.file.buffer;
@@ -129,6 +147,7 @@ module.exports = async (req, res) => {
             data: {
               title,
               description: description || '',
+              content: content || '',
               category: category || '',
               city: city || '',
               fileType: path.extname(req.file.originalname).substring(1) || 'pdf',
@@ -179,8 +198,16 @@ module.exports = async (req, res) => {
       
       console.log('Documento trovato, URL:', document.fileUrl);
       
-      // Reindirizzamento all'URL Cloudinary
-      return res.status(200).json({ fileUrl: document.fileUrl });
+      // Scarica il file da Cloudinary
+      const response = await fetch(document.fileUrl);
+      const buffer = await response.buffer();
+      
+      // Imposta gli header per il download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${document.fileName}"`);
+      
+      // Invia il file
+      return res.send(buffer);
       
     } catch (error) {
       console.error('Errore durante il download del documento:', error);
