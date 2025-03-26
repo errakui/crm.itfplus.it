@@ -84,6 +84,12 @@ module.exports = async (req, res) => {
       console.log('Elaborazione richiesta POST per nuovo utente');
       const { email, password, name, role } = req.body;
 
+      // Verifica password
+      if (!password) {
+        console.error("❌ Password mancante:", password);
+        return res.status(400).json({ error: "Password mancante" });
+      }
+
       // Verifica se l'utente esiste già
       console.log('Verifica se l\'email è già registrata:', email);
       const existingUser = await prisma.user.findUnique({
