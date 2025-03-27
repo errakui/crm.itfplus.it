@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
+const pdfParse = require('pdf-parse');
 
 // Inizializza Prisma Client
 const prisma = new PrismaClient();
@@ -16,6 +17,44 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true
 });
+
+// Lista di città italiane comuni
+const cityNames = [
+  'Roma', 'Milano', 'Napoli', 'Torino', 'Palermo', 'Genova', 'Bologna', 'Firenze', 'Bari', 'Catania',
+  'Venezia', 'Verona', 'Messina', 'Padova', 'Trieste', 'Taranto', 'Brescia', 'Prato', 'Reggio Calabria',
+  'Modena', 'Parma', 'Livorno', 'Cagliari', 'Foggia', 'Sassari', 'Salerno', 'Pescara', 'Siracusa',
+  'Pordenone', 'Treviso', 'Udine', 'Vicenza', 'Monza', 'Bergamo', 'Como', 'Trento'
+];
+
+// Funzione per estrarre il testo da un PDF
+async function extractTextFromPDF(buffer) {
+  try {
+    const data = await pdfParse(buffer);
+    return data.text;
+  } catch (error) {
+    console.error('Errore nell\'estrazione del testo dal PDF:', error);
+    return '';
+  }
+}
+
+// Funzione per individuare la città nel nome o contenuto del file
+function extractCityFromText(text, filename) {
+  // Prima controlla nel nome del file
+  const cityFromFilename = cityNames.find(city => 
+    filename.toUpperCase().includes(city.toUpperCase())
+  );
+  
+  if (cityFromFilename) {
+    return cityFromFilename;
+  }
+  
+  // Poi controlla nel contenuto
+  const cityFromContent = cityNames.find(city => 
+    text.toUpperCase().includes(city.toUpperCase())
+  );
+  
+  return cityFromContent || 'Non specificata';
+}
 
 // Configura multer per l'upload temporaneo
 const storage = multer.memoryStorage();
@@ -107,21 +146,35 @@ module.exports = async (req, res) => {
             const uploadResult = await cloudinaryUpload;
             console.log('File caricato su Cloudinary:', uploadResult.secure_url);
             
+            // Estrai il testo dal PDF
+            let content = '';
+            if (file.mimetype === 'application/pdf') {
+              content = await extractTextFromPDF(file.buffer);
+            }
+            
+            // Estrai la città dal nome file o dal contenuto
+            const extractedCity = extractCityFromText(content, file.originalname);
+            
             // Crea il documento nel database
             const document = await prisma.document.create({
               data: {
                 title: baseName,
                 description: `Documento caricato automaticamente: ${baseName}`,
+                content: content,
                 fileName: file.originalname,
                 fileSize: file.size,
                 fileType: path.extname(file.originalname).substring(1) || 'pdf',
                 fileUrl: uploadResult.secure_url,
                 cloudinaryPublicId: uploadResult.public_id,
-                city: 'Automatico',
+                city: extractedCity,
+                keywords: [], // Array vuoto per i keywords
                 user: {
                   connect: { id: user.id }
                 },
-                isActive: true
+                isActive: true,
+                viewCount: 0,
+                downloadCount: 0,
+                favoriteCount: 0
               }
             });
             

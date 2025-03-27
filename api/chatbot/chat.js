@@ -62,8 +62,8 @@ module.exports = async (req, res) => {
       await prisma.chatMessage.create({
         data: {
           userId: user.id,
-          message,
-          isUser: true
+          content: message,
+          isBot: false
         }
       });
 
@@ -89,8 +89,8 @@ module.exports = async (req, res) => {
       await prisma.chatMessage.create({
         data: {
           userId: user.id,
-          message: response,
-          isUser: false
+          content: response,
+          isBot: true
         }
       });
 

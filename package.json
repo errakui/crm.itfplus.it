@@ -9,7 +9,7 @@
     "build": "tsc",
     "deploy": "npm run build && npm run start",
     "test": "jest",
-    "vercel-build": "npx prisma generate && npx prisma db push --accept-data-loss"
+    "vercel-build": "npx prisma generate && npx prisma db push --accept-data-loss && node prisma/vercel-deploy.js"
   },
   "engines": {
     "node": "22.x"
