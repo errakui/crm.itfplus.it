@@ -36,6 +36,7 @@ import {
   ListItemText,
   ListItemIcon,
   FormHelperText,
+  Checkbox,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -45,6 +46,7 @@ import {
   FileUpload as FileUploadIcon,
   InsertDriveFile as FileIcon,
   CloudUpload as CloudUploadIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
@@ -99,6 +101,10 @@ const AdminPage: React.FC = () => {
   const [uploadSuccess, setUploadSuccess] = useState<string[]>([]);
   const [uploadFailed, setUploadFailed] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+
+  // Stato per la selezione multipla
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const [openMultiDeleteDialog, setOpenMultiDeleteDialog] = useState<boolean>(false);
 
   useEffect(() => {
     // Se non è admin, non dovrebbe essere qui
@@ -334,37 +340,32 @@ const AdminPage: React.FC = () => {
   };
 
   const handleBulkUpload = async () => {
-    if (!bulkFiles.length) return;
+    if (!bulkFiles || bulkFiles.length === 0) {
+      alert('Seleziona almeno un file da caricare');
+      return;
+    }
     
-    console.log("Avvio caricamento di", bulkFiles.length, "file");
     setIsUploading(true);
+    setUploadProgress(0);
+    setCurrentFileIndex(0);
     setUploadSuccess([]);
     setUploadFailed([]);
-    setCurrentFileIndex(0);
-    setUploadProgress(0);
     
     try {
       const formData = new FormData();
-      
-      // Aggiungi tutti i file al FormData
       bulkFiles.forEach(file => {
-        console.log("Aggiunto file:", file.name, file.type, file.size);
         formData.append('documents', file);
       });
       
-      console.log("Invio richiesta di caricamento multiplo...");
       const response = await apiService.bulkUploadDocuments(formData);
-      
-      console.log("Risposta del server:", response.status, response.data);
-      
       const result = response.data;
       
-      setUploadProgress(100);
-      setCurrentFileIndex(bulkFiles.length);
-      setUploadSuccess(result.results?.successful || 0);
+      // Aggiorna contatori
+      setUploadSuccess(result.documents?.map((doc: any) => doc.title) || []);
       setUploadFailed(result.results?.failedFiles || []);
+      setUploadProgress(100);
       
-      // Aggiorna la lista dei documenti dopo il caricamento
+      // Ricarica i documenti
       loadTabData(1);
       
       const message = `Caricamento completato: ${result.results?.successful || 0} file caricati con successo, ${result.results?.failed || 0} falliti.`;
@@ -373,9 +374,59 @@ const AdminPage: React.FC = () => {
       console.error('Errore nel caricamento multiplo:', err);
       const errorMessage = err.response?.data?.message || 'Errore nel caricamento dei file. Verifica la connessione al server.';
       setError(errorMessage);
-      alert(`Si è verificato un errore nel caricamento multiplo: ${errorMessage}`);
+      setUploadFailed(bulkFiles.map(file => file.name));
     } finally {
-      setIsUploading(false);
+      setUploadProgress(100);
+      // Non chiudere automaticamente il dialogo per mostrare lo stato finale
+    }
+  };
+
+  // Gestione selezione multipla
+  const handleDocumentSelect = (id: string) => {
+    if (selectedDocuments.includes(id)) {
+      setSelectedDocuments(selectedDocuments.filter(docId => docId !== id));
+    } else {
+      setSelectedDocuments([...selectedDocuments, id]);
+    }
+  };
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setSelectedDocuments(documents.map(doc => doc.id));
+    } else {
+      setSelectedDocuments([]);
+    }
+  };
+
+  const openMultiDeleteConfirmation = () => {
+    if (selectedDocuments.length === 0) return;
+    setOpenMultiDeleteDialog(true);
+  };
+
+  const handleMultiDelete = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      // Elimina tutti i documenti selezionati
+      await Promise.all(
+        selectedDocuments.map(id => apiService.deleteDocument(id))
+      );
+      
+      // Aggiorna la lista dei documenti
+      const newDocuments = documents.filter(doc => !selectedDocuments.includes(doc.id));
+      setDocuments(newDocuments);
+      
+      // Resetta la selezione
+      setSelectedDocuments([]);
+      setSuccess(`${selectedDocuments.length} documenti eliminati con successo`);
+    } catch (err: any) {
+      console.error('Errore nell\'eliminazione dei documenti:', err);
+      setError('Errore nell\'eliminazione dei documenti');
+    } finally {
+      setLoading(false);
+      setOpenMultiDeleteDialog(false);
     }
   };
 
@@ -393,6 +444,72 @@ const AdminPage: React.FC = () => {
       >
         Pannello di Amministrazione
       </Typography>
+
+      {/* Dashboard con contatori */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <Paper
+            elevation={2}
+            sx={{
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              bgcolor: '#f0f7ff'
+            }}
+          >
+            <Typography variant="h6" gutterBottom color="primary">
+              Utenti Totali
+            </Typography>
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+              {loading ? <CircularProgress size={40} /> : users.length}
+            </Typography>
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+              <Chip
+                label={`${users.filter(u => u.role === 'ADMIN').length} Amministratori`}
+                color="primary"
+                variant="outlined"
+              />
+              <Chip
+                label={`${users.filter(u => u.role === 'USER').length} Utenti`}
+                color="default"
+                variant="outlined"
+              />
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper
+            elevation={2}
+            sx={{
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              bgcolor: '#fff8e1'
+            }}
+          >
+            <Typography variant="h6" gutterBottom color="secondary">
+              Documenti Totali
+            </Typography>
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+              {loading ? <CircularProgress size={40} /> : documents.length}
+            </Typography>
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+              <Chip
+                label={`${documents.reduce((sum, doc) => sum + (doc.viewCount || 0), 0)} Visualizzazioni`}
+                color="secondary"
+                variant="outlined"
+              />
+              <Chip
+                label={`${documents.reduce((sum, doc) => sum + (doc.downloadCount || 0), 0)} Download`}
+                color="secondary"
+                variant="outlined"
+              />
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -521,46 +638,76 @@ const AdminPage: React.FC = () => {
           ) : error ? (
             <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>
           ) : documents && documents.length > 0 ? (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Titolo</TableCell>
-                    <TableCell>Data Caricamento</TableCell>
-                    <TableCell>Visualizzazioni</TableCell>
-                    <TableCell>Download</TableCell>
-                    <TableCell>Preferiti</TableCell>
-                    <TableCell align="right">Azioni</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {documents.map((doc) => (
-                    <TableRow key={doc.id}>
-                      <TableCell>{doc.title}</TableCell>
-                      <TableCell>{formatDate(doc.uploadDate || '')}</TableCell>
-                      <TableCell>{doc.viewCount || 0}</TableCell>
-                      <TableCell>{doc.downloadCount || 0}</TableCell>
-                      <TableCell>{doc.favoriteCount || 0}</TableCell>
-                      <TableCell align="right">
-                        <Tooltip title="Modifica">
-                          <IconButton onClick={() => openDocumentForm(doc)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Elimina">
-                          <IconButton 
-                            onClick={() => openDeleteConfirmation(doc.id, 'document')}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
+            <>
+              {selectedDocuments.length > 0 && (
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="body2" sx={{ mr: 2 }}>
+                    {selectedDocuments.length} documenti selezionati
+                  </Typography>
+                  <Button 
+                    variant="contained" 
+                    color="error" 
+                    startIcon={<DeleteIcon />}
+                    onClick={openMultiDeleteConfirmation}
+                  >
+                    Elimina Selezionati
+                  </Button>
+                </Box>
+              )}
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          indeterminate={selectedDocuments.length > 0 && selectedDocuments.length < documents.length}
+                          checked={documents.length > 0 && selectedDocuments.length === documents.length}
+                          onChange={handleSelectAll}
+                        />
                       </TableCell>
+                      <TableCell>Titolo</TableCell>
+                      <TableCell>Data Caricamento</TableCell>
+                      <TableCell>Visualizzazioni</TableCell>
+                      <TableCell>Download</TableCell>
+                      <TableCell>Preferiti</TableCell>
+                      <TableCell align="right">Azioni</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {documents.map((doc) => (
+                      <TableRow key={doc.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedDocuments.includes(doc.id)}
+                            onChange={() => handleDocumentSelect(doc.id)}
+                          />
+                        </TableCell>
+                        <TableCell>{doc.title}</TableCell>
+                        <TableCell>{formatDate(doc.uploadDate || '')}</TableCell>
+                        <TableCell>{doc.viewCount || 0}</TableCell>
+                        <TableCell>{doc.downloadCount || 0}</TableCell>
+                        <TableCell>{doc.favoriteCount || 0}</TableCell>
+                        <TableCell align="right">
+                          <Tooltip title="Modifica">
+                            <IconButton onClick={() => openDocumentForm(doc)}>
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Elimina">
+                            <IconButton 
+                              onClick={() => openDeleteConfirmation(doc.id, 'document')}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
           ) : (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <Typography variant="body1" color="text.secondary">
@@ -770,30 +917,43 @@ const AdminPage: React.FC = () => {
             )}
             
             {bulkFiles.length > 0 && !isUploading && (
-              <Box sx={{ mt: 2, border: '1px solid #eee', borderRadius: 1, p: 2, maxHeight: '300px', overflowY: 'auto' }}>
+              <Box sx={{ my: 2 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {bulkFiles.length} file selezionati
+                  {bulkFiles.length} file selezionati:
                 </Typography>
-                <List dense>
-                  {bulkFiles.slice(0, 10).map((file, index) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <FileIcon />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={file.name}
-                        secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
-                      />
-                    </ListItem>
-                  ))}
-                  {bulkFiles.length > 10 && (
-                    <ListItem>
-                      <ListItemText 
-                        primary={`+ altri ${bulkFiles.length - 10} file...`}
-                      />
-                    </ListItem>
-                  )}
-                </List>
+                <Paper sx={{ p: 2, maxHeight: '200px', overflow: 'auto' }}>
+                  <List dense>
+                    {bulkFiles.slice(0, 5).map((file, index) => (
+                      <ListItem key={index}>
+                        <ListItemIcon>
+                          <FileIcon />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={file.name} 
+                          secondary={`${(file.size / 1024).toFixed(2)} KB`}
+                        />
+                      </ListItem>
+                    ))}
+                    {bulkFiles.length > 5 && (
+                      <ListItem>
+                        <ListItemText 
+                          primary={`... e altri ${bulkFiles.length - 5} file`}
+                        />
+                      </ListItem>
+                    )}
+                  </List>
+                </Paper>
+                {!isUploading && (
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    fullWidth 
+                    sx={{ mt: 2 }}
+                    onClick={handleBulkUpload}
+                  >
+                    Carica {bulkFiles.length} file
+                  </Button>
+                )}
               </Box>
             )}
             
@@ -801,7 +961,7 @@ const AdminPage: React.FC = () => {
               <Box sx={{ mt: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body2">
-                    Caricamento in corso ({currentFileIndex + 1}/{bulkFiles.length})
+                    Caricamento in corso
                   </Typography>
                   <Typography variant="body2" sx={{ ml: 'auto' }}>
                     {uploadProgress}%
@@ -809,19 +969,40 @@ const AdminPage: React.FC = () => {
                 </Box>
                 <LinearProgress variant="determinate" value={uploadProgress} sx={{ mb: 2 }} />
                 
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{ mt: 2 }}>
                   <Grid item xs={6}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#e8f5e9' }}>
+                    <Paper 
+                      sx={{ 
+                        p: 2, 
+                        textAlign: 'center', 
+                        bgcolor: '#e8f5e9',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                      }}
+                    >
                       <Typography variant="h6" color="success.main">
                         {uploadSuccess.length}
                       </Typography>
                       <Typography variant="body2">
                         Completati
                       </Typography>
+                      {uploadProgress === 100 && uploadFailed.length === 0 && (
+                        <CheckCircleIcon color="success" sx={{ fontSize: 40, mt: 1 }} />
+                      )}
                     </Paper>
                   </Grid>
                   <Grid item xs={6}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#ffebee' }}>
+                    <Paper 
+                      sx={{ 
+                        p: 2, 
+                        textAlign: 'center', 
+                        bgcolor: '#ffebee',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                      }}
+                    >
                       <Typography variant="h6" color="error.main">
                         {uploadFailed.length}
                       </Typography>
@@ -831,23 +1012,60 @@ const AdminPage: React.FC = () => {
                     </Paper>
                   </Grid>
                 </Grid>
+                
+                {uploadProgress === 100 && (
+                  <Box sx={{ mt: 3, textAlign: 'center' }}>
+                    <Typography variant="body1" gutterBottom>
+                      {uploadFailed.length === 0 ? (
+                        <Alert severity="success" sx={{ mb: 2 }}>
+                          Tutti i file sono stati caricati con successo!
+                        </Alert>
+                      ) : (
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                          Caricamento completato con {uploadFailed.length} errori.
+                        </Alert>
+                      )}
+                    </Typography>
+                    <Button 
+                      variant="contained" 
+                      color="primary"
+                      onClick={() => {
+                        setOpenBulkUploadDialog(false);
+                        setBulkFiles([]);
+                        setIsUploading(false);
+                      }}
+                    >
+                      Chiudi
+                    </Button>
+                  </Box>
+                )}
               </Box>
             )}
           </Box>
         </DialogContent>
+      </Dialog>
+
+      {/* Dialog per eliminazione multipla */}
+      <Dialog
+        open={openMultiDeleteDialog}
+        onClose={() => setOpenMultiDeleteDialog(false)}
+        aria-labelledby="multi-delete-dialog-title"
+        aria-describedby="multi-delete-dialog-description"
+      >
+        <DialogTitle id="multi-delete-dialog-title">
+          Elimina Documenti
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="multi-delete-dialog-description">
+            Sei sicuro di voler eliminare {selectedDocuments.length} documenti? Questa azione non può essere annullata.
+          </DialogContentText>
+        </DialogContent>
         <DialogActions>
-          <Button 
-            onClick={() => setOpenBulkUploadDialog(false)} 
-            disabled={isUploading}
-          >
-            {isUploading ? 'Caricamento in corso...' : 'Annulla'}
+          <Button onClick={() => setOpenMultiDeleteDialog(false)} color="primary">
+            Annulla
           </Button>
-          <Button 
-            onClick={handleBulkUpload} 
-            variant="contained"
-            disabled={bulkFiles.length === 0 || isUploading}
-          >
-            {isUploading ? 'Caricamento in corso...' : `Carica ${bulkFiles.length} file`}
+          <Button onClick={handleMultiDelete} color="error" autoFocus>
+            Elimina
           </Button>
         </DialogActions>
       </Dialog>
