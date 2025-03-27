@@ -8,7 +8,7 @@ coverage/
 
 # Produzione
 /build/
-**/build/
+#**/build/
 **/dist/
 /out/
 
@@ -57,7 +57,7 @@ database.bak
 database_transfer.bak
 
 # Artifacts
-/client/build/
+#/client/build/
 /server/dist/
 
 # Lock files
