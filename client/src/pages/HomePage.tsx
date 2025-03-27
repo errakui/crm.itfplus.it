@@ -62,6 +62,7 @@ const HomePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
+        // Prepara i parametri, assicurandosi che cities non sia un array vuoto
         const params = {
           search: searchTerm,
           cities: selectedCities.length > 0 ? selectedCities : undefined,
@@ -69,8 +70,13 @@ const HomePage: React.FC = () => {
           limit: 10
         };
         
+        console.log('Parametri richiesta:', params);
+        
         const response = await apiService.getDocuments(params);
-        if (!response.data) {
+        
+        // Verifica che la risposta contenga i dati necessari
+        if (!response || !response.data) {
+          console.error('Risposta API non valida:', response);
           throw new Error('Nessun dato ricevuto dal server');
         }
         
@@ -83,10 +89,12 @@ const HomePage: React.FC = () => {
         const favoriteIds = favoritesResponse.data.map((doc: any) => doc.documentId || doc.id);
         setFavorites(favoriteIds);
         
-        setLoading(false);
       } catch (err: any) {
         console.error('Errore nel caricamento dei documenti:', err);
         setError(err.response?.data?.message || 'Errore nel caricamento dei documenti');
+        // Mantieni i documenti precedenti in caso di errore
+        setDocuments(prevDocuments => prevDocuments);
+      } finally {
         setLoading(false);
       }
     };
@@ -131,8 +139,14 @@ const HomePage: React.FC = () => {
   };
 
   const handleCityChange = (event: any, newValue: string[]) => {
-    setSelectedCities(newValue);
-    setPage(1); // Reset page when filters change
+    try {
+      console.log('Città selezionate:', newValue);
+      setSelectedCities(newValue);
+      setPage(1); // Reset page when filters change
+    } catch (err) {
+      console.error('Errore nella selezione delle città:', err);
+      // Non modificare lo stato in caso di errore
+    }
   };
 
   // Filtra per tab attivo (tutti i documenti o preferiti)

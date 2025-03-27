@@ -34,93 +34,124 @@ module.exports = async (req, res) => {
 
     // Gestione GET - Lista documenti
     if (req.method === 'GET') {
-      const { search, cities, page = 1, limit = 10 } = req.query;
-      const skip = (page - 1) * limit;
+      try {
+        const { search, cities, page = 1, limit = 10 } = req.query;
+        const skip = (page - 1) * limit;
 
-      // Costruisci la query
-      const where = {
-        isActive: true
-      };
+        // Log per debug
+        console.log('Query parametri ricevuti:', req.query);
+        console.log('Parametro cities:', cities);
 
-      if (search) {
-        where.OR = [
-          { title: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-          { keywords: { has: search } },
-          { content: { contains: search, mode: 'insensitive' } }
-        ];
-      }
-
-      if (cities) {
-        // Gestisci sia stringa singola che array di città
-        const cityArray = Array.isArray(cities) ? cities : cities.split(',').map(c => c.trim());
-        where.city = {
-          in: cityArray
-        };
-      }
-
-      // Recupera i documenti
-      const [documents, total] = await Promise.all([
-        prisma.document.findMany({
-          where,
-          skip,
-          take: parseInt(limit),
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            content: true,
-            city: true,
-            fileUrl: true,
-            fileSize: true,
-            createdAt: true,
-            keywords: true,
-            fileName: true,
-            viewCount: true,
-            downloadCount: true,
-            favoriteCount: true
-          }
-        }),
-        prisma.document.count({ where })
-      ]);
-
-      // Formatta i risultati per evidenziare le corrispondenze
-      const formattedDocuments = documents.map(doc => {
-        const matches = {
-          title: search ? doc.title.toLowerCase().includes(search.toLowerCase()) : false,
-          description: search ? doc.description?.toLowerCase().includes(search.toLowerCase()) : false,
-          content: search ? doc.content?.toLowerCase().includes(search.toLowerCase()) : false,
-          keywords: search ? doc.keywords.some(k => k.toLowerCase().includes(search.toLowerCase())) : false
+        // Costruisci la query
+        const where = {
+          isActive: true
         };
 
-        // Estrai un snippet dal contenuto se c'è una corrispondenza
-        let contentSnippet = null;
-        if (matches.content && doc.content) {
-          const index = doc.content.toLowerCase().indexOf(search.toLowerCase());
-          if (index !== -1) {
-            const start = Math.max(0, index - 100);
-            const end = Math.min(doc.content.length, index + 100);
-            contentSnippet = doc.content.substring(start, end);
+        if (search) {
+          where.OR = [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+            { keywords: { has: search } },
+            { content: { contains: search, mode: 'insensitive' } }
+          ];
+        }
+
+        // Gestione sicura delle città
+        if (cities) {
+          try {
+            // Gestisci sia stringa singola che array di città
+            let cityArray;
+            if (Array.isArray(cities)) {
+              cityArray = cities;
+            } else if (cities.includes(',')) {
+              cityArray = cities.split(',').map(c => c.trim());
+            } else {
+              cityArray = [cities];
+            }
+            console.log('Array città processato:', cityArray);
+            
+            if (cityArray.length > 0) {
+              where.city = {
+                in: cityArray
+              };
+            }
+          } catch (cityError) {
+            console.error('Errore nell\'elaborazione del parametro cities:', cityError);
+            // Non aggiungiamo il filtro se c'è un errore
           }
         }
 
-        return {
-          ...doc,
-          matches,
-          contentSnippet
-        };
-      });
+        // Recupera i documenti con maggiore controllo degli errori
+        try {
+          const [documents, total] = await Promise.all([
+            prisma.document.findMany({
+              where,
+              skip,
+              take: parseInt(limit),
+              orderBy: { createdAt: 'desc' },
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                content: true,
+                city: true,
+                fileUrl: true,
+                fileSize: true,
+                createdAt: true,
+                keywords: true,
+                fileName: true,
+                viewCount: true,
+                downloadCount: true,
+                favoriteCount: true
+              }
+            }),
+            prisma.document.count({ where })
+          ]);
 
-      return res.status(200).json({
-        documents: formattedDocuments,
-        pagination: {
-          total,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          totalPages: Math.ceil(total / limit)
+          // Formatta i risultati per evidenziare le corrispondenze
+          const formattedDocuments = documents.map(doc => {
+            const matches = {
+              title: search ? doc.title.toLowerCase().includes(search.toLowerCase()) : false,
+              description: search ? doc.description?.toLowerCase().includes(search.toLowerCase()) : false,
+              content: search ? doc.content?.toLowerCase().includes(search.toLowerCase()) : false,
+              keywords: search ? doc.keywords.some(k => k.toLowerCase().includes(search.toLowerCase())) : false
+            };
+
+            // Estrai un snippet dal contenuto se c'è una corrispondenza
+            let contentSnippet = null;
+            if (matches.content && doc.content) {
+              const index = doc.content.toLowerCase().indexOf(search.toLowerCase());
+              if (index !== -1) {
+                const start = Math.max(0, index - 100);
+                const end = Math.min(doc.content.length, index + 100);
+                contentSnippet = doc.content.substring(start, end);
+              }
+            }
+
+            return {
+              ...doc,
+              matches,
+              contentSnippet
+            };
+          });
+
+          return res.status(200).json({
+            documents: formattedDocuments,
+            pagination: {
+              total,
+              page: parseInt(page),
+              limit: parseInt(limit),
+              totalPages: Math.ceil(total / limit)
+            }
+          });
+        } catch (retrievalError) {
+          console.error('Errore durante la recuperazione dei documenti:', retrievalError);
+          return res.status(500).json({ error: 'Errore durante la recuperazione dei documenti' });
         }
-      });
+      } catch (queryError) {
+        console.error('Errore durante la costruzione della query:', queryError);
+        return res.status(500).json({ error: 'Errore durante la costruzione della query' });
+      }
     }
 
     // Gestione POST - Nuovo documento (solo admin)

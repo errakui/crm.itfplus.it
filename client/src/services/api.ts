@@ -15,11 +15,24 @@ export const apiService = {
   
   // Documents
   getDocuments: (params?: any) => {
-    // Rimuovi i parametri undefined
-    const cleanParams = Object.fromEntries(
-      Object.entries(params || {}).filter(([_, value]) => value !== undefined)
-    );
-    return api.get('/documents', { params: cleanParams });
+    try {
+      // Verifica e pulisci i parametri
+      if (!params) params = {};
+      
+      // Rimuovi i parametri undefined o array vuoti
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => {
+          if (Array.isArray(value) && value.length === 0) return false;
+          return value !== undefined;
+        })
+      );
+      
+      console.log('Parametri puliti:', cleanParams);
+      return api.get('/documents', { params: cleanParams });
+    } catch (error) {
+      console.error('Errore nella preparazione della richiesta:', error);
+      throw error;
+    }
   },
   
   getDocument: (id: string) => 
