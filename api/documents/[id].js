@@ -72,6 +72,20 @@ module.exports = async (req, res) => {
     // Gestione DELETE - Elimina documento
     if (req.method === 'DELETE') {
       try {
+        // Verifica che il documento esista
+        const document = await prisma.document.findUnique({
+          where: { id: documentId }
+        });
+        
+        if (!document) {
+          return res.status(404).json({ error: 'Documento non trovato' });
+        }
+        
+        // Verifica che l'utente sia il proprietario o un admin
+        if (document.userId !== user.id && user.role !== 'ADMIN') {
+          return res.status(403).json({ error: 'Non sei autorizzato a eliminare questo documento' });
+        }
+        
         // Prima elimina tutti i record correlati
         await prisma.$transaction([
           // Elimina tutti i preferiti associati
