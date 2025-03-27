@@ -69,7 +69,8 @@ const UserDashboard: React.FC = () => {
       // Carica documenti con apiService
       const response = await apiService.getDocuments({
         search: searchTerm,
-        sort: sortOrder
+        sort: sortOrder,
+        cities: selectedCities.length > 0 ? selectedCities : undefined
       });
       
       setDocuments(response.data.documents || []);
@@ -82,7 +83,7 @@ const UserDashboard: React.FC = () => {
   
   useEffect(() => {
     loadDocuments();
-  }, [searchTerm, sortOrder]);
+  }, [searchTerm, sortOrder, selectedCities]);
   
   useEffect(() => {
     const fetchCities = async () => {
