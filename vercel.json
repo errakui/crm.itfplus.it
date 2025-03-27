@@ -5,10 +5,6 @@
   "installCommand": "npm install && npx prisma generate",
   "builds": [
     {
-      "src": "index.js",
-      "use": "@vercel/node"
-    },
-    {
       "src": "api/**/*.js",
       "use": "@vercel/node"
     },
@@ -22,41 +18,43 @@
   ],
   "routes": [
     {
-      "src": "/api",
-      "dest": "/api/index.js"
-    },
-    {
       "src": "/api/auth/login",
+      "methods": ["POST", "OPTIONS"],
       "dest": "/api/auth/login.js"
     },
     {
       "src": "/api/auth/register",
+      "methods": ["POST", "OPTIONS"],
       "dest": "/api/auth/register.js"
     },
     {
       "src": "/api/auth/change-password",
+      "methods": ["POST", "OPTIONS"],
       "dest": "/api/auth/change-password.js"
     },
     {
       "src": "/api/documents/favorites",
-      "methods": ["GET", "POST"],
+      "methods": ["GET", "POST", "OPTIONS"],
       "dest": "/api/documents/favorites.js"
     },
     {
       "src": "/api/documents/favorites/(.*)",
-      "methods": ["DELETE", "GET"],
+      "methods": ["DELETE", "GET", "OPTIONS"],
       "dest": "/api/documents/favorites/[id].js?id=$1"
     },
     {
       "src": "/api/documents/search",
+      "methods": ["GET", "OPTIONS"],
       "dest": "/api/documents/search.js"
     },
     {
       "src": "/api/documents/cities",
+      "methods": ["GET", "OPTIONS"],
       "dest": "/api/documents/cities.js"
     },
     {
       "src": "/api/documents/admin/all",
+      "methods": ["GET", "OPTIONS"],
       "dest": "/api/documents/admin/all.js"
     },
     {
@@ -86,6 +84,7 @@
     },
     {
       "src": "/api/admin/users",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       "dest": "/api/admin/users.js"
     },
     {
@@ -95,15 +94,22 @@
     },
     {
       "src": "/api/support",
+      "methods": ["POST", "OPTIONS"],
       "dest": "/api/support.js"
     },
     {
       "src": "/api/contact",
+      "methods": ["POST", "OPTIONS"],
       "dest": "/api/contact.js"
     },
     {
+      "src": "/api",
+      "methods": ["GET", "OPTIONS"],
+      "dest": "/api/index.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client/build/$1"
+      "dest": "client/build/index.html"
     }
   ]
 } 
