@@ -409,10 +409,8 @@ const AdminPage: React.FC = () => {
     setSuccess(null);
     
     try {
-      // Elimina tutti i documenti selezionati
-      await Promise.all(
-        selectedDocuments.map(id => apiService.deleteDocument(id))
-      );
+      // Usa il nuovo endpoint per l'eliminazione multipla
+      await apiService.deleteMultipleDocuments(selectedDocuments);
       
       // Aggiorna la lista dei documenti
       const newDocuments = documents.filter(doc => !selectedDocuments.includes(doc.id));
@@ -423,7 +421,7 @@ const AdminPage: React.FC = () => {
       setSuccess(`${selectedDocuments.length} documenti eliminati con successo`);
     } catch (err: any) {
       console.error('Errore nell\'eliminazione dei documenti:', err);
-      setError('Errore nell\'eliminazione dei documenti');
+      setError('Errore nell\'eliminazione dei documenti: ' + (err.response?.data?.error || err.message));
     } finally {
       setLoading(false);
       setOpenMultiDeleteDialog(false);

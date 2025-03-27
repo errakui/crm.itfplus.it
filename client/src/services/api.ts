@@ -101,6 +101,9 @@ export const apiService = {
   // Cities
   getCities: () => 
     api.get('/documents/cities'),
+  
+  deleteMultipleDocuments: (documentIds: string[]) => 
+    api.post('/documents/bulk-delete', { documentIds }),
 };
 
 export default api; 

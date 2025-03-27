@@ -69,17 +69,30 @@ module.exports = async (req, res) => {
       return res.status(200).json(document);
     }
 
-    // Gestione DELETE - Eliminazione documento (solo admin)
+    // Gestione DELETE - Elimina documento
     if (req.method === 'DELETE') {
-      if (user.role !== 'ADMIN') {
-        return res.status(403).json({ error: 'Non autorizzato' });
+      try {
+        // Prima elimina tutti i record correlati
+        await prisma.$transaction([
+          // Elimina tutti i preferiti associati
+          prisma.favorite.deleteMany({
+            where: { documentId }
+          }),
+          // Elimina tutti i download associati
+          prisma.download.deleteMany({
+            where: { documentId }
+          }),
+          // Ora elimina il documento
+          prisma.document.delete({
+            where: { id: documentId }
+          })
+        ]);
+        
+        return res.status(200).json({ message: 'Documento eliminato con successo' });
+      } catch (error) {
+        console.error('Errore durante l\'eliminazione del documento:', error);
+        return res.status(500).json({ error: 'Errore del server', details: error.message });
       }
-
-      await prisma.document.delete({
-        where: { id: documentId }
-      });
-
-      return res.status(204).end();
     }
 
     return res.status(405).json({ error: 'Metodo non consentito' });
