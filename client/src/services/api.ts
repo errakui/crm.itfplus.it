@@ -77,7 +77,12 @@ export const apiService = {
     api.put(`/documents/${id}`, data),
   
   deleteDocument: (id: string) => 
-    api.delete(`/documents/${id}`),
+    api.delete(`/documents/${id}`, {
+      timeout: 15000, // 15 secondi di timeout
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }),
   
   bulkUploadDocuments: (formData: FormData) => 
     api.post('/documents/bulk-upload', formData, {
@@ -104,6 +109,10 @@ export const apiService = {
   
   deleteMultipleDocuments: (documentIds: string[]) => 
     api.post('/documents/bulk-delete', { documentIds }),
+
+  // Aggiungo questa funzione in api constant
+  checkApiStatus: () => 
+    api.get('/api', { timeout: 5000 }),
 };
 
 export default api; 

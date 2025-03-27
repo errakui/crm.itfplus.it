@@ -4,8 +4,11 @@
   "description": "Sistema di gestione documenti ITF Plus",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/server.js",
-    "dev": "cd client && npm run dev",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "dev:server": "nodemon server.js",
+    "client": "cd client && npm start",
+    "client:build": "cd client && npm run build",
     "build": "tsc",
     "deploy": "npm run build && npm run start",
     "test": "jest",
@@ -24,6 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "mailgun-js": "^0.22.0",
     "multer": "^1.4.5-lts.1",
+    "node-fetch": "^3.3.2",
     "pdf-parse": "^1.1.1",
     "streamifier": "^0.1.1"
   },
