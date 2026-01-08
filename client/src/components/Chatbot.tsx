@@ -90,10 +90,27 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
   const [transcript, setTranscript] = useState('');
   const [callStatus, setCallStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking'>('idle');
 
+  // REFS per evitare stale closures
+  const isInCallRef = useRef(false);
+  const tokenRef = useRef(token);
+  const documentIdRef = useRef(documentId);
+
   // Refs per Speech API
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sincronizza refs con state
+  useEffect(() => {
+    isInCallRef.current = isInCall;
+  }, [isInCall]);
+
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token]);
+
+  useEffect(() => {
+    documentIdRef.current = documentId;
+  }, [documentId]);
 
   // Verifica supporto Web Speech API
   const isSpeechSupported = typeof window !== 'undefined' && 
@@ -140,9 +157,24 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     };
   }, []);
 
+  // Carica le voci quando disponibili
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      // Le voci potrebbero non essere subito disponibili
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
+
   // Funzione per far parlare Booky
   const speakText = useCallback((text: string, onEnd?: () => void) => {
-    if (!window.speechSynthesis) return;
+    if (!window.speechSynthesis) {
+      console.error('SpeechSynthesis non supportato');
+      if (onEnd) onEnd();
+      return;
+    }
 
     // Cancella qualsiasi sintesi in corso
     window.speechSynthesis.cancel();
@@ -160,26 +192,203 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     }
 
     utterance.onstart = () => {
+      console.log('[Booky] Inizio a parlare:', text.substring(0, 50) + '...');
       setIsSpeaking(true);
       setCallStatus('speaking');
     };
 
     utterance.onend = () => {
+      console.log('[Booky] Ho finito di parlare');
       setIsSpeaking(false);
       if (onEnd) onEnd();
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.error('[Booky] Errore TTS:', e);
       setIsSpeaking(false);
       if (onEnd) onEnd();
     };
 
-    synthesisRef.current = utterance;
     window.speechSynthesis.speak(utterance);
   }, []);
 
-  // Funzione per inviare messaggio (usata sia dal form che dalla chiamata)
-  const sendMessage = useCallback(async (messageText: string, speakResponse: boolean = false) => {
+  // Funzione per iniziare ad ascoltare (definita prima di sendMessage)
+  const startListening = useCallback(() => {
+    console.log('[Voice] startListening chiamato, isInCallRef:', isInCallRef.current);
+    
+    if (!isSpeechSupported) {
+      console.error('[Voice] Speech API non supportata');
+      return;
+    }
+    
+    if (!isInCallRef.current) {
+      console.log('[Voice] Non siamo in chiamata, skip');
+      return;
+    }
+
+    // Se c'è già un riconoscimento attivo, fermalo
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {
+        // Ignora errori
+      }
+    }
+
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognitionAPI();
+
+    recognition.lang = 'it-IT';
+    recognition.continuous = false; // Cambiato a false per gestione migliore
+    recognition.interimResults = true;
+
+    let finalText = '';
+
+    recognition.onstart = () => {
+      console.log('[Voice] Riconoscimento avviato');
+      setIsListening(true);
+      setCallStatus('listening');
+      setTranscript('');
+      finalText = '';
+    };
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+        
+        if (result.isFinal) {
+          finalText += transcript;
+          console.log('[Voice] Testo finale:', finalText);
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      setTranscript(finalText || interimTranscript);
+    };
+
+    recognition.onend = () => {
+      console.log('[Voice] Riconoscimento terminato, testo:', finalText);
+      setIsListening(false);
+
+      // Se abbiamo del testo, invialo
+      if (finalText.trim() && isInCallRef.current) {
+        console.log('[Voice] Invio messaggio:', finalText.trim());
+        sendMessageVoice(finalText.trim());
+      } else if (isInCallRef.current) {
+        // Se non c'è testo ma siamo ancora in chiamata, riavvia
+        console.log('[Voice] Nessun testo, riavvio ascolto');
+        setTimeout(() => {
+          if (isInCallRef.current) {
+            startListening();
+          }
+        }, 500);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('[Voice] Errore:', event.error);
+      setIsListening(false);
+      
+      // Riprova se siamo ancora in chiamata (tranne per alcuni errori)
+      if (isInCallRef.current && event.error !== 'aborted' && event.error !== 'not-allowed') {
+        setTimeout(() => {
+          if (isInCallRef.current) {
+            startListening();
+          }
+        }, 1000);
+      }
+    };
+
+    recognitionRef.current = recognition;
+    
+    try {
+      recognition.start();
+      console.log('[Voice] recognition.start() chiamato');
+    } catch (e) {
+      console.error('[Voice] Errore avvio:', e);
+    }
+  }, [isSpeechSupported]);
+
+  // Funzione per inviare messaggio vocale (usa refs per evitare stale closures)
+  const sendMessageVoice = useCallback(async (messageText: string) => {
+    console.log('[Voice] sendMessageVoice chiamato con:', messageText);
+    
+    if (!messageText.trim()) {
+      console.log('[Voice] Messaggio vuoto, skip');
+      return;
+    }
+
+    const userMessage: Message = {
+      text: messageText,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setLoading(true);
+    setCallStatus('processing');
+
+    try {
+      const payload = {
+        message: messageText,
+        ...(documentIdRef.current && { documentId: documentIdRef.current }),
+      };
+
+      console.log('[Voice] Invio richiesta API...');
+      const response = await axios.post(
+        '/api/chatbot/chat',
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+
+      console.log('[Voice] Risposta ricevuta:', response.data.response?.substring(0, 50) + '...');
+
+      const botMessage: Message = {
+        text: response.data.response,
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setLoading(false);
+
+      // Leggi la risposta e poi riascolta
+      if (isInCallRef.current) {
+        speakText(response.data.response, () => {
+          console.log('[Voice] Booky ha finito di parlare, riavvio ascolto');
+          if (isInCallRef.current) {
+            setTimeout(() => startListening(), 500);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[Voice] Errore API:', error);
+      const errorMessage: Message = {
+        text: 'Mi dispiace, si è verificato un errore. Riprova più tardi.',
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      setLoading(false);
+
+      if (isInCallRef.current) {
+        speakText('Mi dispiace, si è verificato un errore.', () => {
+          if (isInCallRef.current) {
+            setTimeout(() => startListening(), 500);
+          }
+        });
+      }
+    }
+  }, [speakText, startListening]);
+
+  // Funzione per inviare messaggio normale (form)
+  const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || loading || !isAuthenticated()) return;
 
     const userMessage: Message = {
@@ -190,7 +399,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
-    if (speakResponse) setCallStatus('processing');
 
     try {
       const payload = {
@@ -214,16 +422,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
-
-      // Se siamo in chiamata, leggi la risposta
-      if (speakResponse && isInCall) {
-        speakText(response.data.response, () => {
-          // Dopo che Booky ha finito di parlare, riattiva il microfono
-          if (isInCall) {
-            setTimeout(() => startListening(), 500);
-          }
-        });
-      }
     } catch (error) {
       console.error('Errore nella comunicazione con il chatbot:', error);
       const errorMessage: Message = {
@@ -232,119 +430,57 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
-
-      if (speakResponse && isInCall) {
-        speakText('Mi dispiace, si è verificato un errore.', () => {
-          if (isInCall) {
-            setTimeout(() => startListening(), 500);
-          }
-        });
-      }
     } finally {
       setLoading(false);
     }
-  }, [loading, isAuthenticated, documentId, token, isInCall, speakText]);
-
-  // Funzione per iniziare ad ascoltare
-  const startListening = useCallback(() => {
-    if (!isSpeechSupported || !isInCall) return;
-
-    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognitionAPI();
-
-    recognition.lang = 'it-IT';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setCallStatus('listening');
-      setTranscript('');
-    };
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalTranscript += result[0].transcript;
-        } else {
-          interimTranscript += result[0].transcript;
-        }
-      }
-
-      const currentTranscript = finalTranscript || interimTranscript;
-      setTranscript(currentTranscript);
-
-      // Reset del timeout di silenzio ogni volta che c'è input
-      if (silenceTimeoutRef.current) {
-        clearTimeout(silenceTimeoutRef.current);
-      }
-
-      // Se abbiamo un risultato finale, aspetta un po' e poi invia
-      if (finalTranscript) {
-        silenceTimeoutRef.current = setTimeout(() => {
-          if (finalTranscript.trim() && isInCall) {
-            recognition.stop();
-            sendMessage(finalTranscript.trim(), true);
-          }
-        }, 1500); // 1.5 secondi di silenzio prima di inviare
-      }
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      // Non riavviare automaticamente qui - sarà gestito dopo che Booky parla
-    };
-
-    recognition.onerror = (event: any) => {
-      console.error('Errore riconoscimento vocale:', event.error);
-      setIsListening(false);
-      
-      // Riprova se siamo ancora in chiamata e non è un errore di abort
-      if (isInCall && event.error !== 'aborted' && event.error !== 'no-speech') {
-        setTimeout(() => startListening(), 1000);
-      } else if (isInCall && event.error === 'no-speech') {
-        // Se non ha sentito nulla, riprova
-        setTimeout(() => startListening(), 500);
-      }
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  }, [isSpeechSupported, isInCall, sendMessage]);
+  };
 
   // Funzione per iniziare la chiamata
   const startCall = useCallback(() => {
+    console.log('[Call] Avvio chiamata...');
+    
     if (!isSpeechSupported) {
       alert('Il tuo browser non supporta il riconoscimento vocale. Prova con Chrome o Edge.');
       return;
     }
 
+    // Imposta lo stato
     setIsInCall(true);
+    isInCallRef.current = true;
+    setCallStatus('speaking');
     
     // Messaggio di benvenuto vocale
-    const welcomeMessage = documentId 
-      ? 'Ciao! Sono Booky, il tuo assistente legale. Sono pronto ad aiutarti con questa sentenza. Dimmi pure cosa vuoi sapere.'
-      : 'Ciao! Sono Booky, il tuo assistente legale. Dimmi pure come posso aiutarti.';
+    const welcomeMessage = documentIdRef.current 
+      ? 'Ciao! Sono Booky. Dimmi cosa vuoi sapere su questa sentenza.'
+      : 'Ciao! Sono Booky. Come posso aiutarti?';
 
+    console.log('[Call] Dico messaggio di benvenuto...');
     speakText(welcomeMessage, () => {
-      startListening();
+      console.log('[Call] Benvenuto finito, avvio ascolto...');
+      if (isInCallRef.current) {
+        startListening();
+      }
     });
-  }, [isSpeechSupported, documentId, speakText, startListening]);
+  }, [isSpeechSupported, speakText, startListening]);
 
   // Funzione per terminare la chiamata
   const endCall = useCallback(() => {
+    console.log('[Call] Termino chiamata');
+    
     setIsInCall(false);
+    isInCallRef.current = false;
     setIsListening(false);
     setIsSpeaking(false);
     setCallStatus('idle');
     setTranscript('');
 
     if (recognitionRef.current) {
-      recognitionRef.current.abort();
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {
+        // Ignora
+      }
+      recognitionRef.current = null;
     }
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
@@ -693,9 +829,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
               )}
             </Box>
 
-            {/* Timer/Info */}
+            {/* Info */}
             <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
-              Parla quando vuoi • Rilevo automaticamente le pause
+              Parla quando vuoi • Termina la frase e aspetta
             </Typography>
 
             {/* Pulsante Termina */}
