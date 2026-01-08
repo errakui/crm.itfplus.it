@@ -76,27 +76,27 @@ const LoginPage: React.FC = () => {
     >
       {/* Pattern decorativo - nascosto su mobile per performance */}
       {!isMobile && (
-        <Box
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 0)',
-            backgroundSize: '30px 30px',
-            opacity: 0.5,
+      <Box
+        sx={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 0)',
+          backgroundSize: '30px 30px',
+          opacity: 0.5,
             pointerEvents: 'none',
-          }}
-        />
+        }}
+      />
       )}
 
       <Container 
         maxWidth="sm" 
-        sx={{ 
+            sx={{
           display: 'flex', 
           justifyContent: 'center',
           px: { xs: 0, sm: 2 },
-        }}
-      >
+            }}
+          >
         <Paper
           elevation={isMobile ? 8 : 24}
           sx={{
@@ -260,16 +260,16 @@ const LoginPage: React.FC = () => {
               </Button>
               
               <Box sx={{ mt: { xs: 2, sm: 2.5 }, textAlign: 'right' }}>
-                <Link
-                  to="#"
-                  style={{ 
+                  <Link
+                    to="#"
+                    style={{ 
                     color: 'var(--primary-color)', 
-                    textDecoration: 'none',
+                      textDecoration: 'none',
                     fontSize: isMobile ? '0.8rem' : '0.875rem',
-                  }}
-                >
-                  Password dimenticata?
-                </Link>
+                    }}
+                  >
+                    Password dimenticata?
+                  </Link>
               </Box>
             </form>
           </Box>

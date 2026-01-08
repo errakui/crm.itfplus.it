@@ -181,7 +181,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
       // Chiama l'API backend per TTS
       const response = await axios.post(
         '/api/voice/tts',
-        { text, voice: 'nova' }, // nova è una voce femminile naturale
+        { text, voice: 'onyx' }, // nova è una voce femminile naturale
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
@@ -524,7 +524,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     try {
       const response = await axios.post(
         '/api/voice/tts',
-        { text, voice: 'nova' },
+        { text, voice: 'onyx' },
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -6,7 +6,7 @@ import axios from 'axios';
  */
 export const textToSpeech = async (req: Request, res: Response) => {
   try {
-    const { text, voice = 'nova' } = req.body;
+    const { text, voice = 'onyx' } = req.body;
 
     if (!text) {
       return res.status(400).json({ message: 'Testo non fornito' });
