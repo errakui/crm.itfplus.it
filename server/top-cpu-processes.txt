@@ -1,0 +1,108 @@
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       97704  1.8  2.1 11722376 43776 ?      Sl   01:17   1:01 /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/node /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/out/bootstrap-fork --type=ptyHost --logsPath /root/.cursor-server/data/logs/20250406T011747
+root       97550  1.7  4.6 11752880 94016 ?      Sl   01:17   1:00 /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/node /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/out/server-main.js --connection-token=remotessh --accept-server-license-terms --start-server --enable-remote-auto-shutdown --socket-path=/tmp/cursor-6b6f283f-f78c-4bc3-a492-3e7d1c7db4b0
+root      120847  0.9  3.9 11366352 79396 ?      Ssl  02:12   0:01 node /var/www/itfplus/server/dist/server.js
+root       98640  0.7  0.0      0     0 ?        I    01:19   0:23 [kworker/0:2-events]
+root      120780  0.5  3.9 11366368 79392 ?      Ssl  02:11   0:01 node /var/www/itfplus/server/dist/server.js
+root          14  0.3  0.0      0     0 ?        I    Apr02  15:48 [rcu_sched]
+root          85  0.2  0.0      0     0 ?        S    Apr02  11:11 [kswapd0]
+root      120752  0.2  2.6 638800 53756 ?        Ssl  02:10   0:00 PM2 v6.0.5: God Daemon (/root/.pm2)
+root           1  0.0  0.5 167664 11060 ?        Ss   Apr02   0:21 /sbin/init
+root           2  0.0  0.0      0     0 ?        S    Apr02   0:00 [kthreadd]
+root           3  0.0  0.0      0     0 ?        I<   Apr02   0:00 [rcu_gp]
+root           4  0.0  0.0      0     0 ?        I<   Apr02   0:00 [rcu_par_gp]
+root           5  0.0  0.0      0     0 ?        I<   Apr02   0:00 [slub_flushwq]
+root           6  0.0  0.0      0     0 ?        I<   Apr02   0:00 [netns]
+root           7  0.0  0.0      0     0 ?        I    Apr02   0:00 [kworker/0:0-cgroup_destroy]
+root           8  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kworker/0:0H-events_highpri]
+root          10  0.0  0.0      0     0 ?        I<   Apr02   0:00 [mm_percpu_wq]
+root          11  0.0  0.0      0     0 ?        S    Apr02   0:00 [rcu_tasks_rude_]
+root          12  0.0  0.0      0     0 ?        S    Apr02   0:00 [rcu_tasks_trace]
+root          13  0.0  0.0      0     0 ?        S    Apr02   1:48 [ksoftirqd/0]
+root          15  0.0  0.0      0     0 ?        S    Apr02   0:01 [migration/0]
+root          16  0.0  0.0      0     0 ?        S    Apr02   0:00 [idle_inject/0]
+root          18  0.0  0.0      0     0 ?        S    Apr02   0:00 [cpuhp/0]
+root          19  0.0  0.0      0     0 ?        S    Apr02   0:00 [kdevtmpfs]
+root          20  0.0  0.0      0     0 ?        I<   Apr02   0:00 [inet_frag_wq]
+root          21  0.0  0.0      0     0 ?        S    Apr02   0:00 [kauditd]
+root          22  0.0  0.0      0     0 ?        S    Apr02   0:00 [khungtaskd]
+root          23  0.0  0.0      0     0 ?        S    Apr02   0:00 [oom_reaper]
+root          24  0.0  0.0      0     0 ?        I<   Apr02   0:00 [writeback]
+root          25  0.0  0.0      0     0 ?        S    Apr02   0:17 [kcompactd0]
+root          26  0.0  0.0      0     0 ?        SN   Apr02   0:00 [ksmd]
+root          27  0.0  0.0      0     0 ?        SN   Apr02   0:00 [khugepaged]
+root          73  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kintegrityd]
+root          74  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kblockd]
+root          75  0.0  0.0      0     0 ?        I<   Apr02   0:00 [blkcg_punt_bio]
+root          76  0.0  0.0      0     0 ?        I<   Apr02   0:00 [tpm_dev_wq]
+root          77  0.0  0.0      0     0 ?        I<   Apr02   0:00 [ata_sff]
+root          78  0.0  0.0      0     0 ?        I<   Apr02   0:00 [md]
+root          79  0.0  0.0      0     0 ?        I<   Apr02   0:00 [edac-poller]
+root          80  0.0  0.0      0     0 ?        I<   Apr02   0:00 [devfreq_wq]
+root          81  0.0  0.0      0     0 ?        S    Apr02   0:00 [watchdogd]
+root          83  0.0  0.0      0     0 ?        I<   Apr02   0:20 [kworker/0:1H-kblockd]
+root          86  0.0  0.0      0     0 ?        S    Apr02   0:00 [ecryptfs-kthrea]
+root          88  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kthrotld]
+root          89  0.0  0.0      0     0 ?        I<   Apr02   0:00 [acpi_thermal_pm]
+root          91  0.0  0.0      0     0 ?        S    Apr02   0:00 [scsi_eh_0]
+root          92  0.0  0.0      0     0 ?        I<   Apr02   0:00 [scsi_tmf_0]
+root          93  0.0  0.0      0     0 ?        S    Apr02   0:00 [scsi_eh_1]
+root          94  0.0  0.0      0     0 ?        I<   Apr02   0:00 [scsi_tmf_1]
+root          96  0.0  0.0      0     0 ?        I<   Apr02   0:00 [vfio-irqfd-clea]
+root          97  0.0  0.0      0     0 ?        I<   Apr02   0:00 [mld]
+root          98  0.0  0.0      0     0 ?        I<   Apr02   0:00 [ipv6_addrconf]
+root         108  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kstrp]
+root         111  0.0  0.0      0     0 ?        I<   Apr02   0:00 [zswap-shrink]
+root         112  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kworker/u3:0]
+root         117  0.0  0.0      0     0 ?        I<   Apr02   0:00 [charger_manager]
+root         173  0.0  0.0      0     0 ?        S    Apr02   0:00 [scsi_eh_2]
+root         174  0.0  0.0      0     0 ?        I<   Apr02   0:00 [cryptd]
+root         175  0.0  0.0      0     0 ?        I<   Apr02   0:00 [scsi_tmf_2]
+root         242  0.0  0.0      0     0 ?        I<   Apr02   0:00 [raid5wq]
+root         291  0.0  0.0      0     0 ?        S    Apr02   0:12 [jbd2/vda1-8]
+root         292  0.0  0.0      0     0 ?        I<   Apr02   0:00 [ext4-rsv-conver]
+root         365  0.0  0.9 203984 19300 ?        S<s  Apr02   1:05 /lib/systemd/systemd-journald
+root         390  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kaluad]
+root         392  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kmpath_rdacd]
+root         393  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kmpathd]
+root         395  0.0  0.0      0     0 ?        I<   Apr02   0:00 [kmpath_handlerd]
+root         396  0.0  1.3 289352 27100 ?        SLsl Apr02   0:21 /sbin/multipathd -d -s
+systemd+     486  0.0  0.1  89364  2736 ?        Ssl  Apr02   0:00 /lib/systemd/systemd-timesyncd
+root         556  0.0  0.0      0     0 ?        S    Apr02   0:00 [jbd2/sda-8]
+root         557  0.0  0.0      0     0 ?        I<   Apr02   0:00 [ext4-rsv-conver]
+systemd+     579  0.0  0.1  16128  3236 ?        Ss   Apr02   0:01 /lib/systemd/systemd-networkd
+systemd+     581  0.0  0.4  26464  9028 ?        Ss   Apr02   0:01 /lib/systemd/systemd-resolved
+root         624  0.0  0.2  11192  4672 ?        Ss   Apr02   0:00 /lib/systemd/systemd-udevd
+root         694  0.0  0.1   7288  2116 ?        Ss   Apr02   0:00 /usr/sbin/cron -f -P
+message+     695  0.0  0.1   8720  3464 ?        Ss   Apr02   0:01 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+do-agent     697  0.0  0.6 1238588 13596 ?       Ssl  Apr02   1:36 /opt/digitalocean/bin/do-agent --syslog
+root         698  0.0  0.0 1231860 1136 ?        Ssl  Apr02   0:02 /opt/digitalocean/bin/droplet-agent
+root         703  0.0  0.5  33068 11884 ?        Ss   Apr02   0:00 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+syslog       705  0.0  0.1 222404  3608 ?        Ssl  Apr02   0:10 /usr/sbin/rsyslogd -n -iNONE
+root         708  0.0  0.9 1247744 18424 ?       Ssl  Apr02   0:37 /usr/lib/snapd/snapd
+root         710  0.0  0.2  15516  6016 ?        Ss   Apr02   0:01 /lib/systemd/systemd-logind
+root         718  0.0  0.0   6220   760 ttyS0    Ss+  Apr02   0:00 /sbin/agetty -o -p -- \u --keep-baud 115200,57600,38400,9600 ttyS0 vt220
+root         722  0.0  0.0   6176   840 tty1     Ss+  Apr02   0:00 /sbin/agetty -o -p -- \u --noclear tty1 linux
+root         754  0.0  0.3  15436  6152 ?        Ss   Apr02   0:30 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root         767  0.0  0.0  55228  1660 ?        Ss   Apr02   0:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+www-data     768  0.0  0.1  55880  3240 ?        S    Apr02   0:02 nginx: worker process
+root         773  0.0  0.5 110132 11372 ?        Ssl  Apr02   0:00 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+root         906  0.0  0.1  17072  2192 ?        Ss   Apr02   0:00 /lib/systemd/systemd --user
+root         907  0.0  0.1 103792  3772 ?        S    Apr02   0:00 (sd-pam)
+root       25838  0.0  0.2 296008  5400 ?        Ssl  Apr02   0:03 /usr/libexec/packagekitd
+root       25842  0.0  0.1 234508  3356 ?        Ssl  Apr02   0:02 /usr/libexec/polkitd --no-debug
+root       97546  0.0  0.0   2892   848 ?        S    01:17   0:00 sh /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/bin/cursor-server --connection-token=remotessh --accept-server-license-terms --start-server --enable-remote-auto-shutdown --socket-path=/tmp/cursor-6b6f283f-f78c-4bc3-a492-3e7d1c7db4b0
+root       98479  0.0  0.1   8160  2212 pts/1    Ss+  01:18   0:00 /bin/bash --init-file /root/.cursor-server/cli/servers/Stable-1d623c4cc1d3bb6e0fe4f1d5434b47b958b05870/server/out/vs/workbench/contrib/terminal/common/scripts/shellIntegration-bash.sh
+root      110588  0.0  0.1   9108  3724 pts/2    Ss+  01:34   0:00 /usr/bin/bash -l
+root      110971  0.0  0.0      0     0 ?        I    01:35   0:00 [kworker/u2:5-events_unbound]
+root      111322  0.0  0.1   9108  3592 pts/4    Ss+  01:38   0:00 /usr/bin/bash -l
+root      112780  0.0  0.1   9108  3760 pts/5    Ss+  01:48   0:00 /usr/bin/bash -l
+root      112848  0.0  0.2  17156  4316 ?        Ss   01:48   0:00 sshd: root@pts/6
+root      112978  0.0  0.2   9152  4764 pts/6    Ss   01:48   0:00 -bash
+root      114428  0.0  0.0      0     0 ?        I    01:56   0:00 [kworker/u2:1-flush-252:0]
+root      114442  0.0  0.0      0     0 ?        I    01:56   0:00 [kworker/u2:2-events_unbound]
+root      114867  0.0  0.2  17492  5828 ?        Ss   02:00   0:00 sshd: root@pts/7
+root      114917  0.0  0.2   9152  4868 pts/7    Ss+  02:00   0:00 -bash
+root      116035  0.0  0.0      0     0 ?        I    02:04   0:00 [kworker/u2:3-ext4-rsv-conversion]
+root      120771  0.0  0.0      0     0 ?        I    02:11   0:00 [kworker/u2:0-ext4-rsv-conversion]
+root      120874  0.0  0.1  10624  3212 pts/6    R+   02:14   0:00 ps aux --sort=-%cpu

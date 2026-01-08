@@ -1,0 +1,211 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                    CODICI PRONTI DA COPIARE                          ║
+║                  Sistema Creazione Account ITFPlus                   ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════
+1. LINK DIRETTI (già funzionanti)
+═══════════════════════════════════════════════════════════════════════
+
+Form completo:
+https://crm.itfplus.it/form-account.html
+
+Form per iframe:
+https://crm.itfplus.it/form-account-iframe.html
+
+Test PHP:
+https://crm.itfplus.it/test-php.php
+
+
+═══════════════════════════════════════════════════════════════════════
+2. CODICE IFRAME - Per altri siti
+═══════════════════════════════════════════════════════════════════════
+
+Copia questo codice e incollalo in qualsiasi pagina HTML:
+
+<iframe 
+    src="https://crm.itfplus.it/form-account-iframe.html" 
+    width="100%" 
+    height="550" 
+    frameborder="0"
+    style="max-width: 500px; border: none; border-radius: 10px;">
+</iframe>
+
+
+═══════════════════════════════════════════════════════════════════════
+3. SCRIPT PHP - Per gestionale/automazioni
+═══════════════════════════════════════════════════════════════════════
+
+<?php
+function creaAccountITFPlus($email, $nome) {
+    $url = 'https://crm.itfplus.it/api/public/request-account';
+    $apiKey = '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246';
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'X-API-Key: ' . $apiKey
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'email' => $email,
+        'name' => $nome,
+        'expiresInDays' => 3
+    ]));
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    return json_decode($response, true);
+}
+
+// ESEMPIO DI USO
+$email = "mario.rossi@example.com";
+$nome = "Mario Rossi";
+
+$risultato = creaAccountITFPlus($email, $nome);
+
+if ($risultato['success']) {
+    echo "✅ Account creato! Email inviata a: " . $email;
+} else {
+    echo "❌ Errore: " . $risultato['message'];
+}
+?>
+
+
+═══════════════════════════════════════════════════════════════════════
+4. JAVASCRIPT - Per siti web dinamici
+═══════════════════════════════════════════════════════════════════════
+
+<script>
+async function creaAccountITFPlus(email, nome) {
+    try {
+        const response = await fetch('https://crm.itfplus.it/api/public/request-account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246'
+            },
+            body: JSON.stringify({
+                email: email,
+                name: nome,
+                expiresInDays: 3
+            })
+        });
+        
+        const risultato = await response.json();
+        
+        if (risultato.success) {
+            alert('✅ Account creato! Email inviata.');
+            return true;
+        } else {
+            alert('❌ Errore: ' + risultato.message);
+            return false;
+        }
+    } catch (error) {
+        alert('❌ Errore di connessione');
+        return false;
+    }
+}
+
+// ESEMPIO DI USO
+creaAccountITFPlus('mario@example.com', 'Mario Rossi');
+</script>
+
+
+═══════════════════════════════════════════════════════════════════════
+5. CURL - Per test da terminale
+═══════════════════════════════════════════════════════════════════════
+
+curl -X POST https://crm.itfplus.it/api/public/request-account \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: 933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246" \
+  -d '{"email":"mario@example.com","name":"Mario Rossi","expiresInDays":3}'
+
+
+═══════════════════════════════════════════════════════════════════════
+6. WORDPRESS - Integrazione
+═══════════════════════════════════════════════════════════════════════
+
+Metodo 1: Blocco HTML/Shortcode
+Aggiungi un blocco "HTML Personalizzato" e incolla:
+
+<iframe 
+    src="https://crm.itfplus.it/form-account-iframe.html" 
+    width="100%" 
+    height="550" 
+    frameborder="0"
+    style="max-width: 500px; border: none;">
+</iframe>
+
+Metodo 2: Nel tema (functions.php)
+Aggiungi questa funzione:
+
+function itfplus_crea_account($email, $nome) {
+    $response = wp_remote_post('https://crm.itfplus.it/api/public/request-account', [
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'X-API-Key' => '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246'
+        ],
+        'body' => json_encode([
+            'email' => $email,
+            'name' => $nome,
+            'expiresInDays' => 3
+        ])
+    ]);
+    
+    return json_decode(wp_remote_retrieve_body($response), true);
+}
+
+
+═══════════════════════════════════════════════════════════════════════
+7. PYTHON - Per script/automazioni
+═══════════════════════════════════════════════════════════════════════
+
+import requests
+import json
+
+def crea_account_itfplus(email, nome):
+    url = 'https://crm.itfplus.it/api/public/request-account'
+    headers = {
+        'Content-Type': 'application/json',
+        'X-API-Key': '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246'
+    }
+    data = {
+        'email': email,
+        'name': nome,
+        'expiresInDays': 3
+    }
+    
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+# USO
+risultato = crea_account_itfplus('mario@example.com', 'Mario Rossi')
+
+if risultato['success']:
+    print('✅ Account creato!')
+else:
+    print('❌ Errore:', risultato['message'])
+
+
+═══════════════════════════════════════════════════════════════════════
+RIEPILOGO
+═══════════════════════════════════════════════════════════════════════
+
+✅ Form diretto: https://crm.itfplus.it/form-account.html
+✅ Test PHP: https://crm.itfplus.it/test-php.php
+✅ Invia email: SÌ, automaticamente con credenziali
+✅ Durata: 3 giorni
+✅ API Key: configurata (già inclusa nei codici sopra)
+
+COSA FA:
+1. Crea account utente
+2. Genera password automatica
+3. Invia email con credenziali
+4. Account valido 3 giorni
+5. Funziona da subito
+
+═══════════════════════════════════════════════════════════════════════
+

@@ -1,0 +1,323 @@
+/* Importazione dei font Google più moderni */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap');
+
+/* Import delle migliorie grafiche sottili */
+@import url('./styles/enhanced-ui.css');
+
+:root {
+  /* Palette colori Ultra-Moderni 2025 */
+  --primary-color: #0C224E;
+  --primary-light: #1F3A65;
+  --primary-lighter: #395686;
+  --secondary-color: #C38FFF;
+  --secondary-light: #DFC6FF;
+  --accent-color: #FF965B;
+  --accent-light: #FFBE96;
+  --success-color: #2DD4BF;
+  --warning-color: #F59E0B;
+  --error-color: #F43F5E;
+  --info-color: #38BDF8;
+  
+  /* Scale di grigio/neutri */
+  --background-color: #F9FAFC;
+  --card-background: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --border-light: #E2E8F0;
+  
+  /* Dimensioni e spazi */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 24px;
+  --border-radius-xl: 32px;
+  
+  /* Ombre e profondità */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Effetti di glassmorphism */
+  --glass-background: rgba(255, 255, 255, 0.25);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+code {
+  font-family: 'Space Grotesk', monospace;
+}
+
+/* Stili per animazioni evolute */
+.fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.bounce-in {
+  animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-blur-in {
+  animation: fadeBlurIn 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  70% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeBlurIn {
+  from { opacity: 0; filter: blur(10px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* Stili aggiuntivi per componenti comunemente usati */
+.page-container {
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  position: relative;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 70px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+  border-radius: 2px;
+}
+
+/* Stili per la versione */
+.version-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', monospace;
+  color: var(--text-secondary);
+  background-color: rgba(0,0,0,0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+/* Glassmorphism cards e componenti */
+.glass-card {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Elementi di design moderno */
+.modern-card {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.modern-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Buttons moderni e interattivi */
+.modern-button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+  border: none;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.modern-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-lighter), var(--secondary-color));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modern-button:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.modern-button:hover::before {
+  opacity: 1;
+}
+
+/* Stile per truncate di testo */
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
+
+/* Scrollbar customizzato moderno */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-lighter), var(--secondary-color));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Overrides per Material UI */
+.MuiCard-root, 
+.MuiButton-root, 
+.MuiIconButton-root,
+.MuiPaper-root {
+  transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1) !important;
+  border-radius: var(--border-radius-md) !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.MuiButton-contained {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+  box-shadow: var(--shadow-md) !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  padding: 0.6rem 1.5rem !important;
+}
+
+.MuiButton-contained:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  background: linear-gradient(135deg, var(--primary-lighter), var(--secondary-color)) !important;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: var(--border-radius-md) !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.MuiTypography-root {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.MuiTypography-h1, 
+.MuiTypography-h2, 
+.MuiTypography-h3, 
+.MuiTypography-h4, 
+.MuiTypography-h5, 
+.MuiTypography-h6 {
+  font-family: 'Syne', sans-serif !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+
+/* Responsive design avanzato */
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 2rem !important;
+  }
+  
+  .modern-card {
+    border-radius: var(--border-radius-md);
+  }
+  
+  .modern-button {
+    padding: 0.6rem 1.2rem;
+  }
+}
+
+/* Dark mode variables - si attivano con .dark-theme */
+.dark-theme {
+  --background-color: #0F172A;
+  --card-background: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --border-light: #334155;
+}

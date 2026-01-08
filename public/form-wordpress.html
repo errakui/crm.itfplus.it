@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiedi Account di Prova - ITF Plus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .itf-form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .itf-form-container h2 {
+            color: #1B2A4A;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .itf-form-container .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .itf-form-group {
+            margin-bottom: 15px;
+        }
+        .itf-form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .itf-form-container input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        .itf-form-container input:focus {
+            outline: none;
+            border-color: #1B2A4A;
+        }
+        .itf-form-container button {
+            width: 100%;
+            padding: 14px;
+            background: #1B2A4A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: inherit;
+        }
+        .itf-form-container button:hover {
+            background: #2c3e50;
+        }
+        .itf-form-container button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .itf-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+            font-size: 14px;
+        }
+        .itf-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .itf-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .itf-info {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #004085;
+        }
+        .itf-required {
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="itf-form-container">
+        <h2>Richiedi Account di Prova</h2>
+        <p class="subtitle">Account valido per 3 giorni</p>
+        
+        <div class="itf-info">
+            ⏱️ Il tuo account di prova sarà attivo per <strong>3 giorni</strong>. 
+            Riceverai le credenziali via email.
+        </div>
+
+        <form id="itfAccountForm">
+            <div class="itf-form-group">
+                <label for="itf-nome">Nome <span class="itf-required">*</span></label>
+                <input type="text" id="itf-nome" name="nome" required placeholder="Mario">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-cognome">Cognome <span class="itf-required">*</span></label>
+                <input type="text" id="itf-cognome" name="cognome" required placeholder="Rossi">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-email">Email <span class="itf-required">*</span></label>
+                <input type="email" id="itf-email" name="email" required placeholder="mario.rossi@example.com">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-telefono">Telefono <span class="itf-required">*</span></label>
+                <input type="text" id="itf-telefono" name="telefono" required placeholder="+39 333 1234567">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-azienda">Azienda/Studio <span class="itf-required">*</span></label>
+                <input type="text" id="itf-azienda" name="azienda" required placeholder="Studio Legale Rossi">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-ruolo">Ruolo <span class="itf-required">*</span></label>
+                <input type="text" id="itf-ruolo" name="ruolo" required placeholder="Avvocato">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-settore">Settore <span class="itf-required">*</span></label>
+                <input type="text" id="itf-settore" name="settore" required placeholder="Civile">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-citta">Città <span class="itf-required">*</span></label>
+                <input type="text" id="itf-citta" name="citta" required placeholder="Roma">
+            </div>
+            
+            <div class="itf-form-group">
+                <label for="itf-note">Note (opzionale)</label>
+                <input type="text" id="itf-note" name="note" placeholder="Eventuali richieste particolari">
+            </div>
+            
+            <button type="submit" id="itf-submitBtn">Crea Account di Prova</button>
+        </form>
+
+        <div id="itf-message" class="itf-message"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Configurazione API
+            const API_URL = 'https://crm.itfplus.it/api/public/request-account';
+            const API_KEY = '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246';
+            
+            const form = document.getElementById('itfAccountForm');
+            const messageDiv = document.getElementById('itf-message');
+            const submitBtn = document.getElementById('itf-submitBtn');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Invio in corso...';
+                messageDiv.className = 'itf-message';
+                messageDiv.style.display = 'none';
+                
+                // Raccogli tutti i dati dal form
+                const nome = document.getElementById('itf-nome').value.trim();
+                const cognome = document.getElementById('itf-cognome').value.trim();
+                const email = document.getElementById('itf-email').value.trim();
+                const telefono = document.getElementById('itf-telefono').value.trim();
+                const azienda = document.getElementById('itf-azienda').value.trim();
+                const ruolo = document.getElementById('itf-ruolo').value.trim();
+                const settore = document.getElementById('itf-settore').value.trim();
+                const citta = document.getElementById('itf-citta').value.trim();
+                const note = document.getElementById('itf-note').value.trim();
+                
+                // Validazione base
+                if (!nome || !cognome || !email || !telefono || !azienda || !ruolo || !settore || !citta) {
+                    messageDiv.className = 'itf-message error';
+                    messageDiv.innerHTML = '❌ <strong>Errore:</strong> Compila tutti i campi obbligatori.';
+                    messageDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Crea Account di Prova';
+                    return;
+                }
+                
+                // Validazione email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    messageDiv.className = 'itf-message error';
+                    messageDiv.innerHTML = '❌ <strong>Errore:</strong> Inserisci un indirizzo email valido.';
+                    messageDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Crea Account di Prova';
+                    return;
+                }
+                
+                // Prepara i dati per l'API
+                const formData = {
+                    email: email,
+                    name: nome + ' ' + cognome,
+                    expiresInDays: 3,
+                    telefono: telefono,
+                    azienda: azienda,
+                    ruolo: ruolo,
+                    settore: settore,
+                    citta: citta,
+                    note: note || undefined
+                };
+                
+                try {
+                    // Invia alla API pubblica
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': API_KEY
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    // Leggi la risposta
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        messageDiv.className = 'itf-message success';
+                        messageDiv.innerHTML = '✅ <strong>Richiesta inviata con successo!</strong><br>Riceverai una conferma via email a breve con le credenziali di accesso.';
+                        form.reset();
+                    } else {
+                        messageDiv.className = 'itf-message error';
+                        messageDiv.innerHTML = '❌ <strong>Errore:</strong> ' + (result.message || 'Riprova più tardi.');
+                    }
+                } catch (error) {
+                    console.error('Errore:', error);
+                    messageDiv.className = 'itf-message error';
+                    messageDiv.innerHTML = '❌ <strong>Errore di connessione.</strong> Riprova più tardi.';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Crea Account di Prova';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,62 @@
+═══════════════════════════════════════════════════════════════
+SCRIPT GOOGLE SHEETS CON DEBUG
+═══════════════════════════════════════════════════════════════
+
+Sostituisci lo script attuale con questo (ha i log):
+
+function doPost(e) {
+  try {
+    // Log per vedere cosa arriva
+    Logger.log('Ricevuto POST');
+    Logger.log('postData: ' + JSON.stringify(e.postData));
+    
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    Logger.log('Dati parsati: ' + JSON.stringify(data));
+    
+    var row = [
+      new Date().toLocaleString('it-IT'),
+      data.nome || '',
+      data.cognome || '',
+      data.email || '',
+      data.telefono || '',
+      data.azienda || '',
+      data.ruolo || '',
+      data.settore || '',
+      data.citta || '',
+      data.note || '',
+      data.scadenza || ''
+    ];
+    
+    Logger.log('Riga da aggiungere: ' + JSON.stringify(row));
+    Logger.log('Foglio attivo: ' + sheet.getName());
+    
+    sheet.appendRow(row);
+    
+    Logger.log('Riga aggiunta con successo');
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    Logger.log('ERRORE: ' + error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+═══════════════════════════════════════════════════════════════
+DOPO AVER SALVATO:
+═══════════════════════════════════════════════════════════════
+
+1. Salva lo script
+2. Implementa → Gestisci implementazioni → Modifica (rotellina) 
+3. Nuova versione → Implementa
+4. Poi testa di nuovo
+5. Vai su: Estensioni → Apps Script → Esecuzioni
+6. Guarda i log per vedere cosa succede
+
+═══════════════════════════════════════════════════════════════
+

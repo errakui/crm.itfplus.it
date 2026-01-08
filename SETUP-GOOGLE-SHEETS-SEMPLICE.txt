@@ -1,0 +1,112 @@
+╔══════════════════════════════════════════════════════════════╗
+║          GOOGLE SHEETS - SETUP SUPER SEMPLICE                ║
+║                  (Solo 3 passaggi)                           ║
+╚══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+PASSO 1: Crea Google Sheet
+═══════════════════════════════════════════════════════════════
+
+1. Vai su: https://sheets.google.com
+2. Nuovo foglio: "ITFPlus - Utenti Trial"
+3. Nella riga 1 scrivi queste intestazioni:
+
+A1: Data/Ora
+B1: Nome
+C1: Cognome
+D1: Email
+E1: Telefono
+F1: Azienda
+G1: Ruolo
+H1: Settore
+I1: Città
+J1: Note
+K1: Scadenza
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 2: Aggiungi Script
+═══════════════════════════════════════════════════════════════
+
+1. Nel foglio: Estensioni → Apps Script
+2. Cancella tutto
+3. COPIA E INCOLLA questo codice:
+
+────────────────────────────────────────────────────────────────
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    var row = [
+      new Date().toLocaleString('it-IT'),
+      data.nome || '',
+      data.cognome || '',
+      data.email || '',
+      data.telefono || '',
+      data.azienda || '',
+      data.ruolo || '',
+      data.settore || '',
+      data.citta || '',
+      data.note || '',
+      data.scadenza || ''
+    ];
+    
+    sheet.appendRow(row);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+────────────────────────────────────────────────────────────────
+
+4. Salva (icona floppy disk)
+5. Nome: "ITFPlus Trial Logger"
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 3: Pubblica e Configura
+═══════════════════════════════════════════════════════════════
+
+1. Clicca "Implementa" → "Nuova implementazione"
+2. Rotellina ⚙️ → "App web"
+3. "Esegui come": Me
+4. "Chi ha accesso": Chiunque
+5. Clicca "Implementa"
+6. COPIA L'URL (tipo: https://script.google.com/macros/s/ABC.../exec)
+7. Nel server, apri: /var/www/itfplus/server/.env
+8. Aggiungi questa riga:
+
+GOOGLE_SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/TUO_URL/exec
+
+9. Sostituisci TUO_URL con l'URL copiato
+10. Riavvia: pm2 restart itfplus-server
+
+
+═══════════════════════════════════════════════════════════════
+✅ FATTO!
+═══════════════════════════════════════════════════════════════
+
+Ora ogni registrazione trial viene salvata automaticamente su Google Sheets!
+
+Niente JSON, niente Google Cloud, niente complicazioni!
+
+
+═══════════════════════════════════════════════════════════════
+📋 Cosa Succede Ora
+═══════════════════════════════════════════════════════════════
+
+Utente clicca popup Booky → Compila form → Invia
+↓
+✅ Account creato (3 giorni)
+✅ Email inviata con credenziali  
+✅ Dati salvati su Google Sheet
+
+
+═══════════════════════════════════════════════════════════════
+

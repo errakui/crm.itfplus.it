@@ -1,0 +1,111 @@
+═══════════════════════════════════════════════════════════════
+SCRIPT PHP - CREAZIONE ACCOUNT PROVA 3 GIORNI
+═══════════════════════════════════════════════════════════════
+
+CODICE DA COPIARE NEL TUO GESTIONALE:
+
+<?php
+function creaAccountProva3Giorni($email, $nome) {
+    $url = 'https://crm.itfplus.it/api/public/request-account';
+    $apiKey = '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246';
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'X-API-Key: ' . $apiKey
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'email' => $email,
+        'name' => $nome,
+        'expiresInDays' => 3
+    ]));
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    $result = json_decode($response, true);
+    
+    return [
+        'success' => ($httpCode === 201 && $result['success']),
+        'message' => $result['message'] ?? 'Errore',
+        'user' => $result['user'] ?? null
+    ];
+}
+
+// USO:
+$risultato = creaAccountProva3Giorni('mario@example.com', 'Mario Rossi');
+
+if ($risultato['success']) {
+    echo "✅ Account creato! Email inviata.";
+} else {
+    echo "❌ Errore: " . $risultato['message'];
+}
+?>
+
+═══════════════════════════════════════════════════════════════
+COSA FA:
+═══════════════════════════════════════════════════════════════
+
+1. Chiama l'API ITFPlus
+2. Crea account valido per 3 GIORNI
+3. Genera password automatica
+4. Invia EMAIL con credenziali
+5. Ritorna successo/errore
+
+═══════════════════════════════════════════════════════════════
+CODICE JAVASCRIPT (per siti web):
+═══════════════════════════════════════════════════════════════
+
+async function creaAccountProva3Giorni(email, nome) {
+    const response = await fetch('https://crm.itfplus.it/api/public/request-account', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': '933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246'
+        },
+        body: JSON.stringify({
+            email: email,
+            name: nome,
+            expiresInDays: 3
+        })
+    });
+    
+    return await response.json();
+}
+
+// USO:
+creaAccountProva3Giorni('mario@example.com', 'Mario Rossi')
+    .then(risultato => {
+        if (risultato.success) {
+            alert('✅ Account creato! Email inviata.');
+        } else {
+            alert('❌ Errore: ' + risultato.message);
+        }
+    });
+
+═══════════════════════════════════════════════════════════════
+CODICE CURL (test da terminale):
+═══════════════════════════════════════════════════════════════
+
+curl -X POST https://crm.itfplus.it/api/public/request-account \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: 933126c4a803a65808eab51db263a5287841a661d648c08196363bd257b08246" \
+  -d '{"email":"mario@example.com","name":"Mario Rossi","expiresInDays":3}'
+
+═══════════════════════════════════════════════════════════════
+FILE COMPLETO:
+═══════════════════════════════════════════════════════════════
+
+/var/www/itfplus/SCRIPT-PROVA-3-GIORNI.php
+
+Contiene tutti gli esempi:
+- Funzione base
+- Form HTML completo
+- Integrazione gestionale
+- Creazione massiva
+
+═══════════════════════════════════════════════════════════════
+

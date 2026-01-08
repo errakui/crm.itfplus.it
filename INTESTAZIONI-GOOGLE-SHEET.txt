@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════════
+INTESTAZIONI DA AGGIUNGERE NEL GOOGLE SHEET
+═══════════════════════════════════════════════════════════════
+
+Apri il Google Sheet e nella PRIMA RIGA (riga 1) scrivi:
+
+A1: Data/Ora
+B1: Nome
+C1: Cognome
+D1: Email
+E1: Telefono
+F1: Azienda
+G1: Ruolo
+H1: Settore
+I1: Città
+J1: Note
+K1: Scadenza
+
+═══════════════════════════════════════════════════════════════
+FORMATTAZIONE (OPZIONALE):
+═══════════════════════════════════════════════════════════════
+
+Seleziona la riga 1 e:
+- Grassetto
+- Sfondo: Blu scuro (#1B2A4A)
+- Testo: Bianco
+
+═══════════════════════════════════════════════════════════════
+NOTA:
+═══════════════════════════════════════════════════════════════
+
+I dati degli utenti verranno aggiunti dalla riga 2 in poi.
+Se vedi già dei dati, NON eliminarli! Aggiungi solo le intestazioni
+sopra di essi.
+
+═══════════════════════════════════════════════════════════════
+

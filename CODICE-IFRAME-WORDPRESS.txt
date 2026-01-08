@@ -1,0 +1,72 @@
+==========================================
+CODICE IFRAME PER WORDPRESS
+==========================================
+
+Copia e incolla questo codice nella tua pagina WordPress:
+
+<iframe 
+    src="https://crm.itfplus.it/form-iframe.html" 
+    width="100%" 
+    height="750" 
+    frameborder="0"
+    scrolling="no"
+    style="border: none; max-width: 600px; margin: 0 auto; display: block; border-radius: 8px;">
+</iframe>
+
+==========================================
+OPZIONI DI PERSONALIZZAZIONE
+==========================================
+
+Altezza iframe:
+- Per form compatto: height="650"
+- Per form standard: height="750" (consigliato)
+- Per form spazioso: height="850"
+
+Larghezza:
+- width="100%" si adatta al contenitore
+- max-width: 600px limita la larghezza massima
+
+Stile personalizzato:
+Puoi aggiungere ombre, bordi, ecc. modificando lo style:
+
+<iframe 
+    src="https://crm.itfplus.it/form-iframe.html" 
+    width="100%" 
+    height="750" 
+    frameborder="0"
+    scrolling="no"
+    style="border: none; max-width: 600px; margin: 0 auto; display: block; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+</iframe>
+
+==========================================
+COME INSERIRLO SU WORDPRESS
+==========================================
+
+Metodo 1 - Blocco HTML:
+1. Vai su Pagine → Modifica
+2. Aggiungi un blocco "HTML personalizzato"
+3. Incolla il codice iframe
+4. Salva
+
+Metodo 2 - Shortcode:
+1. Crea un shortcode personalizzato
+2. Oppure usa un plugin come "Shortcodes Ultimate"
+3. Incolla il codice iframe nel contenuto
+
+Metodo 3 - Widget:
+1. Vai su Aspetto → Widget
+2. Aggiungi un widget "HTML personalizzato"
+3. Incolla il codice iframe
+
+==========================================
+NOTE IMPORTANTI
+==========================================
+
+✅ Il form è completamente funzionante e standalone
+✅ Si adatta automaticamente a tutti i dispositivi
+✅ Non richiede plugin o dipendenze
+✅ Background trasparente per integrazione perfetta
+✅ Comunica con l'API per creare account di prova
+
+URL del form: https://crm.itfplus.it/form-iframe.html
+

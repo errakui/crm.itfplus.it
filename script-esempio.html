@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Richiesta Account</title>
+</head>
+<body>
+    <h2>Richiedi Account di Prova (3 giorni)</h2>
+    
+    <form id="accountForm">
+        <div>
+            <label>Nome:</label>
+            <input type="text" name="nome" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+        <button type="submit">Richiedi Account</button>
+    </form>
+    
+    <div id="risultato"></div>
+
+    <script>
+        document.getElementById('accountForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const nome = formData.get('nome');
+            const email = formData.get('email');
+            
+            // IMPORTANTE: La API_KEY va messa qui (solo tu la vedi nel codice)
+            // Oppure meglio ancora: chiama il tuo script PHP che ha la chiave
+            const API_KEY = 'la-tua-chiave-segreta';
+            
+            try {
+                const response = await fetch('https://crm.itfplus.it/api/public/request-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        name: nome,
+                        expiresInDays: 3
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('risultato').innerHTML = 
+                        '<p style="color: green;">✅ Account creato! Controlla la tua email per le credenziali.</p>';
+                } else {
+                    document.getElementById('risultato').innerHTML = 
+                        '<p style="color: red;">❌ Errore: ' + result.message + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('risultato').innerHTML = 
+                    '<p style="color: red;">❌ Errore di connessione</p>';
+            }
+        });
+    </script>
+</body>
+</html>
+

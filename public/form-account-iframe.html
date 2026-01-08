@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiedi Account di Prova</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: transparent;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 100%;
+        }
+        h2 {
+            color: #1B2A4A;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1B2A4A;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #1B2A4A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2c3e50;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+            font-size: 14px;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Richiedi Account di Prova</h2>
+        <p class="subtitle">Account valido per 3 giorni</p>
+        
+        <div class="info">
+            ⏱️ Il tuo account di prova sarà attivo per <strong>3 giorni</strong>. 
+            Riceverai le credenziali via email.
+        </div>
+
+        <form id="accountForm">
+            <div class="form-group">
+                <label for="nome">Nome *</label>
+                <input type="text" id="nome" name="nome" required placeholder="Mario">
+            </div>
+            
+            <div class="form-group">
+                <label for="cognome">Cognome *</label>
+                <input type="text" id="cognome" name="cognome" required placeholder="Rossi">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required placeholder="mario.rossi@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Telefono *</label>
+                <input type="text" id="telefono" name="telefono" required placeholder="+39 333 1234567">
+            </div>
+            
+            <div class="form-group">
+                <label for="azienda">Azienda/Studio *</label>
+                <input type="text" id="azienda" name="azienda" required placeholder="Studio Legale Rossi">
+            </div>
+            
+            <div class="form-group">
+                <label for="ruolo">Ruolo *</label>
+                <input type="text" id="ruolo" name="ruolo" required placeholder="Avvocato">
+            </div>
+            
+            <div class="form-group">
+                <label for="settore">Settore *</label>
+                <input type="text" id="settore" name="settore" required placeholder="Civile">
+            </div>
+            
+            <div class="form-group">
+                <label for="citta">Città *</label>
+                <input type="text" id="citta" name="citta" required placeholder="Roma">
+            </div>
+            
+            <div class="form-group">
+                <label for="note">Note (opzionale)</label>
+                <input type="text" id="note" name="note" placeholder="Eventuali richieste particolari">
+            </div>
+            
+            <button type="submit" id="submitBtn">Crea Account di Prova</button>
+        </form>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('accountForm');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Invio in corso...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'none';
+            
+            // Raccogli tutti i dati dal form
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const azienda = document.getElementById('azienda').value;
+            const ruolo = document.getElementById('ruolo').value;
+            const settore = document.getElementById('settore').value;
+            const citta = document.getElementById('citta').value;
+            const note = document.getElementById('note').value;
+            
+            // Calcola data scadenza (3 giorni da oggi)
+            const scadenza = new Date();
+            scadenza.setDate(scadenza.getDate() + 3);
+            const scadenzaFormatted = scadenza.toLocaleDateString('it-IT');
+            
+            const formData = {
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                telefono: telefono,
+                azienda: azienda,
+                ruolo: ruolo,
+                settore: settore,
+                citta: citta,
+                note: note,
+                scadenza: scadenzaFormatted
+            };
+            
+            try {
+                // Invia direttamente a Google Apps Script
+                const response = await fetch('https://script.google.com/macros/s/AKfycbwembKM-0GZ-xtkSpk0v9m5NWfpkDZ3pXuyUmFjEXwsJAs0jTg9DbE4fG9lZ_0eSfMX/exec', {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                // Leggi la risposta
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = '✅ <strong>Richiesta inviata!</strong><br>Riceverai una conferma via email a breve.';
+                    form.reset();
+                    
+                    // Comunica al parent (se in iframe)
+                    if (window.parent !== window) {
+                        window.parent.postMessage({type: 'account-created', email: email}, '*');
+                    }
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = '❌ <strong>Errore:</strong> ' + (result.message || 'Riprova più tardi.');
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ <strong>Errore di invio.</strong> Riprova più tardi.';
+                console.error('Errore:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Crea Account di Prova';
+            }
+        });
+    </script>
+</body>
+</html>
+
