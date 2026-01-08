@@ -85,9 +85,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
         display: { xs: 'block' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
-          width: drawerWidth,
-          backgroundColor: 'background.paper',
-          paddingTop: '70px', // Aggiunto spazio sopra per evitare sovrapposizione con l'header
+          width: { xs: 260, sm: drawerWidth },
+          backgroundColor: 'var(--card-background)',
+          paddingTop: { xs: '56px', sm: '64px' }, // Dinamico basato su altezza navbar
+          borderRight: '1px solid var(--border-light)',
         },
       }}
     >
@@ -155,7 +156,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
         ))}
       </List>
 
-      <Box sx={{ mt: 'auto', p: 2, position: 'absolute', bottom: 0, width: '100%' }}>
+      <Box 
+        sx={{ 
+          p: 2, 
+          mt: 3,
+          borderTop: '1px solid var(--border-light)',
+        }}
+      >
         <Button
           variant="contained"
           color="error"
@@ -165,7 +172,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
           sx={{
             py: 1.2,
             borderRadius: 2,
-            boxShadow: 2,
+            fontWeight: 600,
+            boxShadow: 'none',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(244, 63, 94, 0.3)',
+            },
           }}
         >
           Logout

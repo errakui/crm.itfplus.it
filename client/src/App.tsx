@@ -24,39 +24,38 @@ import Footer from './components/Footer';
 import RegisterPage from './pages/RegisterPage';
 import TermsPage from './pages/TermsPage';
 
-// Tema personalizzato
+// Tema personalizzato ITFPLUS - Unificato
 const theme = createTheme({
   palette: {
     primary: {
       main: '#1B2A4A',
+      light: '#2c4270',
+      dark: '#0d1a2e',
     },
     secondary: {
       main: '#A67C52',
+      light: '#c9a77d',
     },
     background: {
-      default: '#F5F6F8',
+      default: '#F9FAFC',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#0F172A',
+      secondary: '#475569',
     },
   },
   typography: {
-    fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif',
-    h1: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
-    h2: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
-    h3: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
-    h4: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
-    h5: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
-    h6: {
-      fontFamily: 'Cormorant Garamond, serif',
-    },
+    fontFamily: '"Plus Jakarta Sans", sans-serif',
+    h1: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
+    h2: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
+    h3: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
+    h4: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
+    h5: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
+    h6: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
+    body1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    body2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    button: { fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600 },
   },
   components: {
     MuiButton: {
@@ -64,6 +63,7 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           borderRadius: 8,
+          fontWeight: 600,
         },
       },
     },
@@ -86,14 +86,13 @@ const theme = createTheme({
   },
 });
 
+// GlobalStyles minimo - i font sono già importati in index.css
 const globalStyles = (
   <GlobalStyles
     styles={{
-      '@import': "url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap')",
       body: {
         margin: 0,
         padding: 0,
-        fontFamily: 'Roboto, sans-serif',
       }
     }}
   />

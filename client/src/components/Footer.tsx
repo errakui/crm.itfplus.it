@@ -1,127 +1,227 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, IconButton, Divider } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link as MuiLink } from '@mui/material';
-import { Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
+import { Facebook, LinkedIn, Email as EmailIcon, Phone as PhoneIcon } from '@mui/icons-material';
 
 const Footer: React.FC = () => {
-  // Link a WhatsApp
-  const openWhatsApp = () => {
-    window.open('https://wa.me/+393336170230', '_blank');
-  };
+  const currentYear = new Date().getFullYear();
 
   const linkStyle = {
-    color: 'white',
+    color: 'rgba(255, 255, 255, 0.85)',
     textDecoration: 'none',
     display: 'block',
-    marginBottom: '12px',
-    fontFamily: 'Inter, sans-serif',
+    marginBottom: '10px',
+    fontSize: '0.9rem',
+    transition: 'color 0.2s ease',
     '&:hover': {
-      textDecoration: 'underline'
+      color: 'white',
+      textDecoration: 'underline',
     }
   };
 
   return (
     <Box
+      component="footer"
       sx={{
-        bgcolor: '#1B2A4A',
+        bgcolor: 'var(--primary-color)',
         color: 'white',
-        py: 6,
+        py: { xs: 4, sm: 5, md: 6 },
         mt: 'auto',
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
+        <Grid container spacing={{ xs: 3, md: 4 }}>
+          {/* Colonna 1: Logo e descrizione */}
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <img 
+              <Box
+                component="img"
                 src="/itfpluslogo.png" 
                 alt="ITFPLUS" 
-                style={{ 
-                  height: '45px',
-                  filter: 'brightness(0) invert(1)' // Rende il logo bianco
+                sx={{ 
+                  height: { xs: 35, sm: 45 },
+                  filter: 'brightness(0) invert(1)',
                 }} 
               />
             </Box>
-            <Typography variant="body2" sx={{ mb: 2, fontFamily: 'Inter, sans-serif', lineHeight: 1.6 }}>
-              La nostra piattaforma di documentazione giuridica offre un accesso facile e sicuro 
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                mb: 2, 
+                lineHeight: 1.7,
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: { xs: '0.85rem', sm: '0.9rem' },
+              }}
+            >
+              La piattaforma di documentazione giuridica che offre accesso facile e sicuro 
               a una vasta collezione di sentenze.
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton sx={{ color: 'white', '&:hover': { transform: 'translateY(-3px)', color: '#64B5F6' } }}>
+            
+            {/* Social Icons */}
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <IconButton 
+                href="https://facebook.com" 
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  '&:hover': { 
+                    color: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  } 
+                }}
+              >
                 <Facebook />
               </IconButton>
-              <IconButton sx={{ color: 'white', '&:hover': { transform: 'translateY(-3px)', color: '#64B5F6' } }}>
-                <Twitter />
-              </IconButton>
-              <IconButton sx={{ color: 'white', '&:hover': { transform: 'translateY(-3px)', color: '#64B5F6' } }}>
-                <Instagram />
-              </IconButton>
-              <IconButton sx={{ color: 'white', '&:hover': { transform: 'translateY(-3px)', color: '#64B5F6' } }}>
+              <IconButton 
+                href="https://linkedin.com" 
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  '&:hover': { 
+                    color: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  } 
+                }}
+              >
                 <LinkedIn />
               </IconButton>
             </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>
+
+          {/* Colonna 2: Link utili */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography 
+              variant="h6" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 600,
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                mb: 2,
+              }}
+            >
               Link utili
             </Typography>
-            <RouterLink to="/privacy-policy" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Informativa sulla privacy
-            </RouterLink>
-            <RouterLink to="/terms" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Condizioni di abbonamento
-            </RouterLink>
-            <RouterLink to="/faq" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Domande frequenti
-            </RouterLink>
-            <RouterLink to="/contact" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Contattaci
-            </RouterLink>
-            <RouterLink to="/support" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Supporto
-            </RouterLink>
-            <RouterLink to="/changelog" style={{ color: 'white', textDecoration: 'none', display: 'block', marginBottom: '12px', fontFamily: 'Inter, sans-serif' }}>
-              Cronologia delle modifiche
-            </RouterLink>
+            <Box component="nav">
+              <RouterLink to="/privacy-policy" style={linkStyle as React.CSSProperties}>
+                Informativa sulla privacy
+              </RouterLink>
+              <RouterLink to="/terms" style={linkStyle as React.CSSProperties}>
+                Condizioni di abbonamento
+              </RouterLink>
+              <RouterLink to="/faq" style={linkStyle as React.CSSProperties}>
+                Domande frequenti
+              </RouterLink>
+              <RouterLink to="/contact" style={linkStyle as React.CSSProperties}>
+                Contattaci
+              </RouterLink>
+              <RouterLink to="/support" style={linkStyle as React.CSSProperties}>
+                Supporto
+              </RouterLink>
+              <RouterLink to="/changelog" style={linkStyle as React.CSSProperties}>
+                Cronologia modifiche
+              </RouterLink>
+            </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>
+
+          {/* Colonna 3: Contatti */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography 
+              variant="h6" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 600,
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                mb: 2,
+              }}
+            >
               Contatti
             </Typography>
-            <Typography variant="body2" sx={{ mb: 1, fontFamily: 'Inter, sans-serif' }}>
-              Via Santa Teresa, 47
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, fontFamily: 'Inter, sans-serif' }}>
-              37135 – Verona
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, fontFamily: 'Inter, sans-serif' }}>
-              Email: info@itfplus.it
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, fontFamily: 'Inter, sans-serif' }}>
-              Tel: +39 333 617 0230
-            </Typography>
+            <Box sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+                Via Santa Teresa, 47
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+                37135 – Verona
+              </Typography>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <EmailIcon sx={{ fontSize: 18, color: 'var(--accent-color)' }} />
+                <Typography 
+                  component="a" 
+                  href="mailto:info@itfplus.it"
+                  variant="body2" 
+                  sx={{ 
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    textDecoration: 'none',
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                    '&:hover': { color: 'white' },
+                  }}
+                >
+                  info@itfplus.it
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PhoneIcon sx={{ fontSize: 18, color: 'var(--accent-color)' }} />
+                <Typography 
+                  component="a" 
+                  href="tel:+393336170230"
+                  variant="body2" 
+                  sx={{ 
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    textDecoration: 'none',
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                    '&:hover': { color: 'white' },
+                  }}
+                >
+                  +39 333 617 0230
+                </Typography>
+              </Box>
+            </Box>
           </Grid>
         </Grid>
-        <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="body2" sx={{ fontFamily: 'Inter, sans-serif' }}>
-            © {new Date().getFullYear()} ITF Plus. Tutti i diritti riservati.
+
+        <Divider sx={{ my: { xs: 3, md: 4 }, borderColor: 'rgba(255, 255, 255, 0.15)' }} />
+
+        {/* Bottom bar */}
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontSize: { xs: '0.75rem', sm: '0.85rem' },
+            }}
+          >
+            © {currentYear} ITF Plus. Tutti i diritti riservati.
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          
+          <Box 
+            sx={{ 
+              bgcolor: 'rgba(255, 255, 255, 0.1)', 
+              px: 2, 
+              py: 0.5, 
+              borderRadius: '20px',
+            }}
+          >
             <Typography 
               variant="caption" 
               sx={{ 
-                bgcolor: 'rgba(255, 255, 255, 0.1)', 
-                px: 1.5, 
-                py: 0.5, 
-                borderRadius: '20px',
-                fontFamily: 'Inter, sans-serif',
                 fontWeight: 600,
-                letterSpacing: 0.5
+                letterSpacing: 0.5,
+                fontSize: { xs: '0.7rem', sm: '0.75rem' },
               }}
             >
-              versione: 0.0.8
+              versione: 0.0.9
             </Typography>
           </Box>
         </Box>
@@ -130,4 +230,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

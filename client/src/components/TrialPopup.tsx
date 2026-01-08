@@ -119,18 +119,21 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
         onClick={handleOpen}
         sx={{
           position: 'fixed',
-          bottom: 30,
-          right: 30,
+          bottom: { xs: 16, sm: 24, md: 30 },
+          right: { xs: 16, sm: 24, md: 30 },
           cursor: 'pointer',
           zIndex: 9999,
-          animation: 'bounce 2s infinite',
-          '@keyframes bounce': {
-            '0%, 100%': { transform: 'translateY(0)' },
-            '50%': { transform: 'translateY(-10px)' },
+          // Animazione bounce solo all'inizio, poi si ferma
+          animation: 'bounceOnce 0.8s ease-out',
+          '@keyframes bounceOnce': {
+            '0%': { transform: 'translateY(100px)', opacity: 0 },
+            '60%': { transform: 'translateY(-10px)', opacity: 1 },
+            '80%': { transform: 'translateY(5px)' },
+            '100%': { transform: 'translateY(0)' },
           },
-          transition: 'all 0.3s ease',
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           '&:hover': {
-            transform: 'scale(1.05)',
+            transform: 'scale(1.03) translateY(-3px)',
           },
         }}
       >
@@ -138,14 +141,14 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
         <Box
           sx={{
             position: 'relative',
-            background: 'linear-gradient(135deg, #1B2A4A 0%, #2c4270 100%)',
-            borderRadius: '20px',
-            padding: '15px 20px',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%)',
+            borderRadius: { xs: '16px', sm: '20px' },
+            padding: { xs: '12px 16px', sm: '15px 20px' },
+            boxShadow: '0 8px 25px rgba(27, 42, 74, 0.35)',
             display: 'flex',
             alignItems: 'center',
-            gap: 2,
-            maxWidth: '350px',
+            gap: { xs: 1.5, sm: 2 },
+            maxWidth: { xs: '300px', sm: '350px' },
           }}
         >
           {/* Immagine Booky */}
@@ -154,11 +157,12 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
             src="/booky.png"
             alt="Booky"
             sx={{
-              width: 60,
-              height: 60,
+              width: { xs: 45, sm: 60 },
+              height: { xs: 45, sm: 60 },
               borderRadius: '50%',
               border: '3px solid white',
               boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+              flexShrink: 0,
             }}
           />
           
@@ -168,18 +172,20 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
               variant="h6"
               sx={{
                 color: 'white',
-                fontWeight: 'bold',
-                fontSize: '18px',
+                fontWeight: 700,
+                fontSize: { xs: '14px', sm: '18px' },
                 lineHeight: 1.2,
+                fontFamily: '"Syne", sans-serif',
               }}
             >
               SEI NUOVO?
             </Typography>
             <Typography
               sx={{
-                color: '#FFD700',
-                fontWeight: 'bold',
-                fontSize: '16px',
+                color: 'var(--accent-color)',
+                fontWeight: 700,
+                fontSize: { xs: '12px', sm: '16px' },
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
               }}
             >
               PROVAMI GRATIS SUBITO!
@@ -190,20 +196,21 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
           <Box
             sx={{
               position: 'absolute',
-              top: -10,
-              right: -10,
-              background: '#FF6B35',
+              top: { xs: -8, sm: -10 },
+              right: { xs: -8, sm: -10 },
+              background: 'var(--error-color)',
               color: 'white',
               borderRadius: '50%',
-              width: 50,
-              height: 50,
+              width: { xs: 40, sm: 50 },
+              height: { xs: 40, sm: 50 },
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '12px',
-              fontWeight: 'bold',
+              fontSize: { xs: '10px', sm: '12px' },
+              fontWeight: 700,
               border: '3px solid white',
               boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
             }}
           >
             3 GG
@@ -225,11 +232,12 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
       >
         <DialogTitle
           sx={{
-            background: 'linear-gradient(135deg, #1B2A4A 0%, #2c4270 100%)',
+            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%)',
             color: 'white',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            py: { xs: 2, sm: 2.5 },
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -411,9 +419,13 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
                 sx={{
                   mt: 3,
                   py: 1.5,
-                  background: 'linear-gradient(to right, #1B2A4A, #2c4270)',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
+                  background: 'linear-gradient(to right, var(--primary-color), var(--primary-light))',
+                  fontSize: { xs: '14px', sm: '16px' },
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  '&:hover': {
+                    background: 'linear-gradient(to right, var(--primary-light), var(--primary-lighter))',
+                  },
                 }}
               >
                 {loading ? (

@@ -67,7 +67,7 @@ const LoginPage: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #0d2748 0%, #0a1a2e 100%)',
+        background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%)',
         position: 'relative',
         overflow: 'auto',
         py: { xs: 2, sm: 3, md: 4 },
@@ -124,7 +124,7 @@ const LoginPage: React.FC = () => {
           >
             <Box
               component="img"
-              src="/logoitfplus.png"
+              src="/itfpluslogo.png"
               alt="ITFPLUS Logo"
               sx={{
                 height: { xs: 50, sm: 65, md: 80 },
@@ -140,7 +140,7 @@ const LoginPage: React.FC = () => {
               variant={isMobile ? 'h6' : 'h5'}
               sx={{
                 mb: 1,
-                color: '#1B2A4A',
+                color: 'var(--primary-color)',
                 fontWeight: 600,
                 fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
               }}
@@ -238,13 +238,13 @@ const LoginPage: React.FC = () => {
                 sx={{ 
                   py: { xs: 1.2, sm: 1.5 }, 
                   borderRadius: { xs: 1.5, sm: 2 },
-                  background: 'linear-gradient(to right, #1B2A4A, #2c4270)',
+                  background: 'linear-gradient(to right, var(--primary-color), var(--primary-light))',
                   fontSize: { xs: '0.9rem', sm: '1rem' },
                   fontWeight: 600,
                   textTransform: 'none',
                   boxShadow: '0 4px 12px rgba(27, 42, 74, 0.3)',
                   '&:hover': {
-                    background: 'linear-gradient(to right, #243656, #3a5a8a)',
+                    background: 'linear-gradient(to right, var(--primary-light), var(--primary-lighter))',
                     boxShadow: '0 6px 16px rgba(27, 42, 74, 0.4)',
                   },
                   '&:active': {
@@ -263,7 +263,7 @@ const LoginPage: React.FC = () => {
                 <Link
                   to="#"
                   style={{ 
-                    color: '#1B2A4A', 
+                    color: 'var(--primary-color)', 
                     textDecoration: 'none',
                     fontSize: isMobile ? '0.8rem' : '0.875rem',
                   }}

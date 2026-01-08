@@ -5,14 +5,15 @@
 @import url('./styles/enhanced-ui.css');
 
 :root {
-  /* Palette colori Ultra-Moderni 2025 */
-  --primary-color: #0C224E;
-  --primary-light: #1F3A65;
-  --primary-lighter: #395686;
-  --secondary-color: #C38FFF;
-  --secondary-light: #DFC6FF;
-  --accent-color: #FF965B;
-  --accent-light: #FFBE96;
+  /* Palette colori ITFPLUS - Unificata */
+  --primary-color: #1B2A4A;
+  --primary-light: #2c4270;
+  --primary-lighter: #3d5a8a;
+  --primary-dark: #0d1a2e;
+  --secondary-color: #A67C52;
+  --secondary-light: #c9a77d;
+  --accent-color: #FFD700;
+  --accent-light: #ffe44d;
   --success-color: #2DD4BF;
   --warning-color: #F59E0B;
   --error-color: #F43F5E;
