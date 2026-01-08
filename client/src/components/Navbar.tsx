@@ -28,6 +28,7 @@ import {
   Favorite as FavoriteIcon,
   Close as CloseIcon,
   Login as LoginIcon,
+  Article as BlogIcon,
 } from '@mui/icons-material';
 import AuthContext from '../contexts/AuthContext';
 
@@ -65,6 +66,8 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
 
   // Menu items per mobile drawer
   const mobileMenuItems = [
+    // Blog visibile a tutti
+    { text: 'Blog', icon: <BlogIcon />, path: '/blog' },
     ...(isAuthenticated() ? [
       { text: 'Preferiti', icon: <FavoriteIcon />, path: '/favorites' },
     ] : []),
@@ -139,6 +142,21 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             {!isMobile ? (
               // DESKTOP: mostra bottoni
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {/* Blog - visibile a tutti */}
+                <Button
+                  component={Link}
+                  to="/blog"
+                  color="inherit"
+                  startIcon={<BlogIcon />}
+                  sx={{ 
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
+                  Blog
+                </Button>
+
                 {isAuthenticated() && (
                   <Button
                     component={Link}

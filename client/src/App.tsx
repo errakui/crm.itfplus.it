@@ -23,6 +23,8 @@ import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import RegisterPage from './pages/RegisterPage';
 import TermsPage from './pages/TermsPage';
+import BlogPage from './pages/BlogPage';
+import ArticlePage from './pages/ArticlePage';
 
 // Tema ITFPLUS - Professionale Giuridico
 const theme = createTheme({
@@ -148,6 +150,8 @@ const App: React.FC = () => {
                 <Route path="/changelog" element={<ChangelogPage />} />
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/blog/:slug" element={<ArticlePage />} />
                 
                 {/* Dashboard utente (solo utenti autenticati) */}
                 <Route
