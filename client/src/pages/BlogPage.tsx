@@ -31,9 +31,476 @@ export interface Article {
 // Articoli del blog (hardcoded per ora)
 export const articles: Article[] = [
   {
+    id: '4',
+    slug: 'booky-assistente-ai-sentenze-giuridiche',
+    title: 'Booky: L\'Assistente AI Rivoluzionario per l\'Analisi delle Sentenze Giuridiche',
+    excerpt: 'Scopri Booky, l\'intelligenza artificiale integrata in ITFPLUS che ti aiuta a comprendere, analizzare e interpretare le sentenze in tempo reale. Un assistente virtuale pensato per avvocati e professionisti del diritto.',
+    content: `
+## Introduzione a Booky: L'Intelligenza Artificiale al Servizio del Diritto
+
+Nel mondo giuridico moderno, la quantità di informazioni da elaborare è in costante crescita. **Booky** nasce come risposta a questa sfida: un assistente AI avanzato, integrato direttamente in ogni sentenza della piattaforma ITFPLUS, progettato per supportare avvocati, giuristi e professionisti del diritto nell'analisi e comprensione dei documenti legali.
+
+## Cos'è Booky e Come Funziona
+
+**Booky** è un chatbot basato su intelligenza artificiale che appare automaticamente quando apri qualsiasi sentenza su ITFPLUS. Non si tratta di un semplice assistente generico: Booky è contestualizzato sulla sentenza specifica che stai leggendo, il che significa che può rispondere a domande precise sul documento che hai davanti.
+
+### Tecnologia alla Base di Booky
+
+Booky utilizza tecnologie di **Natural Language Processing (NLP)** e **Large Language Models (LLM)** di ultima generazione per:
+
+- **Comprendere il contesto giuridico**: Booky è addestrato su terminologia legale italiana
+- **Analizzare il testo della sentenza**: Estrae automaticamente i punti salienti
+- **Rispondere in linguaggio naturale**: Puoi fare domande come parleresti a un collega
+- **Citare le fonti**: Ogni risposta fa riferimento a parti specifiche del documento
+
+## Come Utilizzare Booky: Guida Pratica
+
+### Passo 1: Apri una Sentenza
+
+Accedi alla piattaforma ITFPLUS, cerca la sentenza di tuo interesse e aprila nel visualizzatore documenti.
+
+### Passo 2: Attiva la Chat con Booky
+
+Troverai l'icona di Booky nell'angolo della schermata. Cliccaci sopra per aprire la finestra di chat.
+
+### Passo 3: Fai le Tue Domande
+
+Ecco alcuni esempi di domande che puoi porre a Booky:
+
+- *"Qual è il principio di diritto enunciato in questa sentenza?"*
+- *"Riassumi i fatti del caso in 5 punti"*
+- *"Quali sono i precedenti giurisprudenziali citati?"*
+- *"Come si è espressa la Corte sulla questione della prescrizione?"*
+- *"Quali articoli di legge vengono applicati?"*
+- *"Estrai le massime giurisprudenziali"*
+
+### Passo 4: Approfondisci
+
+Booky può continuare la conversazione. Se una risposta non è chiara, chiedi chiarimenti o approfondimenti specifici.
+
+## Vantaggi di Booky per i Professionisti del Diritto
+
+### 1. Risparmio di Tempo
+
+Leggere e analizzare una sentenza complessa può richiedere ore. Con Booky, puoi ottenere un riassunto dei punti chiave in pochi secondi, permettendoti di valutare rapidamente la rilevanza del documento per il tuo caso.
+
+### 2. Comprensione Approfondita
+
+Booky non si limita a riassumere: può spiegare concetti giuridici complessi, contestualizzare le decisioni della Corte e aiutarti a comprendere le sfumature interpretative.
+
+### 3. Estrazione Automatica di Informazioni
+
+Hai bisogno di estrarre tutte le norme citate? O tutti i precedenti giurisprudenziali? Booky può farlo per te in un istante.
+
+### 4. Supporto alla Ricerca
+
+Se stai preparando una memoria difensiva o un parere, Booky può aiutarti a identificare i passaggi più rilevanti da citare.
+
+### 5. Accessibilità 24/7
+
+A differenza di un collaboratore umano, Booky è sempre disponibile, anche alle 3 di notte prima di un'udienza importante.
+
+## Casi d'Uso Pratici
+
+### Per l'Avvocato Penalista
+
+*"Booky, in questa sentenza come ha valutato la Corte l'elemento soggettivo del reato? Ci sono riferimenti a sentenze della Cassazione?"*
+
+### Per l'Avvocato Civilista
+
+*"Quali sono i criteri di quantificazione del danno applicati in questa sentenza? Sono conformi agli orientamenti più recenti?"*
+
+### Per il Praticante
+
+*"Puoi spiegarmi cosa si intende per 'giudicato implicito' come usato in questa sentenza?"*
+
+### Per lo Studio Legale
+
+*"Estrai un riassunto di 200 parole di questa sentenza da inserire nel nostro database interno"*
+
+## Sicurezza e Privacy
+
+Booky opera nel rispetto della privacy:
+
+- **I dati delle conversazioni non vengono utilizzati per addestrare il modello**
+- **Le chat sono private e non vengono condivise**
+- **Conformità GDPR garantita**
+
+## Il Futuro di Booky
+
+Il team ITFPLUS lavora costantemente per migliorare Booky. Nelle prossime versioni prevediamo:
+
+- **Confronto tra sentenze**: Booky potrà comparare più sentenze tra loro
+- **Suggerimenti proattivi**: Booky suggerirà sentenze correlate
+- **Generazione di bozze**: Supporto nella redazione di atti
+- **Integrazione con gestionali**: Export diretto verso i software di studio
+
+## Conclusioni
+
+**Booky rappresenta il futuro dell'assistenza legale digitale**. Non sostituisce il giurista, ma lo potenzia, permettendogli di lavorare in modo più efficiente e informato.
+
+Prova Booky oggi stesso su ITFPLUS. Apri una sentenza e inizia a fare domande: scoprirai un nuovo modo di lavorare con i documenti giuridici.
+
+---
+
+*Booky è disponibile per tutti gli utenti ITFPLUS. Richiedi la tua prova gratuita di 3 giorni per scoprire come l'AI può trasformare il tuo lavoro quotidiano.*
+    `,
+    date: '2026-01-08',
+    author: 'Team ITFPLUS',
+    category: 'Intelligenza Artificiale',
+    readTime: '8 min',
+  },
+  {
+    id: '3',
+    slug: 'motore-ricerca-sentenze-piu-potente-italia',
+    title: 'Il Motore di Ricerca per Sentenze Più Potente d\'Italia: Tecnologia e Funzionalità',
+    excerpt: 'Scopri la tecnologia dietro il motore di ricerca ITFPLUS: full-text search, filtri avanzati, ricerca per tribunale e molto altro. Come trovare la sentenza giusta in pochi secondi.',
+    content: `
+## Introduzione: Perché il Motore di Ricerca è Fondamentale
+
+Nel lavoro quotidiano di un avvocato o di un professionista del diritto, **trovare la sentenza giusta al momento giusto può fare la differenza tra vincere e perdere una causa**. Il motore di ricerca di ITFPLUS è stato progettato con un unico obiettivo: permetterti di trovare esattamente ciò che cerchi nel minor tempo possibile.
+
+## La Tecnologia Behind the Scenes
+
+### Full-Text Search: Ricerca nel Contenuto Completo
+
+A differenza di molti database giuridici che permettono solo la ricerca per titolo o metadati, **ITFPLUS indicizza l'intero contenuto di ogni sentenza**. Questo significa che puoi cercare:
+
+- **Frasi specifiche**: Cerca "danno da perdita di chance" e troverai tutte le sentenze che contengono questa espressione
+- **Combinazioni di termini**: Usa operatori logici per ricerche complesse
+- **Citazioni normative**: Cerca "art. 2043 c.c." per trovare tutte le sentenze che citano quell'articolo
+
+### Algoritmo di Ranking Intelligente
+
+Non basta trovare le sentenze: bisogna mostrarle nell'ordine giusto. Il nostro algoritmo considera:
+
+- **Rilevanza testuale**: Quanto il documento corrisponde alla tua ricerca
+- **Frequenza dei termini**: Quante volte appaiono i termini cercati
+- **Posizione dei termini**: I termini nel titolo o nei principi di diritto pesano di più
+- **Attualità**: Le sentenze più recenti hanno priorità a parità di rilevanza
+
+### Indicizzazione in Tempo Reale
+
+Quando una nuova sentenza viene aggiunta al database, è **immediatamente ricercabile**. Non ci sono ritardi di indicizzazione: ciò che è nel sistema, è trovabile.
+
+## Funzionalità di Ricerca Avanzate
+
+### 1. Ricerca Semplice
+
+La barra di ricerca principale accetta qualsiasi query in linguaggio naturale:
+
+- \`risarcimento danni sinistro stradale\`
+- \`licenziamento per giusta causa\`
+- \`nullità contratto bancario\`
+
+### 2. Filtro per Città/Tribunale
+
+Una delle funzionalità più apprezzate: **filtra le sentenze per tribunale di provenienza**. 
+
+Perché è importante?
+- **Giurisprudenza locale**: Conosci l'orientamento del tribunale dove operi
+- **Precedenti specifici**: Trova sentenze dello stesso giudice o sezione
+- **Analisi territoriale**: Confronta come diverse corti affrontano lo stesso tema
+
+Come usarlo:
+1. Esegui la tua ricerca
+2. Clicca su "Filtri avanzati"
+3. Seleziona una o più città
+4. I risultati si aggiornano istantaneamente
+
+### 3. Ricerca Combinata
+
+Combina ricerca testuale e filtri per risultati ultra-precisi:
+
+*Esempio*: Cerchi sentenze sul danno biologico emesse dal Tribunale di Milano negli ultimi 2 anni? Con ITFPLUS è una ricerca di 10 secondi.
+
+### 4. Evidenziazione dei Risultati
+
+Quando apri una sentenza dai risultati di ricerca, **i termini cercati sono evidenziati in verde** direttamente nel testo. Non devi più scorrere pagine cercando dove appare la parola che ti interessa.
+
+## Confronto con Altri Motori di Ricerca Giuridici
+
+| Funzionalità | ITFPLUS | Altri Database |
+|--------------|---------|----------------|
+| Full-text search | ✅ Completo | ⚠️ Spesso limitato |
+| Filtro per tribunale | ✅ Sì | ❌ Raramente |
+| Evidenziazione termini | ✅ Automatica | ❌ No |
+| Velocità | ✅ < 1 secondo | ⚠️ Variabile |
+| AI integrata (Booky) | ✅ Sì | ❌ No |
+| Aggiornamento | ✅ Tempo reale | ⚠️ Periodico |
+
+## Consigli per Ricerche Efficaci
+
+### 1. Sii Specifico ma Non Troppo
+
+- ❌ Troppo generico: \`contratto\`
+- ❌ Troppo specifico: \`contratto di compravendita immobiliare con clausola risolutiva espressa per inadempimento del venditore relativo a vizi occulti\`
+- ✅ Giusto equilibrio: \`compravendita immobiliare vizi occulti\`
+
+### 2. Usa Termini Giuridici Corretti
+
+Il motore comprende il linguaggio giuridico. Usa la terminologia tecnica:
+
+- \`inadempimento contrattuale\` invece di \`non ha rispettato il contratto\`
+- \`legittimazione attiva\` invece di \`può fare causa\`
+
+### 3. Prova Sinonimi
+
+Se non trovi risultati, prova sinonimi o formulazioni alternative:
+
+- \`risarcimento\` / \`indennizzo\` / \`ristoro\`
+- \`recesso\` / \`disdetta\` / \`risoluzione\`
+
+### 4. Sfrutta i Filtri
+
+Dopo una ricerca ampia, usa i filtri per restringere:
+- Prima cerca \`responsabilità medica\`
+- Poi filtra per il tribunale di tuo interesse
+
+## Performance e Affidabilità
+
+### Velocità
+
+- **Tempo medio di risposta**: < 500ms
+- **Caricamento risultati**: Istantaneo con paginazione
+- **Nessun limite di ricerche**: Cerca quanto vuoi
+
+### Uptime
+
+- **Disponibilità**: 99.9%
+- **Backup continui**: I tuoi preferiti e le tue ricerche sono al sicuro
+- **Supporto tecnico**: Assistenza dedicata per problemi
+
+## Il Futuro del Motore di Ricerca
+
+Stiamo lavorando su:
+
+- **Ricerca semantica**: Capire il significato, non solo le parole
+- **Suggerimenti automatici**: "Forse cercavi..."
+- **Ricerche salvate**: Salva le tue query frequenti
+- **Alert automatici**: Ricevi notifiche quando escono nuove sentenze sul tuo tema
+
+## Conclusioni
+
+Il motore di ricerca ITFPLUS non è solo un database: è uno **strumento di lavoro progettato da giuristi per giuristi**. Ogni funzionalità è pensata per farti risparmiare tempo e trovare esattamente ciò che ti serve.
+
+**Provalo gratuitamente per 3 giorni** e scopri la differenza che un motore di ricerca professionale può fare nel tuo lavoro quotidiano.
+
+---
+
+*ITFPLUS: La ricerca giuridica come dovrebbe essere.*
+    `,
+    date: '2026-01-08',
+    author: 'Team ITFPLUS',
+    category: 'Tecnologia',
+    readTime: '10 min',
+  },
+  {
+    id: '2',
+    slug: 'guida-completa-sentenze-come-leggerle-analizzarle',
+    title: 'Guida Completa alle Sentenze: Come Leggerle, Analizzarle e Utilizzarle nel Tuo Lavoro',
+    excerpt: 'Tutto quello che devi sapere sulle sentenze giuridiche: struttura, come leggerle efficacemente, come citarle correttamente e come sfruttarle al meglio con ITFPLUS.',
+    content: `
+## Introduzione: L'Importanza delle Sentenze nella Pratica Legale
+
+Le sentenze rappresentano il **cuore della giurisprudenza**. Sono la fonte primaria per comprendere come i giudici interpretano e applicano le norme, e costituiscono uno strumento indispensabile per qualsiasi professionista del diritto. In questa guida completa, esploreremo tutto ciò che c'è da sapere sulle sentenze e su come ITFPLUS ti aiuta a lavorare con esse.
+
+## La Struttura di una Sentenza Italiana
+
+Ogni sentenza segue una struttura codificata che, una volta compresa, rende la lettura molto più efficiente.
+
+### 1. Intestazione (Epigrafe)
+
+Contiene:
+- **Autorità giudiziaria**: Tribunale, Corte d'Appello, Cassazione, ecc.
+- **Sezione**: Es. "Sezione Lavoro", "Sezione Civile III"
+- **Numero e anno**: Es. "Sentenza n. 1234/2025"
+- **Data di pubblicazione**
+- **Composizione del collegio o nome del giudice monocratico**
+
+### 2. Svolgimento del Processo (Fatto)
+
+Questa sezione narra:
+- **Chi sono le parti**: Attore/ricorrente e convenuto/resistente
+- **Cosa è successo**: I fatti che hanno dato origine alla controversia
+- **Iter processuale**: Le fasi precedenti del giudizio
+- **Domande delle parti**: Cosa chiedono attore e convenuto
+
+### 3. Motivi della Decisione (Diritto)
+
+Il cuore della sentenza:
+- **Questioni giuridiche**: I problemi di diritto da risolvere
+- **Interpretazione delle norme**: Come il giudice legge le leggi applicabili
+- **Precedenti citati**: Altre sentenze richiamate
+- **Ragionamento logico-giuridico**: Come si arriva alla decisione
+
+### 4. Dispositivo
+
+La decisione vera e propria:
+- **Accoglimento/rigetto** della domanda
+- **Condanne**: Pagamenti, risarcimenti, obblighi di fare
+- **Spese processuali**: Chi paga i costi del processo
+
+## Come Leggere Efficacemente una Sentenza
+
+### Strategia 1: Lettura a Imbuto
+
+1. **Leggi prima il dispositivo**: Capisci subito come è finita
+2. **Scorri l'intestazione**: Comprendi il contesto
+3. **Leggi i motivi della decisione**: Il ragionamento del giudice
+4. **Approfondisci il fatto se necessario**: Solo se ti serve il contesto fattuale
+
+### Strategia 2: Ricerca Mirata con ITFPLUS
+
+Se stai cercando un principio specifico:
+
+1. Usa il motore di ricerca con termini precisi
+2. Apri la sentenza
+3. I **termini cercati sono evidenziati in verde**
+4. Vai direttamente ai passaggi rilevanti
+5. Usa **Booky** per chiedere chiarimenti
+
+### Strategia 3: Analisi Comparativa
+
+Quando devi confrontare più sentenze:
+
+1. Cerca il tema su ITFPLUS
+2. Salva nei preferiti le sentenze rilevanti
+3. Apri ciascuna e usa Booky per estrarre i principi
+4. Confronta gli orientamenti
+
+## Le Sentenze su ITFPLUS: Funzionalità Specifiche
+
+### Visualizzatore Integrato
+
+Non devi scaricare PDF o aprire programmi esterni:
+
+- **Lettura nel browser**: Apri e leggi direttamente online
+- **Zoom e navigazione**: Adatta la visualizzazione alle tue esigenze
+- **Responsive**: Funziona anche su tablet e smartphone
+
+### Evidenziazione Automatica
+
+Quando arrivi da una ricerca:
+
+- I **termini cercati sono evidenziati** nel testo
+- Trovi subito i passaggi pertinenti
+- Risparmi tempo nella lettura
+
+### Preferiti
+
+Costruisci il tuo archivio personale:
+
+- **Salva** le sentenze importanti con un click
+- **Organizza** la tua giurisprudenza di riferimento
+- **Accedi rapidamente** quando ti servono
+
+### Booky: L'Assistente AI
+
+Per ogni sentenza hai Booky a disposizione:
+
+- Chiedi riassunti
+- Fai domande specifiche
+- Estrai citazioni e principi
+- Comprendi passaggi complessi
+
+## Come Citare Correttamente una Sentenza
+
+### Formato Standard
+
+> Cass. civ., Sez. III, 15 marzo 2025, n. 1234
+
+Elementi:
+- **Autorità**: Cass. civ. (Cassazione civile), Trib. Milano, App. Roma, ecc.
+- **Sezione**: Se rilevante
+- **Data**: Giorno, mese, anno
+- **Numero**: Numero della sentenza
+
+### Nelle Memorie Difensive
+
+*"Come affermato dalla Suprema Corte, 'il danno da perdita di chance richiede la prova, anche presuntiva, della concreta possibilità di conseguire il risultato utile' (Cass. civ., Sez. III, 15 marzo 2025, n. 1234)."*
+
+### Nei Pareri
+
+Quando citi più sentenze sullo stesso punto:
+
+*"L'orientamento consolidato della giurisprudenza di legittimità (cfr. Cass. n. 1234/2025, Cass. n. 5678/2024, Cass. n. 9012/2023) afferma che..."*
+
+## Tipologie di Sentenze e Loro Valore
+
+### Sentenze della Cassazione
+
+- **Massimo valore precedenziale**
+- Vincolanti per l'interpretazione del diritto
+- Le Sezioni Unite hanno autorità superiore
+
+### Sentenze di Merito
+
+- **Valore persuasivo** ma non vincolante
+- Utili per conoscere orientamenti locali
+- Importanti per prevedere esiti in tribunali specifici
+
+### Ordinanze e Decreti
+
+- Spesso su questioni procedurali
+- Minore approfondimento motivazionale
+- Comunque utili per prassi applicative
+
+## Errori Comuni da Evitare
+
+### 1. Citare Sentenze Superate
+
+Verifica sempre che l'orientamento sia ancora attuale. ITFPLUS ti aiuta mostrando le sentenze più recenti in cima ai risultati.
+
+### 2. Decontestualizzare
+
+Non estrapolare frasi dal contesto. Leggi sempre il ragionamento completo per capire se è applicabile al tuo caso.
+
+### 3. Ignorare la Giurisprudenza Contraria
+
+Un buon avvocato conosce anche gli orientamenti sfavorevoli. Cerca sempre anche l'altro punto di vista.
+
+### 4. Non Verificare le Fonti
+
+Controlla sempre che la sentenza citata dalla controparte dica davvero ciò che sostiene.
+
+## ITFPLUS: Il Tuo Alleato per le Sentenze
+
+### Database Sempre Aggiornato
+
+Nuove sentenze aggiunte costantemente, indicizzate in tempo reale.
+
+### Ricerca Potente
+
+Trova ciò che cerchi in secondi, non in ore.
+
+### AI Integrata
+
+Booky ti aiuta a comprendere e analizzare ogni sentenza.
+
+### Accessibile Ovunque
+
+Da computer, tablet o smartphone. In studio o in tribunale.
+
+## Conclusioni
+
+Lavorare con le sentenze è un'arte che richiede metodo, esperienza e gli strumenti giusti. **ITFPLUS combina un database completo, un motore di ricerca potente e l'assistenza dell'intelligenza artificiale** per offrirti tutto ciò di cui hai bisogno.
+
+Non perdere tempo con ricerche inefficienti. Prova ITFPLUS gratuitamente per 3 giorni e scopri un nuovo modo di lavorare con la giurisprudenza.
+
+---
+
+*ITFPLUS: La giurisprudenza a portata di click.*
+    `,
+    date: '2026-01-08',
+    author: 'Team ITFPLUS',
+    category: 'Guide',
+    readTime: '12 min',
+  },
+  {
     id: '1',
     slug: 'come-funziona-itfplus',
-    title: 'Come funziona ITFPLUS: Guida completa alla piattaforma',
+    title: 'Come funziona ITFPLUS: Guida Introduttiva alla Piattaforma',
     excerpt: 'Scopri come utilizzare al meglio ITFPLUS per la ricerca e consultazione di documenti giuridici. Una guida passo-passo per professionisti del diritto.',
     content: `
 ## Introduzione
