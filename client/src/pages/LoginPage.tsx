@@ -83,44 +83,6 @@ const LoginPage: React.FC = () => {
         }}
       />
 
-      {/* Effetto neve con fiocchi */}
-      {[...Array(60)].map((_, i) => {
-        const size = Math.random() * 15 + 10;
-        return (
-          <Box
-            key={i}
-            sx={{
-              position: 'absolute',
-              fontSize: `${size}px`,
-              color: 'rgba(255, 255, 255, 0.9)',
-              top: `${Math.random() * -100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `snowfall ${8 + Math.random() * 12}s linear infinite`,
-              animationDelay: `${Math.random() * 5}s`,
-              userSelect: 'none',
-              pointerEvents: 'none',
-              '@keyframes snowfall': {
-                '0%': { 
-                  transform: 'translateY(0) rotate(0deg)',
-                  opacity: 0,
-                },
-                '10%': {
-                  opacity: 1,
-                },
-                '90%': {
-                  opacity: 1,
-                },
-                '100%': { 
-                  transform: `translateY(110vh) rotate(${Math.random() * 360}deg)`,
-                  opacity: 0,
-                },
-              },
-            }}
-          >
-            ❄
-          </Box>
-        );
-      })}
 
       <Container maxWidth="sm">
         <Paper
