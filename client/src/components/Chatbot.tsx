@@ -168,48 +168,68 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     }
   }, []);
 
-  // Funzione per far parlare Booky
-  const speakText = useCallback((text: string, onEnd?: () => void) => {
-    if (!window.speechSynthesis) {
-      console.error('SpeechSynthesis non supportato');
-      if (onEnd) onEnd();
-      return;
-    }
+  // Ref per audio player
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Cancella qualsiasi sintesi in corso
-    window.speechSynthesis.cancel();
+  // Funzione per far parlare Booky con OpenAI TTS
+  const speakText = useCallback(async (text: string, onEnd?: () => void) => {
+    console.log('[Booky] Richiedo audio TTS per:', text.substring(0, 50) + '...');
+    setIsSpeaking(true);
+    setCallStatus('speaking');
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'it-IT';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    try {
+      // Chiama l'API backend per TTS
+      const response = await axios.post(
+        '/api/voice/tts',
+        { text, voice: 'nova' }, // nova è una voce femminile naturale
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+          responseType: 'blob',
+        }
+      );
 
-    // Cerca una voce italiana
-    const voices = window.speechSynthesis.getVoices();
-    const italianVoice = voices.find(voice => voice.lang.startsWith('it'));
-    if (italianVoice) {
-      utterance.voice = italianVoice;
-    }
+      // Crea URL per l'audio
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
 
-    utterance.onstart = () => {
-      console.log('[Booky] Inizio a parlare:', text.substring(0, 50) + '...');
-      setIsSpeaking(true);
-      setCallStatus('speaking');
-    };
+      // Riproduci l'audio
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
 
-    utterance.onend = () => {
-      console.log('[Booky] Ho finito di parlare');
+      audio.onended = () => {
+        console.log('[Booky] Ho finito di parlare');
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        if (onEnd) onEnd();
+      };
+
+      audio.onerror = (e) => {
+        console.error('[Booky] Errore riproduzione audio:', e);
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        if (onEnd) onEnd();
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('[Booky] Errore TTS API:', error);
       setIsSpeaking(false);
-      if (onEnd) onEnd();
-    };
-
-    utterance.onerror = (e) => {
-      console.error('[Booky] Errore TTS:', e);
-      setIsSpeaking(false);
-      if (onEnd) onEnd();
-    };
-
-    window.speechSynthesis.speak(utterance);
+      
+      // Fallback a Web Speech API se OpenAI fallisce
+      if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          if (onEnd) onEnd();
+        };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        if (onEnd) onEnd();
+      }
+    }
   }, []);
 
   // Funzione per iniziare ad ascoltare (definita prima di sendMessage)
@@ -499,16 +519,33 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
     await sendMessage(input);
   };
 
-  // Funzione per leggere un singolo messaggio
-  const speakSingleMessage = (text: string) => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'it-IT';
-      const voices = window.speechSynthesis.getVoices();
-      const italianVoice = voices.find(voice => voice.lang.startsWith('it'));
-      if (italianVoice) utterance.voice = italianVoice;
-      window.speechSynthesis.speak(utterance);
+  // Funzione per leggere un singolo messaggio con OpenAI TTS
+  const speakSingleMessage = async (text: string) => {
+    try {
+      const response = await axios.post(
+        '/api/voice/tts',
+        { text, voice: 'nova' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob',
+        }
+      );
+
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.onended = () => URL.revokeObjectURL(audioUrl);
+      await audio.play();
+    } catch (error) {
+      console.error('Errore TTS:', error);
+      // Fallback
+      if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+        window.speechSynthesis.speak(utterance);
+      }
     }
   };
 
