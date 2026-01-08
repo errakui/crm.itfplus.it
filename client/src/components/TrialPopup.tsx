@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import { trackSignUp } from '../utils/analytics';
 
 interface TrialPopupProps {
   apiUrl?: string;
@@ -95,6 +96,10 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
 
       if (response.data.success) {
         setSuccess(true);
+        
+        // 📊 Traccia registrazione trial su Google Analytics
+        trackSignUp('trial_popup');
+        
         setTimeout(() => {
           handleClose();
         }, 5000);

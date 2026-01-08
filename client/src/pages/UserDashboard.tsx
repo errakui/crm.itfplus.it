@@ -24,6 +24,7 @@ import AuthContext, { AuthContextType } from '../contexts/AuthContext';
 import axios from 'axios';
 import API from '../utils/http';
 import { useOptimizedSearch, measurePerformance } from '../utils/searchOptimization';
+import { trackSearch, trackAddToFavorites, trackRemoveFromFavorites, trackDocumentView } from '../utils/analytics';
 
 interface Document {
   id: string;
@@ -150,6 +151,14 @@ const UserDashboard: React.FC = () => {
         setDocuments(response.data.documents || []);
         setTotalPages(response.data.totalPages || 1);
         setTotalDocuments(response.data.total || 0);
+        
+        // 📊 Traccia ricerca su Google Analytics (solo se c'è un termine di ricerca)
+        if (searchTerm) {
+          trackSearch(searchTerm, {
+            cities: selectedCities,
+            resultsCount: response.data.total || 0,
+          });
+        }
       } else if (activeTab === 1) {
         // Fetch preferiti usando la nuova API utilità
         console.log(`[UserDashboard] Richiesta preferiti con paginazione:`, {
@@ -241,6 +250,9 @@ const UserDashboard: React.FC = () => {
         
         setFavorites(favorites.filter(doc => doc.id !== documentId));
         setUserFavorites(userFavorites.filter(id => id !== documentId));
+        
+        // 📊 Traccia rimozione preferiti su GA4
+        trackRemoveFromFavorites(documentId);
       } else {
         // Aggiungi ai preferiti
         await axios.post(
@@ -254,6 +266,9 @@ const UserDashboard: React.FC = () => {
         if (docToAdd) {
           setFavorites([...favorites, docToAdd]);
           setUserFavorites([...userFavorites, documentId]);
+          
+          // 📊 Traccia aggiunta preferiti su GA4
+          trackAddToFavorites(documentId, docToAdd.title);
         }
       }
     } catch (err) {
@@ -262,6 +277,12 @@ const UserDashboard: React.FC = () => {
   };
 
   const handleViewDocument = (id: string) => {
+    // 📊 Traccia visualizzazione documento su GA4
+    const doc = [...documents, ...favorites].find(d => d.id === id);
+    if (doc) {
+      trackDocumentView(id, doc.title);
+    }
+    
     // Salva lo stato della ricerca corrente
     const searchState = {
       searchTerm: searchTerm,

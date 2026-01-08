@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
+import { trackBlogView } from '../utils/analytics';
 import {
   Container,
   Typography,
@@ -22,6 +23,13 @@ const ArticlePage: React.FC = () => {
   
   // Trova l'articolo
   const article = articles.find((a) => a.slug === slug);
+
+  // 📊 Traccia visualizzazione articolo su GA4
+  useEffect(() => {
+    if (article) {
+      trackBlogView(article.slug, article.title);
+    }
+  }, [article]);
 
   // Se l'articolo non esiste, redirect al blog
   if (!article) {

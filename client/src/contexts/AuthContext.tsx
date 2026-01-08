@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { trackLogin } from '../utils/analytics';
 
 interface User {
   id: string;
@@ -103,6 +104,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUserId(userData.id);
       
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      
+      // 📊 Traccia login su Google Analytics
+      trackLogin('email');
       
       navigate('/dashboard');
     } catch (error) {
