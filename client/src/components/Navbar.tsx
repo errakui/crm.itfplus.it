@@ -77,11 +77,11 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
     <>
       <AppBar 
         position="fixed" 
+        elevation={1}
         sx={{ 
           backgroundColor: 'var(--primary-color)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+          borderRadius: 0,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
@@ -183,12 +183,13 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                     >
                       <Avatar 
                         sx={{ 
-                          width: 36, 
-                          height: 36, 
+                          width: 34, 
+                          height: 34, 
                           backgroundColor: 'var(--secondary-color)', 
                           color: 'white',
-                          fontSize: '1rem',
+                          fontSize: '0.9rem',
                           fontWeight: 600,
+                          borderRadius: '4px',
                         }}
                       >
                         {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
@@ -212,7 +213,9 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                         sx: {
                           mt: 1,
                           minWidth: 180,
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                          border: '1px solid var(--border-light)',
                         }
                       }}
                     >
@@ -277,31 +280,34 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             width: 280,
             pt: '64px',
             backgroundColor: 'var(--card-background)',
+            borderRadius: 0,
           }
         }}
       >
         <Box sx={{ p: 2 }}>
           {isAuthenticated() && user && (
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 2, 
-                mb: 2,
-                p: 2,
-                borderRadius: 2,
-                backgroundColor: 'rgba(27, 42, 74, 0.05)',
-              }}
-            >
-              <Avatar 
+              <Box 
                 sx={{ 
-                  width: 48, 
-                  height: 48, 
-                  backgroundColor: 'var(--primary-color)', 
-                  color: 'white',
-                  fontWeight: 600,
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 2, 
+                  mb: 2,
+                  p: 2,
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(27, 42, 74, 0.04)',
+                  border: '1px solid var(--border-light)',
                 }}
               >
+                <Avatar 
+                  sx={{ 
+                    width: 44, 
+                    height: 44, 
+                    backgroundColor: 'var(--primary-color)', 
+                    color: 'white',
+                    fontWeight: 600,
+                    borderRadius: '4px',
+                  }}
+                >
                 {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
               </Avatar>
               <Box>
@@ -325,10 +331,10 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   to={item.path}
                   onClick={() => setMobileDrawerOpen(false)}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '4px',
                     mb: 0.5,
                     '&:hover': {
-                      backgroundColor: 'rgba(27, 42, 74, 0.08)',
+                      backgroundColor: 'rgba(27, 42, 74, 0.06)',
                     },
                   }}
                 >
@@ -350,10 +356,10 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                 <ListItemButton
                   onClick={handleLogout}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '4px',
                     color: 'var(--error-color)',
                     '&:hover': {
-                      backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                      backgroundColor: 'rgba(244, 63, 94, 0.08)',
                     },
                   }}
                 >
@@ -373,7 +379,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   to="/login"
                   onClick={() => setMobileDrawerOpen(false)}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '4px',
                     backgroundColor: 'var(--primary-color)',
                     color: 'white',
                     '&:hover': {

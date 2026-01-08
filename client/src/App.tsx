@@ -24,7 +24,7 @@ import Footer from './components/Footer';
 import RegisterPage from './pages/RegisterPage';
 import TermsPage from './pages/TermsPage';
 
-// Tema personalizzato ITFPLUS - Unificato
+// Tema ITFPLUS - Professionale Giuridico
 const theme = createTheme({
   palette: {
     primary: {
@@ -46,23 +46,26 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Plus Jakarta Sans", sans-serif',
-    h1: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
-    h2: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
-    h3: { fontFamily: '"Syne", sans-serif', fontWeight: 700 },
-    h4: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
-    h5: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
-    h6: { fontFamily: '"Syne", sans-serif', fontWeight: 600 },
-    body1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    body2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    button: { fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600 },
+    fontFamily: '"Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+    h1: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    h2: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    h3: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    h4: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    h5: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    h6: { fontFamily: '"Libre Baskerville", Georgia, serif', fontWeight: 700 },
+    body1: { fontFamily: '"Source Sans Pro", sans-serif' },
+    body2: { fontFamily: '"Source Sans Pro", sans-serif' },
+    button: { fontFamily: '"Source Sans Pro", sans-serif', fontWeight: 600 },
+  },
+  shape: {
+    borderRadius: 4, // Bordi professionali
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          borderRadius: 8,
+          borderRadius: 4,
           fontWeight: 600,
         },
       },
@@ -70,7 +73,14 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 4,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 4,
         },
       },
     },
@@ -78,8 +88,15 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
+            borderRadius: 4,
           },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0, // Navbar completamente squadrata
         },
       },
     },

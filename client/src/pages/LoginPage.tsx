@@ -101,7 +101,7 @@ const LoginPage: React.FC = () => {
           elevation={isMobile ? 8 : 24}
           sx={{
             p: { xs: 3, sm: 4, md: 5 },
-            borderRadius: { xs: 2, sm: 3, md: 4 },
+            borderRadius: '4px',
             background: 'white',
             textAlign: 'center',
             position: 'relative',
@@ -187,7 +187,7 @@ const LoginPage: React.FC = () => {
                 sx={{ 
                   mb: { xs: 2, sm: 2.5, md: 3 },
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: { xs: 1, sm: 1.5 },
+                    borderRadius: '4px',
                   },
                 }}
                 inputProps={{
@@ -208,7 +208,7 @@ const LoginPage: React.FC = () => {
                 sx={{ 
                   mb: { xs: 2, sm: 2.5, md: 3 },
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: { xs: 1, sm: 1.5 },
+                    borderRadius: '4px',
                   },
                 }}
                 InputProps={{
@@ -237,7 +237,7 @@ const LoginPage: React.FC = () => {
                 disabled={loading}
                 sx={{ 
                   py: { xs: 1.2, sm: 1.5 }, 
-                  borderRadius: { xs: 1.5, sm: 2 },
+                  borderRadius: '4px',
                   background: 'linear-gradient(to right, var(--primary-color), var(--primary-light))',
                   fontSize: { xs: '0.9rem', sm: '1rem' },
                   fontWeight: 600,

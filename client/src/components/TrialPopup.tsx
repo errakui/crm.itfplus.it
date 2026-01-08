@@ -142,7 +142,7 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
           sx={{
             position: 'relative',
             background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%)',
-            borderRadius: { xs: '16px', sm: '20px' },
+            borderRadius: '6px',
             padding: { xs: '12px 16px', sm: '15px 20px' },
             boxShadow: '0 8px 25px rgba(27, 42, 74, 0.35)',
             display: 'flex',
@@ -200,9 +200,9 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
               right: { xs: -8, sm: -10 },
               background: 'var(--error-color)',
               color: 'white',
-              borderRadius: '50%',
-              width: { xs: 40, sm: 50 },
-              height: { xs: 40, sm: 50 },
+              borderRadius: '4px',
+              width: { xs: 36, sm: 44 },
+              height: { xs: 36, sm: 44 },
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -226,7 +226,7 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: '6px',
           },
         }}
       >
@@ -422,7 +422,7 @@ const TrialPopup: React.FC<TrialPopupProps> = ({ apiUrl = '/api' }) => {
                   background: 'linear-gradient(to right, var(--primary-color), var(--primary-light))',
                   fontSize: { xs: '14px', sm: '16px' },
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '4px',
                   '&:hover': {
                     background: 'linear-gradient(to right, var(--primary-light), var(--primary-lighter))',
                   },

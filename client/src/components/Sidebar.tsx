@@ -171,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
           onClick={handleLogout}
           sx={{
             py: 1.2,
-            borderRadius: 2,
+            borderRadius: '4px',
             fontWeight: 600,
             boxShadow: 'none',
             '&:hover': {
