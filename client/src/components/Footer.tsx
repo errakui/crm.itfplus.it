@@ -202,7 +202,24 @@ const Footer: React.FC = () => {
               fontSize: { xs: '0.75rem', sm: '0.85rem' },
             }}
           >
-            © {currentYear} ITF Plus. Tutti i diritti riservati.
+            © {currentYear} ITF Plus. Tutti i diritti riservati. | Developed with ❤️ by{' '}
+            <Typography
+              component="a"
+              href="https://errakui.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                color: 'var(--accent-color)',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: 'inherit',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              errakui.dev
+            </Typography>
           </Typography>
           
           <Box 
