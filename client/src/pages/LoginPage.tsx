@@ -9,7 +9,8 @@ import {
   InputAdornment,
   IconButton,
   Container,
-  Grid,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
@@ -21,6 +22,8 @@ import TrialPopup from '../components/TrialPopup';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login, isAdmin } = useContext(AuthContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -60,63 +63,86 @@ const LoginPage: React.FC = () => {
     <Box
       sx={{
         width: '100%',
-        height: '100vh',
+        minHeight: ['100vh', '-webkit-fill-available'], // Fix per iOS Safari
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #0d2748 0%, #0a1a2e 100%)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'auto',
+        py: { xs: 2, sm: 3, md: 4 },
+        px: { xs: 2, sm: 3 },
       }}
     >
-      {/* Pattern decorativo */}
-      <Box
-        sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 0)',
-          backgroundSize: '30px 30px',
-          opacity: 0.5,
-        }}
-      />
-
-
-      <Container maxWidth="sm">
-        <Paper
-          elevation={24}
+      {/* Pattern decorativo - nascosto su mobile per performance */}
+      {!isMobile && (
+        <Box
           sx={{
-            p: 5,
-            borderRadius: 4,
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 0)',
+            backgroundSize: '30px 30px',
+            opacity: 0.5,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      <Container 
+        maxWidth="sm" 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          px: { xs: 0, sm: 2 },
+        }}
+      >
+        <Paper
+          elevation={isMobile ? 8 : 24}
+          sx={{
+            p: { xs: 3, sm: 4, md: 5 },
+            borderRadius: { xs: 2, sm: 3, md: 4 },
             background: 'white',
             textAlign: 'center',
             position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            boxShadow: isMobile 
+              ? '0 4px 20px rgba(0,0,0,0.15)' 
+              : '0 10px 30px rgba(0,0,0,0.2)',
+            width: '100%',
+            maxWidth: { xs: '100%', sm: '450px' },
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           {/* Logo */}
-          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <Box 
+            sx={{ 
+              mb: { xs: 2, sm: 3, md: 4 }, 
+              display: 'flex', 
+              justifyContent: 'center' 
+            }}
+          >
             <Box
               component="img"
               src="/logoitfplus.png"
               alt="ITFPLUS Logo"
               sx={{
-                height: 80,
-                mb: 1
+                height: { xs: 50, sm: 65, md: 80 },
+                width: 'auto',
+                maxWidth: '100%',
+                objectFit: 'contain',
               }}
             />
           </Box>
 
-          <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ position: 'relative', zIndex: 1, flex: 1 }}>
             <Typography
-              variant="h5"
+              variant={isMobile ? 'h6' : 'h5'}
               sx={{
                 mb: 1,
                 color: '#1B2A4A',
-                fontWeight: 500,
+                fontWeight: 600,
+                fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
               }}
             >
               Accedi a ITFPLUS
@@ -125,7 +151,10 @@ const LoginPage: React.FC = () => {
             <Typography 
               variant="body2" 
               color="text.secondary"
-              sx={{ mb: 3 }}
+              sx={{ 
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              }}
             >
               Inserisci le tue credenziali per accedere
             </Typography>
@@ -135,9 +164,10 @@ const LoginPage: React.FC = () => {
                 color="error" 
                 sx={{ 
                   mb: 2,
-                  p: 1,
+                  p: { xs: 1, sm: 1.5 },
                   bgcolor: 'rgba(211, 47, 47, 0.1)',
-                  borderRadius: 1
+                  borderRadius: 1,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
                 }}
               >
                 {error}
@@ -153,7 +183,17 @@ const LoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                sx={{ mb: 3 }}
+                size={isMobile ? 'small' : 'medium'}
+                sx={{ 
+                  mb: { xs: 2, sm: 2.5, md: 3 },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: { xs: 1, sm: 1.5 },
+                  },
+                }}
+                inputProps={{
+                  autoComplete: 'email',
+                  inputMode: 'email',
+                }}
               />
               
               <TextField
@@ -164,18 +204,29 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                sx={{ mb: 3 }}
+                size={isMobile ? 'small' : 'medium'}
+                sx={{ 
+                  mb: { xs: 2, sm: 2.5, md: 3 },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: { xs: 1, sm: 1.5 },
+                  },
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
+                        size={isMobile ? 'small' : 'medium'}
+                        aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
+                }}
+                inputProps={{
+                  autoComplete: 'current-password',
                 }}
               />
 
@@ -185,42 +236,53 @@ const LoginPage: React.FC = () => {
                 variant="contained"
                 disabled={loading}
                 sx={{ 
-                  py: 1.5, 
-                  borderRadius: 2,
+                  py: { xs: 1.2, sm: 1.5 }, 
+                  borderRadius: { xs: 1.5, sm: 2 },
                   background: 'linear-gradient(to right, #1B2A4A, #2c4270)',
-                  mb: 2
+                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  boxShadow: '0 4px 12px rgba(27, 42, 74, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #243656, #3a5a8a)',
+                    boxShadow: '0 6px 16px rgba(27, 42, 74, 0.4)',
+                  },
+                  '&:active': {
+                    transform: 'scale(0.98)',
+                  },
+                  '&:disabled': {
+                    background: '#ccc',
+                  },
+                  transition: 'all 0.2s ease',
                 }}
               >
                 {loading ? 'Accesso in corso...' : 'Accedi'}
               </Button>
               
-              <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
-                <Grid item>
-                  <Link
-                    to="#"
-                    style={{ 
-                      color: '#1B2A4A', 
-                      textDecoration: 'none',
-                      fontSize: '0.875rem'
-                    }}
-                  >
-                    Password dimenticata?
-                  </Link>
-                </Grid>
-              </Grid>
+              <Box sx={{ mt: { xs: 2, sm: 2.5 }, textAlign: 'right' }}>
+                <Link
+                  to="#"
+                  style={{ 
+                    color: '#1B2A4A', 
+                    textDecoration: 'none',
+                    fontSize: isMobile ? '0.8rem' : '0.875rem',
+                  }}
+                >
+                  Password dimenticata?
+                </Link>
+              </Box>
             </form>
           </Box>
           
+          {/* Footer - non più assoluto per evitare sovrapposizioni */}
           <Box
             sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
+              mt: { xs: 3, sm: 4 },
+              pt: { xs: 2, sm: 2.5 },
+              borderTop: '1px solid rgba(0,0,0,0.08)',
               textAlign: 'center',
-              p: 2,
               color: 'text.secondary',
-              fontSize: '0.75rem',
+              fontSize: { xs: '0.65rem', sm: '0.75rem' },
             }}
           >
             powered by giuridica.net
@@ -228,8 +290,8 @@ const LoginPage: React.FC = () => {
         </Paper>
       </Container>
 
-      {/* Popup Trial in basso a destra */}
-      <TrialPopup />
+      {/* Popup Trial - nascosto su mobile per non ingombrare */}
+      {!isMobile && <TrialPopup />}
     </Box>
   );
 };
