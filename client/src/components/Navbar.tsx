@@ -70,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
     // Blog visibile a tutti
     { text: 'Blog', icon: <BlogIcon />, path: '/blog' },
     ...(isAuthenticated() ? [
-      { text: '✨ BOOKY SEARCH', icon: <AIIcon />, path: '/booky-search', highlight: true },
+      { text: 'BOOKY SEARCH', icon: <AIIcon />, path: '/booky-search', highlight: true },
       { text: 'Preferiti', icon: <FavoriteIcon />, path: '/favorites' },
     ] : []),
     ...(isAdmin() ? [
@@ -176,7 +176,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                     },
                   }}
                 >
-                  ✨ BOOKY SEARCH
+                  BOOKY SEARCH
                 </Button>
                 <Button
                   component={Link}
