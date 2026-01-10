@@ -31,6 +31,393 @@ export interface Article {
 // Articoli del blog (hardcoded per ora)
 export const articles: Article[] = [
   {
+    id: '7',
+    slug: 'convenzioni-ordini-avvocati-tribunali-italia',
+    title: 'Convenzioni ITFPLUS con gli Ordini degli Avvocati: Accesso Agevolato per i Professionisti',
+    excerpt: 'ITFPLUS ha stipulato convenzioni con numerosi Ordini degli Avvocati in tutta Italia. Scopri se il tuo Ordine è convenzionato e come accedere alla tariffa riservata di 500€ annui.',
+    content: `
+## Le Convenzioni ITFPLUS: Un Vantaggio Esclusivo per gli Avvocati
+
+ITFPLUS crede nel valore della collaborazione istituzionale. Per questo abbiamo stipulato **convenzioni con numerosi Ordini degli Avvocati** su tutto il territorio nazionale, offrendo condizioni economiche agevolate ai professionisti iscritti.
+
+## Tariffa Riservata agli Avvocati Convenzionati
+
+Gli avvocati iscritti agli Ordini convenzionati possono accedere a ITFPLUS a una **tariffa speciale di 500€ annui**, rispetto al prezzo standard di 700€. Un risparmio significativo per accedere a tutte le funzionalità della piattaforma.
+
+### Come Attivare la Convenzione
+
+1. **Verifica** che il tuo Ordine sia nell'elenco sottostante
+2. **Richiedi** la prova gratuita di 3 giorni
+3. **Comunica** il tuo Ordine di appartenenza
+4. **Attiva** l'abbonamento alla tariffa convenzionata
+
+## Ordini degli Avvocati Convenzionati
+
+### Unione Triveneta degli Ordini degli Avvocati
+
+L'**Unione Triveneta** comprende 14 Ordini del Nord-Est Italia, tutti convenzionati con ITFPLUS:
+
+- **Verona**
+- **Vicenza**
+- **Padova**
+- **Venezia**
+- **Treviso**
+- **Belluno**
+- **Rovigo**
+- **Trieste**
+- **Udine**
+- **Gorizia**
+- **Pordenone**
+- **Bolzano**
+- **Trento**
+- **Rovereto**
+
+### Altri Ordini Convenzionati
+
+Oltre all'Unione Triveneta, ITFPLUS ha convenzioni attive con:
+
+- **Asti**
+- **Genova**
+- **La Spezia**
+- **Lodi**
+- **Monza**
+- **Fermo**
+- **Velletri**
+
+## Vantaggi della Convenzione
+
+### Per l'Avvocato
+
+- **Risparmio economico**: 500€ invece di 700€ annui
+- **Accesso completo**: Tutte le funzionalità senza limitazioni
+- **Supporto prioritario**: Assistenza dedicata
+- **Aggiornamenti inclusi**: Nuove sentenze e funzionalità
+
+### Per l'Ordine
+
+- **Servizio per gli iscritti**: Un beneficio concreto per i propri associati
+- **Formazione**: Possibilità di webinar formativi sulla piattaforma
+- **Collaborazione**: Partnership per eventi e iniziative
+
+## Il Tuo Ordine Non È in Elenco?
+
+Stiamo lavorando per ampliare la rete di convenzioni. Se il tuo Ordine non è ancora convenzionato:
+
+1. **Richiedi comunque la prova gratuita** per valutare la piattaforma
+2. **Segnala l'interesse** al tuo Consiglio dell'Ordine
+3. **Contattaci** per avviare una proposta di convenzione
+
+## Come Richiedere Informazioni
+
+Per informazioni sulle convenzioni o per proporre una nuova partnership:
+
+- **Email**: info@itfplus.it
+- **Telefono**: +39 333 617 0230
+- **Form di contatto**: Sezione "Contattaci" sul sito
+
+## Conclusioni
+
+Le convenzioni con gli Ordini degli Avvocati rappresentano l'impegno di ITFPLUS nel rendere la ricerca giuridica accessibile a tutti i professionisti. Se sei iscritto a uno degli Ordini convenzionati, **approfitta della tariffa riservata di 500€** e inizia a lavorare con il database di sentenze più completo d'Italia.
+
+---
+
+*ITFPLUS: La giurisprudenza a portata di click, a un prezzo accessibile.*
+    `,
+    date: '2026-01-10',
+    author: 'Team ITFPLUS',
+    category: 'Convenzioni',
+    readTime: '5 min',
+  },
+  {
+    id: '6',
+    slug: 'trial-gratuito-3-giorni-cosa-puoi-fare',
+    title: 'Prova Gratuita di 3 Giorni: Tutto Quello che Puoi Fare con ITFPLUS',
+    excerpt: 'Hai 3 giorni per esplorare ITFPLUS senza impegno. Ecco una guida pratica per sfruttare al massimo il periodo di prova e valutare se la piattaforma fa per te.',
+    content: `
+## Introduzione: Perché Offriamo una Prova Gratuita
+
+Sappiamo che scegliere uno strumento di lavoro è una decisione importante. Per questo offriamo **3 giorni di prova gratuita** con accesso completo a tutte le funzionalità. Nessun trucco, nessun limite: provi tutto e poi decidi.
+
+## Come Attivare la Prova Gratuita
+
+### Passo 1: Richiedi l'Accesso
+
+Dalla pagina di login, compila il form "Richiedi Trial" con:
+
+- Nome e Cognome
+- Email professionale
+- Numero di telefono
+- Ordine di appartenenza (se applicabile)
+- Una breve descrizione delle tue esigenze
+
+### Passo 2: Ricevi le Credenziali
+
+Entro poche ore riceverai via email le tue credenziali di accesso. Il trial parte dal momento del primo login.
+
+### Passo 3: Esplora la Piattaforma
+
+Hai 72 ore per provare tutto. Ecco cosa ti consigliamo di fare.
+
+## Giorno 1: Scopri il Motore di Ricerca
+
+### Prova la Ricerca Testuale
+
+Inizia cercando temi che ti interessano professionalmente:
+
+- Cerca per parole chiave generiche come "risarcimento danni"
+- Prova ricerche più specifiche come "danno biologico sinistro stradale"
+- Cerca citazioni normative come "art. 2043 c.c."
+
+### Esplora i Filtri per Città
+
+Se lavori principalmente in un tribunale:
+
+1. Esegui una ricerca
+2. Attiva i filtri avanzati
+3. Seleziona la tua città
+4. Osserva come cambiano i risultati
+
+### Valuta la Velocità
+
+Nota quanto è veloce ottenere risultati. Confronta con gli strumenti che usi attualmente.
+
+## Giorno 2: Conosci Booky, l'Assistente AI
+
+### Apri una Sentenza e Attiva Booky
+
+Quando visualizzi una sentenza, troverai l'icona di Booky. Cliccala e inizia a fare domande:
+
+- "Riassumi questa sentenza in 5 punti"
+- "Qual è il principio di diritto?"
+- "Quali articoli di legge vengono citati?"
+
+### Prova la Modalità Vocale
+
+Novità 2026: puoi **parlare con Booky** come in una telefonata:
+
+1. Clicca sull'icona del telefono nella chat
+2. Parla la tua domanda
+3. Booky risponderà a voce
+
+Perfetto per quando hai le mani occupate o preferisci un'interazione più naturale.
+
+### Testa Diverse Tipologie di Domande
+
+Booky può:
+- Riassumere
+- Spiegare concetti giuridici
+- Estrarre citazioni
+- Confrontare passaggi
+
+## Giorno 3: Organizza e Valuta
+
+### Crea la Tua Lista di Preferiti
+
+Salva le sentenze che trovi utili:
+
+1. Clicca sull'icona cuore su una sentenza
+2. Vai nella sezione "Preferiti" per rivederle
+3. Inizia a costruire il tuo archivio personale
+
+### Valuta l'Utilità per il Tuo Lavoro
+
+Poniti queste domande:
+
+- Ho trovato sentenze che non conoscevo?
+- Il motore di ricerca è più veloce di quello che uso ora?
+- Booky mi ha fatto risparmiare tempo?
+- La piattaforma è facile da usare?
+
+### Contatta il Supporto
+
+Se hai dubbi o domande, contattaci. Il supporto è attivo anche durante il trial.
+
+## Cosa Succede Dopo i 3 Giorni?
+
+### Se Vuoi Continuare
+
+Attiva l'abbonamento e mantieni tutti i preferiti e le impostazioni salvate durante il trial.
+
+Se sei iscritto a un **Ordine convenzionato**, ricorda di comunicarlo per ottenere la tariffa agevolata di 500€ invece di 700€.
+
+### Se Non Vuoi Continuare
+
+Nessun problema. Il tuo account verrà disattivato automaticamente. Non ti verrà addebitato nulla.
+
+## Domande Frequenti sul Trial
+
+### Devo inserire una carta di credito?
+
+No. La prova è completamente gratuita e non richiede dati di pagamento.
+
+### Posso prolungare il trial?
+
+In casi particolari, contattaci e valuteremo insieme.
+
+### I preferiti salvati durante il trial rimangono?
+
+Sì, se attivi l'abbonamento tutto ciò che hai salvato rimane.
+
+### Posso usare il trial da mobile?
+
+Assolutamente sì. ITFPLUS è responsive e funziona su smartphone e tablet.
+
+## Conclusioni
+
+3 giorni sono sufficienti per capire se ITFPLUS può migliorare il tuo lavoro quotidiano. **Provalo senza impegno** e scopri un nuovo modo di fare ricerca giuridica.
+
+---
+
+*ITFPLUS: Prova gratis, scegli consapevolmente.*
+    `,
+    date: '2026-01-10',
+    author: 'Team ITFPLUS',
+    category: 'Guide',
+    readTime: '6 min',
+  },
+  {
+    id: '5',
+    slug: 'digitalizzazione-studio-legale-itfplus',
+    title: 'Digitalizzazione dello Studio Legale: Come ITFPLUS Semplifica la Ricerca Giuridica',
+    excerpt: 'Scopri come la digitalizzazione sta trasformando gli studi legali e come ITFPLUS offre strumenti concreti per la ricerca e l\'analisi delle sentenze.',
+    content: `
+## La Trasformazione Digitale del Lavoro Legale
+
+Il settore legale sta vivendo una trasformazione digitale senza precedenti. Ciò che prima richiedeva ore di ricerca in biblioteca o la consultazione di pesanti volumi cartacei, oggi può essere fatto in pochi click.
+
+ITFPLUS si inserisce in questa trasformazione offrendo **strumenti pratici e immediati** per la ricerca giuridica quotidiana.
+
+## Le Funzionalità Digitali di ITFPLUS
+
+### Motore di Ricerca Full-Text
+
+Il cuore di ITFPLUS è il motore di ricerca che indicizza **l'intero contenuto di ogni sentenza**:
+
+- **Ricerca per parole chiave**: Trova sentenze che contengono i termini che ti interessano
+- **Ricerca in linguaggio naturale**: Scrivi come parleresti a un collega
+- **Risultati istantanei**: Risposte in meno di un secondo
+
+### Filtri per Tribunale e Città
+
+Una funzionalità particolarmente apprezzata dai professionisti:
+
+- **Filtra per città**: Seleziona uno o più tribunali di interesse
+- **Conosci la giurisprudenza locale**: Scopri come decide il tribunale dove operi
+- **Confronta orientamenti**: Vedi come diverse corti affrontano lo stesso tema
+
+### Evidenziazione dei Termini Cercati
+
+Quando apri una sentenza dai risultati di ricerca:
+
+- I **termini cercati sono evidenziati in verde** nel testo
+- Trovi subito i passaggi rilevanti
+- Risparmi tempo nella lettura
+
+### Gestione dei Preferiti
+
+Costruisci il tuo archivio personale di sentenze:
+
+- **Salva con un click**: Clicca sull'icona cuore per salvare una sentenza
+- **Organizza**: Accedi rapidamente alle sentenze salvate dalla sezione Preferiti
+- **Sempre disponibili**: I tuoi preferiti sono sincronizzati e accessibili da qualsiasi dispositivo
+
+### Booky: L'Assistente AI
+
+L'intelligenza artificiale integrata in ogni sentenza:
+
+- **Riassunti automatici**: Chiedi a Booky di riassumere una sentenza
+- **Domande specifiche**: Fai domande sul contenuto del documento
+- **Spiegazioni**: Chiedi chiarimenti su passaggi complessi
+- **Estrazione informazioni**: Richiedi l'elenco degli articoli citati o dei precedenti
+
+### Modalità Vocale
+
+Novità del 2026: puoi **parlare con Booky**:
+
+- Clicca sull'icona del telefono nella chat
+- Parla la tua domanda
+- Booky risponde a voce
+- Interazione naturale e mani libere
+
+## Accessibilità Ovunque
+
+### Da Computer
+
+L'esperienza completa su desktop con:
+- Visualizzazione ottimale dei documenti
+- Tutte le funzionalità disponibili
+- Spazio di lavoro ampio
+
+### Da Tablet e Smartphone
+
+ITFPLUS è **responsive**:
+- Funziona perfettamente su mobile
+- Interfaccia adattata allo schermo
+- Ricerca e consultazione anche in tribunale
+
+## Sicurezza e Privacy
+
+### Protezione dei Dati
+
+- **Connessione sicura**: Protocollo HTTPS
+- **Autenticazione**: Accesso con credenziali personali
+- **Privacy**: I tuoi dati non vengono condivisi
+
+### Conformità GDPR
+
+ITFPLUS rispetta la normativa europea sulla protezione dei dati personali.
+
+## Supporto e Assistenza
+
+### Canali di Supporto
+
+- **Email**: info@itfplus.it
+- **Telefono**: +39 333 617 0230
+- **Sezione FAQ**: Risposte alle domande frequenti
+
+### Contatti Rapidi
+
+Dalla piattaforma puoi accedere rapidamente a:
+- Assistenza tecnica
+- Domande frequenti
+- Form di contatto
+
+## Perché Scegliere ITFPLUS
+
+### Strumenti Concreti
+
+Non promesse vaghe, ma funzionalità che usi ogni giorno:
+- Ricerca veloce
+- Filtri efficaci
+- AI che risponde alle tue domande
+
+### Semplicità d'Uso
+
+Interfaccia pulita e intuitiva:
+- Nessuna formazione necessaria
+- Impari usando
+- Tutto a portata di click
+
+### Prova Senza Rischi
+
+3 giorni di trial gratuito per valutare personalmente.
+
+## Conclusioni
+
+La digitalizzazione non è il futuro: è il presente. ITFPLUS offre gli strumenti per affrontarla con **semplicità ed efficacia**.
+
+Prova gratuitamente per 3 giorni e scopri come la ricerca giuridica può essere più semplice.
+
+---
+
+*ITFPLUS: La ricerca giuridica del presente.*
+    `,
+    date: '2026-01-10',
+    author: 'Team ITFPLUS',
+    category: 'Innovazione',
+    readTime: '7 min',
+  },
+  {
     id: '4',
     slug: 'booky-assistente-ai-sentenze-giuridiche',
     title: 'Booky: L\'Assistente AI Rivoluzionario per l\'Analisi delle Sentenze Giuridiche',
