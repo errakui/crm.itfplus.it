@@ -392,7 +392,22 @@ const BookySearchPage: React.FC = () => {
               textAlign: 'center',
               p: 3
             }}>
-              <AIIcon sx={{ fontSize: 64, color: 'var(--primary-color)', opacity: 0.7 }} />
+              <Box
+                component="img"
+                src="/booky.png"
+                alt="Booky - Assistente AI"
+                sx={{
+                  width: { xs: 120, md: 150 },
+                  height: { xs: 120, md: 150 },
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))',
+                  animation: 'float 3s ease-in-out infinite',
+                  '@keyframes float': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                  }
+                }}
+              />
               <Typography 
                 variant="h5" 
                 sx={{ 
