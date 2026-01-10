@@ -29,6 +29,7 @@ import {
   Close as CloseIcon,
   Login as LoginIcon,
   Article as BlogIcon,
+  AutoAwesome as AIIcon,
 } from '@mui/icons-material';
 import AuthContext from '../contexts/AuthContext';
 
@@ -69,6 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
     // Blog visibile a tutti
     { text: 'Blog', icon: <BlogIcon />, path: '/blog' },
     ...(isAuthenticated() ? [
+      { text: '✨ BOOKY SEARCH', icon: <AIIcon />, path: '/booky-search', highlight: true },
       { text: 'Preferiti', icon: <FavoriteIcon />, path: '/favorites' },
     ] : []),
     ...(isAdmin() ? [
@@ -158,19 +160,38 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                 </Button>
 
             {isAuthenticated() && (
-              <Button
-                component={Link}
-                to="/favorites"
-                color="inherit"
-                startIcon={<FavoriteIcon />}
-                    sx={{ 
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-              >
-                Preferiti
-              </Button>
+              <>
+                <Button
+                  component={Link}
+                  to="/booky-search"
+                  color="inherit"
+                  startIcon={<AIIcon />}
+                  sx={{ 
+                    background: 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.1) 100%)',
+                    border: '1px solid rgba(255,215,0,0.3)',
+                    borderRadius: '4px',
+                    fontWeight: 600,
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, rgba(255,215,0,0.25) 0%, rgba(255,193,7,0.2) 100%)',
+                    },
+                  }}
+                >
+                  ✨ BOOKY SEARCH
+                </Button>
+                <Button
+                  component={Link}
+                  to="/favorites"
+                  color="inherit"
+                  startIcon={<FavoriteIcon />}
+                  sx={{ 
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
+                  Preferiti
+                </Button>
+              </>
             )}
 
             {isAdmin() && (
@@ -351,17 +372,29 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   sx={{
                     borderRadius: '4px',
                     mb: 0.5,
+                    ...((item as any).highlight && {
+                      background: 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.1) 100%)',
+                      border: '1px solid rgba(255,215,0,0.3)',
+                    }),
                     '&:hover': {
-                      backgroundColor: 'rgba(27, 42, 74, 0.06)',
+                      backgroundColor: (item as any).highlight 
+                        ? 'rgba(255,215,0,0.25)' 
+                        : 'rgba(27, 42, 74, 0.06)',
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 40, color: 'var(--primary-color)' }}>
+                  <ListItemIcon sx={{ 
+                    minWidth: 40, 
+                    color: (item as any).highlight ? '#B8860B' : 'var(--primary-color)' 
+                  }}>
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText 
                     primary={item.text}
-                    primaryTypographyProps={{ fontWeight: 500 }}
+                    primaryTypographyProps={{ 
+                      fontWeight: (item as any).highlight ? 600 : 500,
+                      color: (item as any).highlight ? '#B8860B' : 'inherit'
+                    }}
                   />
                 </ListItemButton>
               </ListItem>
