@@ -78,6 +78,29 @@ const BookySearchPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Funzione per formattare il markdown in HTML
+  const formatMarkdown = (text: string): string => {
+    return text
+      // Headers
+      .replace(/^### (.*$)/gm, '<strong style="font-size: 1.1em; display: block; margin-top: 16px; margin-bottom: 8px;">$1</strong>')
+      .replace(/^## (.*$)/gm, '<strong style="font-size: 1.2em; display: block; margin-top: 20px; margin-bottom: 10px; color: var(--primary-color);">$1</strong>')
+      .replace(/^# (.*$)/gm, '<strong style="font-size: 1.3em; display: block; margin-top: 24px; margin-bottom: 12px; color: var(--primary-color);">$1</strong>')
+      // Bold
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.*?)__/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      // Bullet points
+      .replace(/^- (.*$)/gm, '<span style="display: block; padding-left: 16px; margin: 4px 0;">• $1</span>')
+      .replace(/^\* (.*$)/gm, '<span style="display: block; padding-left: 16px; margin: 4px 0;">• $1</span>')
+      // Numbered lists
+      .replace(/^(\d+)\. (.*$)/gm, '<span style="display: block; padding-left: 16px; margin: 4px 0;">$1. $2</span>')
+      // Line breaks
+      .replace(/\n\n/g, '<br/><br/>')
+      .replace(/\n/g, '<br/>');
+  };
+
   // Carica sessioni all'avvio
   useEffect(() => {
     loadSessions();
@@ -434,15 +457,22 @@ const BookySearchPage: React.FC = () => {
                     }}
                   >
                     {/* Contenuto messaggio */}
-                    <Typography 
-                      sx={{ 
-                        whiteSpace: 'pre-wrap',
-                        lineHeight: 1.7,
-                        '& strong': { fontWeight: 600 }
-                      }}
-                    >
-                      {msg.content}
-                    </Typography>
+                    {msg.role === 'user' ? (
+                      <Typography sx={{ lineHeight: 1.7 }}>
+                        {msg.content}
+                      </Typography>
+                    ) : (
+                      <Typography 
+                        component="div"
+                        sx={{ 
+                          lineHeight: 1.7,
+                          '& strong': { fontWeight: 600 },
+                          '& em': { fontStyle: 'italic' },
+                          '& br': { display: 'block', marginBottom: '4px' }
+                        }}
+                        dangerouslySetInnerHTML={{ __html: formatMarkdown(msg.content) }}
+                      />
+                    )}
 
                     {/* Documenti trovati (solo per messaggi assistant) */}
                     {msg.role === 'assistant' && msg.documents && msg.documents.length > 0 && (

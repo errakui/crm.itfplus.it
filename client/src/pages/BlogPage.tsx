@@ -31,6 +31,152 @@ export interface Article {
 // Articoli del blog (hardcoded per ora)
 export const articles: Article[] = [
   {
+    id: '8',
+    slug: 'booky-search-ricerca-intelligente-sentenze-ai',
+    title: 'BOOKY SEARCH: La Ricerca Intelligente che Rivoluziona il Lavoro dell\'Avvocato',
+    excerpt: 'Scopri BOOKY SEARCH, la nuova funzionalità di ITFPLUS che combina ricerca nel database e intelligenza artificiale. Descrivi il tuo caso e ottieni analisi, orientamenti giurisprudenziali e sentenze pertinenti in pochi secondi.',
+    content: `
+## BOOKY SEARCH: Il Futuro della Ricerca Giuridica è Qui
+
+Immagina di poter descrivere il tuo caso a un collega esperto che conosce tutte le sentenze del database e in pochi secondi ti fornisce un'analisi completa con le sentenze più pertinenti. Questo è **BOOKY SEARCH**.
+
+## Cos'è BOOKY SEARCH
+
+BOOKY SEARCH è la nuova funzionalità di ITFPLUS che combina la potenza della ricerca full-text con l'intelligenza artificiale. Non devi più pensare alle parole chiave giuste: descrivi semplicemente il tuo caso in linguaggio naturale e lascia che l'AI faccia il resto.
+
+## Come Funziona: Passo per Passo
+
+### 1. Accedi a BOOKY SEARCH
+
+Dal menu laterale, clicca su "BOOKY SEARCH" (contraddistinto dal badge BETA). Si aprirà un'interfaccia simile a ChatGPT, pulita e intuitiva.
+
+### 2. Descrivi il Tuo Caso
+
+Non serve conoscere le parole chiave perfette. Scrivi come parleresti a un collega:
+
+- "Ho un cliente che ha subito un danno biologico del 15% in un sinistro stradale a Verona. L'assicurazione offre poco. Cosa dice la giurisprudenza?"
+- "Sto seguendo un caso di licenziamento per giusta causa dove il dipendente ha usato i social media in modo inappropriato"
+- "Cerco precedenti sulla nullità delle clausole abusive nei contratti bancari"
+
+### 3. Ricevi l'Analisi Completa
+
+BOOKY SEARCH:
+
+1. **Cerca nel database** tutte le sentenze pertinenti usando algoritmi di ricerca avanzata
+2. **Conta i risultati** e ti dice quante sentenze ha trovato
+3. **Analizza gli orientamenti** giurisprudenziali emergenti
+4. **Ti mostra le sentenze più rilevanti** con estratti significativi
+
+### 4. Esplora i Risultati
+
+Per ogni sentenza trovata puoi:
+
+- **Visualizzare** il documento completo con un click
+- **Salvare nei preferiti** per ritrovarla facilmente
+- **Vedere il tribunale** di provenienza
+
+### 5. Continua la Conversazione
+
+Puoi fare domande di follow-up:
+
+- "Ci sono sentenze più recenti?"
+- "E per quanto riguarda la quantificazione del danno morale?"
+- "Mostrami sentenze del Tribunale di Milano"
+
+## La Tecnologia Dietro BOOKY SEARCH
+
+### Ricerca Full-Text PostgreSQL
+
+Il cuore di BOOKY SEARCH è un motore di ricerca ottimizzato per il linguaggio giuridico italiano. Quando scrivi la tua domanda:
+
+1. L'AI estrae i concetti chiave dalla tua descrizione
+2. Questi vengono trasformati in una query di ricerca
+3. PostgreSQL cerca in millisecondi tra migliaia di sentenze
+4. I risultati sono ordinati per rilevanza
+
+### Intelligenza Artificiale
+
+Dopo la ricerca, l'AI analizza i risultati e:
+
+- Identifica i principi di diritto ricorrenti
+- Riconosce gli orientamenti maggioritari e minoritari
+- Suggerisce quali sentenze sono più utili per il tuo caso
+- Spiega in modo chiaro cosa emerge dalla giurisprudenza
+
+### Salvataggio delle Chat
+
+Ogni conversazione viene salvata automaticamente. Nella sidebar trovi tutte le tue ricerche precedenti e puoi:
+
+- Riprendere una conversazione passata
+- Rivedere le sentenze trovate
+- Eliminare le chat che non ti servono più
+
+## Casi d'Uso Pratici
+
+### Per l'Avvocato Civilista
+
+"Sto preparando un atto di citazione per responsabilità medica. Il mio cliente ha subito danni durante un intervento chirurgico. Quali sono gli orientamenti sulla prova del nesso causale?"
+
+BOOKY SEARCH ti mostrerà:
+- Sentenze sulla responsabilità medica
+- Focus sul nesso causale e onere della prova
+- Distinzione tra inadempimento e danno
+
+### Per l'Avvocato Penalista
+
+"Devo difendere un imputato accusato di truffa aggravata. Cerco precedenti sulle attenuanti generiche in casi simili."
+
+### Per l'Avvocato del Lavoro
+
+"Il mio cliente è stato licenziato per scarso rendimento, ma non ha mai ricevuto contestazioni disciplinari. Cosa dice la Cassazione?"
+
+### Per lo Studio Legale
+
+"Stiamo valutando se accettare un caso di risarcimento danni da vacanza rovinata. Quali sono le prospettive di successo secondo la giurisprudenza recente?"
+
+## Vantaggi Rispetto alla Ricerca Tradizionale
+
+| Ricerca Tradizionale | BOOKY SEARCH |
+|---------------------|--------------|
+| Devi conoscere le parole chiave giuste | Descrivi il caso in linguaggio naturale |
+| Risultati da filtrare manualmente | Analisi automatica dei risultati |
+| Nessun contesto | Spiegazione degli orientamenti |
+| Lista di documenti | Sentenze con estratti rilevanti |
+| Ricerche perse | Chat salvate automaticamente |
+
+## Perché BOOKY SEARCH è in BETA
+
+Stiamo continuamente migliorando BOOKY SEARCH basandoci sul feedback degli utenti. La versione BETA ti permette di:
+
+- Provare la funzionalità in anteprima
+- Contribuire al miglioramento con i tuoi feedback
+- Essere tra i primi a sfruttare questa innovazione
+
+## Come Iniziare
+
+1. **Accedi** a ITFPLUS con le tue credenziali
+2. **Clicca** su "BOOKY SEARCH" nel menu laterale
+3. **Descrivi** il tuo primo caso
+4. **Scopri** un nuovo modo di fare ricerca giuridica
+
+## Conclusioni
+
+BOOKY SEARCH rappresenta un salto evolutivo nella ricerca giuridica. Non sostituisce il giurista, ma lo potenzia enormemente, permettendogli di trovare in secondi ciò che prima richiedeva ore.
+
+La combinazione di ricerca avanzata e intelligenza artificiale rende ITFPLUS lo strumento più innovativo per i professionisti del diritto in Italia.
+
+Prova BOOKY SEARCH oggi stesso e scopri come l'AI può trasformare il tuo modo di lavorare.
+
+---
+
+*BOOKY SEARCH è disponibile per tutti gli utenti ITFPLUS. Accedi ora e inizia la tua prima ricerca intelligente.*
+    `,
+    date: '2026-01-10',
+    author: 'Team ITFPLUS',
+    category: 'Novità',
+    readTime: '8 min',
+  },
+  {
     id: '7',
     slug: 'convenzioni-ordini-avvocati-tribunali-italia',
     title: 'Convenzioni ITFPLUS con gli Ordini degli Avvocati: Accesso Agevolato per i Professionisti',
