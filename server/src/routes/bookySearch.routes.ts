@@ -4,7 +4,8 @@ import {
   searchWithAI,
   getChatSessions,
   getChatSession,
-  deleteChatSession
+  deleteChatSession,
+  getUsageLimit
 } from '../controllers/bookySearch.controller';
 
 const router = express.Router();
@@ -14,6 +15,9 @@ router.use(authenticateToken);
 
 // POST /api/booky-search - Ricerca con AI
 router.post('/', (searchWithAI as unknown) as RequestHandler);
+
+// GET /api/booky-search/limit - Stato limite giornaliero
+router.get('/limit', (getUsageLimit as unknown) as RequestHandler);
 
 // GET /api/booky-search/sessions - Lista sessioni chat
 router.get('/sessions', (getChatSessions as unknown) as RequestHandler);

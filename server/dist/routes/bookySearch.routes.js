@@ -11,6 +11,8 @@ const router = express_1.default.Router();
 router.use(auth_middleware_1.authenticateToken);
 // POST /api/booky-search - Ricerca con AI
 router.post('/', bookySearch_controller_1.searchWithAI);
+// GET /api/booky-search/limit - Stato limite giornaliero
+router.get('/limit', bookySearch_controller_1.getUsageLimit);
 // GET /api/booky-search/sessions - Lista sessioni chat
 router.get('/sessions', bookySearch_controller_1.getChatSessions);
 // GET /api/booky-search/sessions/:sessionId - Dettaglio sessione

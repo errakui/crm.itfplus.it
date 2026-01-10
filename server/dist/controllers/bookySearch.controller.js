@@ -12,17 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteChatSession = exports.getChatSession = exports.getChatSessions = exports.searchWithAI = void 0;
+exports.getUsageLimit = exports.deleteChatSession = exports.getChatSession = exports.getChatSessions = exports.searchWithAI = void 0;
 const server_1 = require("../server");
 const axios_1 = __importDefault(require("axios"));
+// Limite giornaliero per utenti normali
+const DAILY_LIMIT_USER = 2;
 /**
  * BOOKY SEARCH - Ricerca intelligente con AI
  * Cerca nel database e analizza i risultati con Perplexity
+ * LIMITE: 2 messaggi/giorno per USER, illimitato per ADMIN
  */
 const searchWithAI = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c;
     try {
         const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userRole = (_b = req.user) === null || _b === void 0 ? void 0 : _b.role;
         const { message, sessionId } = req.body;
         if (!message) {
             return res.status(400).json({ message: 'Messaggio non fornito' });
@@ -30,7 +34,42 @@ const searchWithAI = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!userId) {
             return res.status(401).json({ message: 'Utente non autenticato' });
         }
-        console.log(`[BOOKY SEARCH] Query: "${message}" - User: ${userId}`);
+        // CONTROLLO LIMITE GIORNALIERO (solo per USER, non per ADMIN)
+        if (userRole !== 'ADMIN') {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+            // Conta i messaggi dell'utente di oggi
+            const todaySessions = yield server_1.prisma.chatSession.findMany({
+                where: {
+                    userId,
+                    updatedAt: {
+                        gte: todayStart,
+                        lte: todayEnd
+                    }
+                },
+                select: {
+                    messages: true
+                }
+            });
+            // Conta solo i messaggi 'user' (non le risposte 'assistant')
+            let todayMessageCount = 0;
+            for (const session of todaySessions) {
+                const messages = session.messages;
+                todayMessageCount += messages.filter((m) => m.role === 'user').length;
+            }
+            console.log(`[BOOKY SEARCH] User ${userId} - Messaggi oggi: ${todayMessageCount}/${DAILY_LIMIT_USER}`);
+            if (todayMessageCount >= DAILY_LIMIT_USER) {
+                return res.status(429).json({
+                    message: `Hai raggiunto il limite giornaliero di ${DAILY_LIMIT_USER} ricerche. Il limite si resetta a mezzanotte.`,
+                    limitReached: true,
+                    dailyLimit: DAILY_LIMIT_USER,
+                    used: todayMessageCount
+                });
+            }
+        }
+        console.log(`[BOOKY SEARCH] Query: "${message}" - User: ${userId} (${userRole})`);
         // 1. RICERCA NEL DATABASE - Estrai parole chiave dalla domanda
         const searchTerms = extractSearchTerms(message);
         console.log(`[BOOKY SEARCH] Termini estratti: ${searchTerms}`);
@@ -58,7 +97,7 @@ const searchWithAI = (req, res) => __awaiter(void 0, void 0, void 0, function* (
       FROM documents d
       WHERE d.tsv @@ websearch_to_tsquery('italian', unaccent($1));
     `, searchTerms);
-        const totalFound = parseInt(((_b = countResult[0]) === null || _b === void 0 ? void 0 : _b.total) || '0');
+        const totalFound = parseInt(((_c = countResult[0]) === null || _c === void 0 ? void 0 : _c.total) || '0');
         console.log(`[BOOKY SEARCH] Trovate ${totalFound} sentenze, mostrando prime ${searchResults.length}`);
         // 2. Formatta i documenti per la risposta
         const documents = searchResults.map((doc) => ({
@@ -304,4 +343,61 @@ const deleteChatSession = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.deleteChatSession = deleteChatSession;
+/**
+ * Ottieni lo stato del limite giornaliero
+ */
+const getUsageLimit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userRole = (_b = req.user) === null || _b === void 0 ? void 0 : _b.role;
+        if (!userId) {
+            return res.status(401).json({ message: 'Utente non autenticato' });
+        }
+        // Admin ha accesso illimitato
+        if (userRole === 'ADMIN') {
+            return res.status(200).json({
+                isAdmin: true,
+                unlimited: true,
+                dailyLimit: -1,
+                used: 0,
+                remaining: -1
+            });
+        }
+        // Conta messaggi di oggi per USER
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+        const todaySessions = yield server_1.prisma.chatSession.findMany({
+            where: {
+                userId,
+                updatedAt: {
+                    gte: todayStart,
+                    lte: todayEnd
+                }
+            },
+            select: {
+                messages: true
+            }
+        });
+        let todayMessageCount = 0;
+        for (const session of todaySessions) {
+            const messages = session.messages;
+            todayMessageCount += messages.filter((m) => m.role === 'user').length;
+        }
+        return res.status(200).json({
+            isAdmin: false,
+            unlimited: false,
+            dailyLimit: DAILY_LIMIT_USER,
+            used: todayMessageCount,
+            remaining: Math.max(0, DAILY_LIMIT_USER - todayMessageCount)
+        });
+    }
+    catch (error) {
+        console.error('[BOOKY SEARCH] Errore getUsageLimit:', error);
+        return res.status(500).json({ message: 'Errore nel recupero del limite' });
+    }
+});
+exports.getUsageLimit = getUsageLimit;
 //# sourceMappingURL=bookySearch.controller.js.map

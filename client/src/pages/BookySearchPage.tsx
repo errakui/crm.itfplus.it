@@ -75,6 +75,15 @@ const BookySearchPage: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [loadingSessions, setLoadingSessions] = useState(true);
   
+  // Limite utilizzo
+  const [usageLimit, setUsageLimit] = useState<{
+    isAdmin: boolean;
+    unlimited: boolean;
+    dailyLimit: number;
+    used: number;
+    remaining: number;
+  } | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -101,10 +110,26 @@ const BookySearchPage: React.FC = () => {
       .replace(/\n/g, '<br/>');
   };
 
-  // Carica sessioni all'avvio
+  // Carica sessioni e limite all'avvio
   useEffect(() => {
     loadSessions();
+    loadUsageLimit();
   }, [token]);
+
+  const loadUsageLimit = async () => {
+    try {
+      const response = await axios.get<{
+        isAdmin: boolean;
+        unlimited: boolean;
+        dailyLimit: number;
+        used: number;
+        remaining: number;
+      }>('/api/booky-search/limit');
+      setUsageLimit(response.data);
+    } catch (error) {
+      console.error('Errore caricamento limite:', error);
+    }
+  };
 
   // Scroll automatico ai nuovi messaggi
   useEffect(() => {
@@ -159,6 +184,16 @@ const BookySearchPage: React.FC = () => {
     
     if (!input.trim() || isLoading) return;
 
+    // Controlla limite (se non è admin e ha esaurito)
+    if (usageLimit && !usageLimit.unlimited && usageLimit.remaining <= 0) {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⚠️ Hai raggiunto il limite giornaliero di ${usageLimit.dailyLimit} ricerche. Il limite si resetta a mezzanotte. Contatta l'assistenza per un upgrade!`,
+        timestamp: new Date()
+      }]);
+      return;
+    }
+
     const userMessage: Message = {
       role: 'user',
       content: input.trim(),
@@ -190,13 +225,28 @@ const BookySearchPage: React.FC = () => {
         setCurrentSessionId(response.data.sessionId);
         loadSessions(); // Ricarica la lista sessioni
       }
+
+      // Aggiorna il limite dopo l'invio
+      loadUsageLimit();
     } catch (error: any) {
       console.error('Errore ricerca:', error);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'Mi dispiace, si è verificato un errore durante la ricerca. Riprova tra qualche istante.',
-        timestamp: new Date()
-      }]);
+      
+      // Gestisci errore limite raggiunto (429)
+      if (error.response?.status === 429) {
+        const data = error.response.data;
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `⚠️ ${data.message || 'Limite giornaliero raggiunto.'}`,
+          timestamp: new Date()
+        }]);
+        loadUsageLimit(); // Aggiorna stato limite
+      } else {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: 'Mi dispiace, si è verificato un errore durante la ricerca. Riprova tra qualche istante.',
+          timestamp: new Date()
+        }]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -344,7 +394,7 @@ const BookySearchPage: React.FC = () => {
             </IconButton>
           )}
           
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
             <AIIcon sx={{ color: 'var(--primary-color)', fontSize: 28 }} />
             <Typography 
               variant="h6" 
@@ -367,6 +417,31 @@ const BookySearchPage: React.FC = () => {
               }} 
             />
           </Box>
+          
+          {/* Indicatore limite */}
+          {usageLimit && (
+            <Chip
+              label={usageLimit.unlimited 
+                ? '∞ Illimitato' 
+                : `${usageLimit.remaining}/${usageLimit.dailyLimit} ricerche`
+              }
+              size="small"
+              sx={{
+                bgcolor: usageLimit.unlimited 
+                  ? 'rgba(76, 175, 80, 0.1)' 
+                  : usageLimit.remaining > 0 
+                    ? 'rgba(33, 150, 243, 0.1)' 
+                    : 'rgba(244, 67, 54, 0.1)',
+                color: usageLimit.unlimited 
+                  ? '#388E3C' 
+                  : usageLimit.remaining > 0 
+                    ? '#1976D2' 
+                    : '#D32F2F',
+                fontWeight: 600,
+                fontSize: '0.75rem'
+              }}
+            />
+          )}
         </Paper>
 
         {/* Area Messaggi */}
