@@ -78,17 +78,17 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
 
   return (
     <>
-      <AppBar 
-        position="fixed" 
+    <AppBar 
+      position="fixed" 
         elevation={1}
-        sx={{ 
+      sx={{ 
           backgroundColor: 'var(--primary-color)',
-          borderRadius: 0,
+        borderRadius: 0,
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
-        <Container maxWidth={false}>
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
+      <Container maxWidth={false}>
           <Toolbar 
             sx={{ 
               justifyContent: 'space-between',
@@ -97,46 +97,46 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             }}
           >
             {/* Sinistra: Hamburger (per sidebar) + Logo */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {/* Hamburger per aprire Sidebar - solo se autenticato */}
               {isAuthenticated() && (
-                <IconButton
-                  color="inherit"
+            <IconButton
+              color="inherit"
                   aria-label="apri menu laterale"
-                  edge="start"
-                  onClick={onMenuClick}
+              edge="start"
+              onClick={onMenuClick}
                   sx={{ 
                     mr: { xs: 1, sm: 2 },
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     },
                   }}
-                >
-                  <MenuIcon />
-                </IconButton>
+            >
+              <MenuIcon />
+            </IconButton>
               )}
               
               {/* Logo */}
-              <Box
-                component={Link}
-                to={isAuthenticated() ? "/dashboard" : "/login"}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  textDecoration: 'none',
-                }}
-              >
+            <Box
+              component={Link}
+              to={isAuthenticated() ? "/dashboard" : "/login"}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+              }}
+            >
                 <Box
                   component="img"
-                  src="/itfpluslogo.png" 
-                  alt="ITFPLUS" 
+                src="/itfpluslogo.png" 
+                alt="ITFPLUS" 
                   sx={{ 
                     height: { xs: 32, sm: 40 },
                     width: 'auto',
-                  }}
-                />
-              </Box>
+                }} 
+              />
             </Box>
+          </Box>
 
             {/* Destra: Menu desktop o hamburger mobile */}
             {!isMobile ? (
@@ -157,48 +157,48 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   Blog
                 </Button>
 
-                {isAuthenticated() && (
-                  <Button
-                    component={Link}
-                    to="/favorites"
-                    color="inherit"
-                    startIcon={<FavoriteIcon />}
+            {isAuthenticated() && (
+              <Button
+                component={Link}
+                to="/favorites"
+                color="inherit"
+                startIcon={<FavoriteIcon />}
                     sx={{ 
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
                     }}
-                  >
-                    Preferiti
-                  </Button>
-                )}
+              >
+                Preferiti
+              </Button>
+            )}
 
-                {isAdmin() && (
-                  <Button
-                    component={Link}
-                    to="/admin"
-                    color="inherit"
-                    startIcon={<AdminIcon />}
+            {isAdmin() && (
+              <Button
+                component={Link}
+                to="/admin"
+                color="inherit"
+                startIcon={<AdminIcon />}
                     sx={{ 
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
                     }}
-                  >
-                    Admin
-                  </Button>
-                )}
+              >
+                Admin
+              </Button>
+            )}
 
-                {isAuthenticated() ? (
-                  <Box>
-                    <IconButton
-                      size="large"
+            {isAuthenticated() ? (
+              <Box>
+                <IconButton
+                  size="large"
                       aria-label="menu account"
-                      aria-controls="menu-appbar"
-                      aria-haspopup="true"
-                      onClick={handleMenu}
-                      color="inherit"
-                    >
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
                       <Avatar 
                         sx={{ 
                           width: 34, 
@@ -211,22 +211,22 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                         }}
                       >
                         {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-                      </Avatar>
-                    </IconButton>
-                    <Menu
-                      id="menu-appbar"
-                      anchorEl={anchorEl}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                      }}
-                      keepMounted
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      open={Boolean(anchorEl)}
-                      onClose={handleClose}
+                  </Avatar>
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
                       PaperProps={{
                         sx: {
                           mt: 1,
@@ -236,7 +236,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                           border: '1px solid var(--border-light)',
                         }
                       }}
-                    >
+                >
                       <MenuItem 
                         onClick={handleLogout}
                         sx={{ 
@@ -247,16 +247,16 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                         }}
                       >
                         <LogoutIcon fontSize="small" sx={{ mr: 1.5, color: 'var(--error-color)' }} />
-                        Logout
-                      </MenuItem>
-                    </Menu>
-                  </Box>
-                ) : (
-                  <Button
-                    component={Link}
-                    to="/login"
-                    color="inherit"
-                    variant="outlined"
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </Box>
+            ) : (
+              <Button
+                component={Link}
+                to="/login"
+                color="inherit"
+                variant="outlined"
                     sx={{ 
                       borderColor: 'rgba(255, 255, 255, 0.5)',
                       '&:hover': {
@@ -264,15 +264,15 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
                     }}
-                  >
-                    Accedi
-                  </Button>
-                )}
-              </Box>
+              >
+                Accedi
+              </Button>
+            )}
+          </Box>
             ) : (
               // MOBILE: mostra hamburger per drawer
-              <IconButton
-                color="inherit"
+            <IconButton
+              color="inherit"
                 aria-label="apri menu"
                 onClick={handleMobileDrawerToggle}
                 sx={{
@@ -282,7 +282,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                 }}
               >
                 {mobileDrawerOpen ? <CloseIcon /> : <AccountCircle />}
-              </IconButton>
+            </IconButton>
             )}
           </Toolbar>
         </Container>
@@ -337,7 +337,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                 </Box>
               </Box>
             </Box>
-          )}
+              )}
 
           <Divider sx={{ my: 2 }} />
 
@@ -369,7 +369,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
 
             <Divider sx={{ my: 2 }} />
 
-            {isAuthenticated() ? (
+              {isAuthenticated() ? (
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={handleLogout}
@@ -390,7 +390,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   />
                 </ListItemButton>
               </ListItem>
-            ) : (
+              ) : (
               <ListItem disablePadding>
                 <ListItemButton
                   component={Link}
@@ -414,12 +414,12 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   />
                 </ListItemButton>
               </ListItem>
-            )}
+              )}
           </List>
-        </Box>
+          </Box>
       </Drawer>
     </>
   );
 };
 
-export default Navbar;
+export default Navbar; 

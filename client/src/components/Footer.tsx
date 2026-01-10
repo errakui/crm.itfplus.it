@@ -105,23 +105,23 @@ const Footer: React.FC = () => {
             </Typography>
             <Box component="nav">
               <RouterLink to="/privacy-policy" style={linkStyle as React.CSSProperties}>
-                Informativa sulla privacy
-              </RouterLink>
+              Informativa sulla privacy
+            </RouterLink>
               <RouterLink to="/terms" style={linkStyle as React.CSSProperties}>
-                Condizioni di abbonamento
-              </RouterLink>
+              Condizioni di abbonamento
+            </RouterLink>
               <RouterLink to="/faq" style={linkStyle as React.CSSProperties}>
-                Domande frequenti
-              </RouterLink>
+              Domande frequenti
+            </RouterLink>
               <RouterLink to="/contact" style={linkStyle as React.CSSProperties}>
-                Contattaci
-              </RouterLink>
+              Contattaci
+            </RouterLink>
               <RouterLink to="/support" style={linkStyle as React.CSSProperties}>
-                Supporto
-              </RouterLink>
+              Supporto
+            </RouterLink>
               <RouterLink to="/changelog" style={linkStyle as React.CSSProperties}>
                 Cronologia modifiche
-              </RouterLink>
+            </RouterLink>
             </Box>
           </Grid>
 
@@ -140,11 +140,11 @@ const Footer: React.FC = () => {
             </Typography>
             <Box sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
               <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                Via Santa Teresa, 47
-              </Typography>
+              Via Santa Teresa, 47
+            </Typography>
               <Typography variant="body2" sx={{ mb: 2, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                37135 – Verona
-              </Typography>
+              37135 – Verona
+            </Typography>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <EmailIcon sx={{ fontSize: 18, color: 'var(--accent-color)' }} />
@@ -160,7 +160,7 @@ const Footer: React.FC = () => {
                   }}
                 >
                   info@itfplus.it
-                </Typography>
+            </Typography>
               </Box>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -177,7 +177,7 @@ const Footer: React.FC = () => {
                   }}
                 >
                   +39 333 617 0230
-                </Typography>
+            </Typography>
               </Box>
             </Box>
           </Grid>
@@ -247,4 +247,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer;
+export default Footer; 

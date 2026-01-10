@@ -25,6 +25,7 @@ import RegisterPage from './pages/RegisterPage';
 import TermsPage from './pages/TermsPage';
 import BlogPage from './pages/BlogPage';
 import ArticlePage from './pages/ArticlePage';
+import BookySearchPage from './pages/BookySearchPage';
 
 // Tema ITFPLUS - Professionale Giuridico
 const theme = createTheme({
@@ -58,7 +59,7 @@ const theme = createTheme({
     body1: { fontFamily: '"Source Sans Pro", sans-serif' },
     body2: { fontFamily: '"Source Sans Pro", sans-serif' },
     button: { fontFamily: '"Source Sans Pro", sans-serif', fontWeight: 600 },
-  },
+    },
   shape: {
     borderRadius: 4, // Bordi professionali
   },
@@ -189,6 +190,16 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute>
                       <SupportPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* BOOKY SEARCH - Ricerca AI (solo utenti autenticati) */}
+                <Route
+                  path="/booky-search"
+                  element={
+                    <ProtectedRoute>
+                      <BookySearchPage />
                     </ProtectedRoute>
                   }
                 />

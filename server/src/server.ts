@@ -20,6 +20,7 @@ import contactRoutes from './routes/contact.routes';
 import adminRoutes from './routes/admin.routes';
 import publicRoutes from './routes/public.routes';
 import voiceRoutes from './routes/voice.routes';
+import bookySearchRoutes from './routes/bookySearch.routes';
 
 // Caricamento variabili d'ambiente
 dotenv.config();
@@ -106,6 +107,7 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api', contactRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/booky-search', bookySearchRoutes);
 
 // Endpoint di test
 app.get('/api', (req: Request, res: Response) => {

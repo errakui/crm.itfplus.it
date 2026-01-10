@@ -12,6 +12,7 @@ import {
   Typography,
   Button,
   Avatar,
+  Chip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -21,6 +22,7 @@ import {
   ContactSupport as ContactSupportIcon,
   Logout as LogoutIcon,
   Person as PersonIcon,
+  AutoAwesome as AIIcon,
 } from '@mui/icons-material';
 import AuthContext from '../contexts/AuthContext';
 
@@ -46,6 +48,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
       text: 'Motore di ricerca',
       icon: <SearchIcon />,
       path: '/dashboard',
+    },
+    {
+      text: 'BOOKY SEARCH',
+      icon: <AIIcon />,
+      path: '/booky-search',
+      badge: 'BETA',
     },
     {
       text: 'Il mio profilo',
@@ -146,7 +154,24 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, drawerWidth = 280 }) =
                 {item.icon}
               </ListItemIcon>
               <ListItemText
-                primary={item.text}
+                primary={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {item.text}
+                    {(item as any).badge && (
+                      <Chip 
+                        label={(item as any).badge} 
+                        size="small" 
+                        sx={{ 
+                          height: 18,
+                          fontSize: '0.6rem',
+                          fontWeight: 700,
+                          bgcolor: 'rgba(255, 193, 7, 0.2)',
+                          color: '#B8860B'
+                        }}
+                      />
+                    )}
+                  </Box>
+                }
                 primaryTypographyProps={{
                   fontWeight: location.pathname === item.path ? 'bold' : 'regular',
                 }}

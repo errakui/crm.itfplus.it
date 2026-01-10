@@ -589,94 +589,94 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
 
   return (
     <>
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          height: '100%', 
-          maxHeight: 'calc(100vh - 200px)',
+    <Paper 
+      elevation={3} 
+      sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100%', 
+        maxHeight: 'calc(100vh - 200px)',
           borderRadius: 'var(--border-radius-lg)',
-          overflow: 'hidden',
-          backgroundColor: '#FFFFFF'
+        overflow: 'hidden',
+        backgroundColor: '#FFFFFF'
+      }}
+    >
+      {/* Header */}
+      <Box 
+        sx={{ 
+          p: 2, 
+          backgroundColor: '#1B2A4A', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}
       >
-        {/* Header */}
-        <Box 
-          sx={{ 
-            p: 2, 
-            backgroundColor: '#1B2A4A', 
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <img 
-              src="/booky.png" 
-              alt="Booky" 
-              style={{ 
-                width: '32px', 
-                height: '32px', 
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '2px solid white'
-              }} 
-            />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <img 
+            src="/booky.png" 
+            alt="Booky" 
+            style={{ 
+              width: '32px', 
+              height: '32px', 
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '2px solid white'
+            }} 
+          />
             <Typography variant="h6" fontFamily="var(--font-heading)">
               Booky - Assistente Legale
-            </Typography>
-          </Box>
-          <IconButton 
-            size="small" 
-            onClick={clearChat} 
-            sx={{ color: 'white' }}
-            title="Cancella conversazione"
-          >
-            <ClearIcon />
-          </IconButton>
+          </Typography>
         </Box>
-        
-        <Divider />
-        
-        {/* Messaggi */}
-        <Box 
-          sx={{ 
-            flexGrow: 1, 
-            overflowY: 'auto', 
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            backgroundColor: '#F5F5F0'
-          }}
+        <IconButton 
+          size="small" 
+          onClick={clearChat} 
+          sx={{ color: 'white' }}
+          title="Cancella conversazione"
         >
-          {messages.map((message, index) => (
-            <Box
-              key={index}
+          <ClearIcon />
+        </IconButton>
+      </Box>
+      
+      <Divider />
+      
+      {/* Messaggi */}
+      <Box 
+        sx={{ 
+          flexGrow: 1, 
+          overflowY: 'auto', 
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          backgroundColor: '#F5F5F0'
+        }}
+      >
+        {messages.map((message, index) => (
+          <Box
+            key={index}
+            sx={{
+              alignSelf: message.sender === 'user' ? 'flex-end' : 'flex-start',
+              maxWidth: '80%',
+            }}
+          >
+            <Paper
+              elevation={1}
               sx={{
-                alignSelf: message.sender === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '80%',
-              }}
-            >
-              <Paper
-                elevation={1}
-                sx={{
-                  p: 2,
-                  backgroundColor: message.sender === 'user' ? '#1B2A4A' : '#FFFFFF',
-                  color: message.sender === 'user' ? 'white' : 'inherit',
+                p: 2,
+                backgroundColor: message.sender === 'user' ? '#1B2A4A' : '#FFFFFF',
+                color: message.sender === 'user' ? 'white' : 'inherit',
                   borderRadius: 'var(--border-radius-lg)',
                   borderTopRightRadius: message.sender === 'user' ? '0px' : 'var(--border-radius-lg)',
                   borderTopLeftRadius: message.sender === 'bot' ? '0px' : 'var(--border-radius-lg)',
                   position: 'relative',
-                }}
-              >
-                <Typography variant="body1">{message.text}</Typography>
+              }}
+            >
+              <Typography variant="body1">{message.text}</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                   <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                    {formatTime(message.timestamp)}
-                  </Typography>
+                {formatTime(message.timestamp)}
+              </Typography>
                   {message.sender === 'bot' && (
                     <IconButton 
                       size="small" 
@@ -693,39 +693,39 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
                     </IconButton>
                   )}
                 </Box>
-              </Paper>
-            </Box>
-          ))}
-          {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-              <CircularProgress size={24} />
-            </Box>
-          )}
-          <div ref={messagesEndRef} />
-        </Box>
-        
-        <Divider />
-        
-        {/* Input */}
-        <Box 
-          component="form" 
-          onSubmit={handleSubmit} 
-          sx={{ 
-            p: 2, 
-            display: 'flex', 
-            alignItems: 'center',
+            </Paper>
+          </Box>
+        ))}
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
+        <div ref={messagesEndRef} />
+      </Box>
+      
+      <Divider />
+      
+      {/* Input */}
+      <Box 
+        component="form" 
+        onSubmit={handleSubmit} 
+        sx={{ 
+          p: 2, 
+          display: 'flex', 
+          alignItems: 'center',
             backgroundColor: '#FFFFFF',
             gap: 1,
-          }}
-        >
-          <TextField
-            fullWidth
-            placeholder="Scrivi un messaggio..."
-            variant="outlined"
-            value={input}
-            onChange={handleInputChange}
+        }}
+      >
+        <TextField
+          fullWidth
+          placeholder="Scrivi un messaggio..."
+          variant="outlined"
+          value={input}
+          onChange={handleInputChange}
             disabled={loading || !isAuthenticated() || isInCall}
-            size="small"
+          size="small"
           />
           
           {/* Pulsante Chiamata */}
@@ -745,16 +745,16 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
             </IconButton>
           )}
           
-          <Button
-            type="submit"
-            variant="contained"
+        <Button
+          type="submit"
+          variant="contained"
             disabled={loading || !input.trim() || !isAuthenticated() || isInCall}
-            sx={{ minWidth: '50px', bgcolor: '#1B2A4A' }}
-          >
-            <SendIcon />
-          </Button>
-        </Box>
-      </Paper>
+          sx={{ minWidth: '50px', bgcolor: '#1B2A4A' }}
+        >
+          <SendIcon />
+        </Button>
+      </Box>
+    </Paper>
 
       {/* Modal Chiamata in Corso */}
       <Modal
@@ -895,4 +895,4 @@ const Chatbot: React.FC<ChatbotProps> = ({ documentId }) => {
   );
 };
 
-export default Chatbot;
+export default Chatbot; 

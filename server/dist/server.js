@@ -33,6 +33,7 @@ const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const public_routes_1 = __importDefault(require("./routes/public.routes"));
 const voice_routes_1 = __importDefault(require("./routes/voice.routes"));
+const bookySearch_routes_1 = __importDefault(require("./routes/bookySearch.routes"));
 // Caricamento variabili d'ambiente
 dotenv_1.default.config();
 // Inizializzazione app Express
@@ -108,6 +109,7 @@ app.use('/api/chatbot', chatbot_routes_1.default);
 app.use('/api', contact_routes_1.default);
 app.use('/api/public', public_routes_1.default);
 app.use('/api/voice', voice_routes_1.default);
+app.use('/api/booky-search', bookySearch_routes_1.default);
 // Endpoint di test
 app.get('/api', (req, res) => {
     res.json({ message: 'ITFPLUS API funzionante!' });
